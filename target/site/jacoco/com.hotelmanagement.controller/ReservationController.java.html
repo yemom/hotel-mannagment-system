@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.controller</a> &gt; <span class="el_source">ReservationController.java</span></div><h1>ReservationController.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.controller;
+
+import com.hotelmanagement.model.Reservation;
+import com.hotelmanagement.model.Guest;
+import com.hotelmanagement.model.Room;
+import com.hotelmanagement.repository.GuestRepository;
+import com.hotelmanagement.repository.RoomRepository;
+import com.hotelmanagement.service.ReservationService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/reservations&quot;)
+@RequiredArgsConstructor
+public class ReservationController {
+
+    private final ReservationService reservationService;
+    private final GuestRepository guestRepository;
+    private final RoomRepository roomRepository;
+
+    @PostMapping
+    public ResponseEntity&lt;Reservation&gt; createReservation(@RequestBody ReservationRequest request) {
+        try {
+<span class="nc" id="L28">            Guest guest = guestRepository.findById(request.getGuestId())</span>
+<span class="nc" id="L29">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+<span class="nc" id="L30">            Room room = roomRepository.findById(request.getRoomId())</span>
+<span class="nc" id="L31">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Room not found&quot;));</span>
+<span class="nc" id="L32">            Reservation reservation = Reservation.builder()</span>
+<span class="nc" id="L33">                .guest(guest)</span>
+<span class="nc" id="L34">                .room(room)</span>
+<span class="nc" id="L35">                .checkInDate(request.getCheckInDate())</span>
+<span class="nc" id="L36">                .checkOutDate(request.getCheckOutDate())</span>
+<span class="nc" id="L37">                .numberOfGuests(request.getNumberOfGuests())</span>
+<span class="nc" id="L38">                .specialRequests(request.getSpecialRequests())</span>
+<span class="nc" id="L39">                .build();</span>
+<span class="nc" id="L40">            Reservation created = reservationService.createReservation(reservation);</span>
+<span class="nc" id="L41">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="nc" id="L42">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L43">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Reservation&gt; getReservation(@PathVariable Long id) {
+<span class="nc" id="L49">        return reservationService.getReservation(id)</span>
+<span class="nc" id="L50">            .map(ResponseEntity::ok)</span>
+<span class="nc" id="L51">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Reservation&gt;&gt; getAllReservations() {
+<span class="nc" id="L56">        return ResponseEntity.ok(reservationService.getAllReservations());</span>
+    }
+
+    @GetMapping(&quot;/guest/{guestId}&quot;)
+    public ResponseEntity&lt;List&lt;Reservation&gt;&gt; getReservationsByGuest(@PathVariable Long guestId) {
+<span class="nc" id="L61">        return ResponseEntity.ok(reservationService.getReservationsByGuest(guestId));</span>
+    }
+
+    @GetMapping(&quot;/room/{roomId}&quot;)
+    public ResponseEntity&lt;List&lt;Reservation&gt;&gt; getReservationsByRoom(@PathVariable Long roomId) {
+<span class="nc" id="L66">        return ResponseEntity.ok(reservationService.getReservationsByRoom(roomId));</span>
+    }
+
+    @PostMapping(&quot;/{id}/confirm&quot;)
+    public ResponseEntity&lt;Reservation&gt; confirmReservation(@PathVariable Long id) {
+        try {
+<span class="nc" id="L72">            Reservation confirmed = reservationService.confirmReservation(id);</span>
+<span class="nc" id="L73">            return ResponseEntity.ok(confirmed);</span>
+<span class="nc" id="L74">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L75">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/check-in&quot;)
+    public ResponseEntity&lt;Reservation&gt; checkIn(@PathVariable Long id) {
+        try {
+<span class="nc" id="L82">            Reservation checkedIn = reservationService.checkIn(id);</span>
+<span class="nc" id="L83">            return ResponseEntity.ok(checkedIn);</span>
+<span class="nc" id="L84">        } catch (IllegalArgumentException | IllegalStateException e) {</span>
+<span class="nc" id="L85">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/check-out&quot;)
+    public ResponseEntity&lt;Reservation&gt; checkOut(@PathVariable Long id) {
+        try {
+<span class="nc" id="L92">            Reservation checkedOut = reservationService.checkOut(id);</span>
+<span class="nc" id="L93">            return ResponseEntity.ok(checkedOut);</span>
+<span class="nc" id="L94">        } catch (IllegalArgumentException | IllegalStateException e) {</span>
+<span class="nc" id="L95">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/cancel&quot;)
+    public ResponseEntity&lt;Reservation&gt; cancelReservation(@PathVariable Long id) {
+        try {
+<span class="nc" id="L102">            Reservation cancelled = reservationService.cancelReservation(id);</span>
+<span class="nc" id="L103">            return ResponseEntity.ok(cancelled);</span>
+<span class="nc" id="L104">        } catch (IllegalArgumentException | IllegalStateException e) {</span>
+<span class="nc" id="L105">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @lombok.Data
+    public static class ReservationRequest {
+        private Long guestId;
+        private Long roomId;
+        private java.time.LocalDate checkInDate;
+        private java.time.LocalDate checkOutDate;
+        private Integer numberOfGuests;
+        private String specialRequests;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

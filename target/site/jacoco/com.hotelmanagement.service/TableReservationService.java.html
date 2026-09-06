@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TableReservationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.service</a> &gt; <span class="el_source">TableReservationService.java</span></div><h1>TableReservationService.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.service;
+
+import com.hotelmanagement.model.Guest;
+import com.hotelmanagement.model.RestaurantTable;
+import com.hotelmanagement.model.TableReservation;
+import com.hotelmanagement.model.TableReservationStatus;
+import com.hotelmanagement.repository.GuestRepository;
+import com.hotelmanagement.repository.RestaurantTableRepository;
+import com.hotelmanagement.repository.TableReservationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class TableReservationService {
+
+    private final TableReservationRepository repository;
+    private final GuestRepository guestRepository;
+    private final RestaurantTableRepository tableRepository;
+
+    public TableReservation create(TableReservation reservation) {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (reservation.getReservationDate() == null) {</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;Reservation date is required&quot;);</span>
+        }
+<span class="pc bpc" id="L29" title="1 of 4 branches missed.">        if (reservation.getTimeSlot() == null || reservation.getTimeSlot().isBlank()) {</span>
+<span class="fc" id="L30">            throw new IllegalArgumentException(&quot;Time slot is required&quot;);</span>
+        }
+<span class="pc bpc" id="L32" title="1 of 4 branches missed.">        if (reservation.getPartySize() == null || reservation.getPartySize() &lt; 1) {</span>
+<span class="fc" id="L33">            throw new IllegalArgumentException(&quot;Party size must be at least 1&quot;);</span>
+        }
+<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (reservation.getPartySize() &gt; 20) {</span>
+<span class="fc" id="L36">            throw new IllegalArgumentException(&quot;Party size cannot exceed 20&quot;);</span>
+        }
+<span class="pc bpc" id="L38" title="1 of 4 branches missed.">        if (reservation.getGuest() == null || reservation.getGuest().getId() == null) {</span>
+<span class="fc" id="L39">            throw new IllegalArgumentException(&quot;Guest is required&quot;);</span>
+        }
+
+<span class="fc" id="L42">        Guest guest = guestRepository.findById(reservation.getGuest().getId())</span>
+<span class="fc" id="L43">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found: &quot; + reservation.getGuest().getId()));</span>
+<span class="fc" id="L44">        reservation.setGuest(guest);</span>
+
+<span class="pc bpc" id="L46" title="2 of 4 branches missed.">        if (reservation.getRestaurantTable() != null &amp;&amp; reservation.getRestaurantTable().getId() != null) {</span>
+<span class="fc" id="L47">            RestaurantTable table = tableRepository.findById(reservation.getRestaurantTable().getId())</span>
+<span class="pc" id="L48">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Table not found: &quot; + reservation.getRestaurantTable().getId()));</span>
+<span class="fc" id="L49">            reservation.setRestaurantTable(table);</span>
+        }
+
+<span class="fc" id="L52">        reservation.setStatus(TableReservationStatus.PENDING);</span>
+<span class="fc" id="L53">        reservation.setCreatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L54">        return repository.save(reservation);</span>
+    }
+
+    public List&lt;TableReservation&gt; getAll() {
+<span class="fc" id="L58">        return repository.findAll();</span>
+    }
+
+    public TableReservation getById(Long id) {
+<span class="fc" id="L62">        return repository.findById(id)</span>
+<span class="pc" id="L63">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Table reservation not found: &quot; + id));</span>
+    }
+
+    public List&lt;TableReservation&gt; getByGuestId(Long guestId) {
+<span class="fc" id="L67">        return repository.findByGuestId(guestId);</span>
+    }
+
+    public List&lt;TableReservation&gt; getByDate(LocalDate date) {
+<span class="fc" id="L71">        return repository.findByReservationDate(date);</span>
+    }
+
+    public TableReservation confirm(Long id) {
+<span class="fc" id="L75">        TableReservation res = getById(id);</span>
+<span class="fc" id="L76">        res.confirm();</span>
+<span class="fc" id="L77">        return repository.save(res);</span>
+    }
+
+    public TableReservation seat(Long id) {
+<span class="fc" id="L81">        TableReservation res = getById(id);</span>
+<span class="fc" id="L82">        res.seat();</span>
+        // Mark the physical table as OCCUPIED
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
+<span class="fc" id="L85">            res.getRestaurantTable().setStatus(</span>
+<span class="fc" id="L86">                com.hotelmanagement.model.TableStatus.OCCUPIED);</span>
+        }
+<span class="fc" id="L88">        return repository.save(res);</span>
+    }
+
+    public TableReservation complete(Long id) {
+<span class="fc" id="L92">        TableReservation res = getById(id);</span>
+<span class="fc" id="L93">        res.complete();</span>
+        // Free up the physical table
+<span class="pc bpc" id="L95" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
+<span class="fc" id="L96">            res.getRestaurantTable().setStatus(</span>
+<span class="fc" id="L97">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
+        }
+<span class="fc" id="L99">        return repository.save(res);</span>
+    }
+
+    public TableReservation cancel(Long id) {
+<span class="fc" id="L103">        TableReservation res = getById(id);</span>
+<span class="fc" id="L104">        res.cancel();</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
+<span class="fc" id="L106">            res.getRestaurantTable().setStatus(</span>
+<span class="fc" id="L107">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
+        }
+<span class="fc" id="L109">        return repository.save(res);</span>
+    }
+
+    public TableReservation markNoShow(Long id) {
+<span class="fc" id="L113">        TableReservation res = getById(id);</span>
+<span class="fc" id="L114">        res.markNoShow();</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
+<span class="fc" id="L116">            res.getRestaurantTable().setStatus(</span>
+<span class="fc" id="L117">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
+        }
+<span class="fc" id="L119">        return repository.save(res);</span>
+    }
+
+    public void delete(Long id) {
+<span class="fc" id="L123">        TableReservation res = repository.findById(id).orElse(null);</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        if (res != null) {</span>
+<span class="pc bpc" id="L125" title="2 of 4 branches missed.">            if (res.getRestaurantTable() != null &amp;&amp; TableReservationStatus.SEATED.equals(res.getStatus())) {</span>
+<span class="fc" id="L126">                res.getRestaurantTable().setStatus(com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
+<span class="fc" id="L127">                tableRepository.save(res.getRestaurantTable());</span>
+            }
+<span class="fc" id="L129">            repository.delete(res);</span>
+        }
+<span class="fc" id="L131">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

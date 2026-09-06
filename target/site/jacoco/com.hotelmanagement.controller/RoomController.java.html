@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RoomController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.controller</a> &gt; <span class="el_source">RoomController.java</span></div><h1>RoomController.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.controller;
+
+import com.hotelmanagement.model.Room;
+import com.hotelmanagement.model.RoomStatus;
+import com.hotelmanagement.model.RoomType;
+import com.hotelmanagement.service.RoomService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/rooms&quot;)
+@RequiredArgsConstructor
+public class RoomController {
+
+    private final RoomService roomService;
+
+    @PostMapping
+    public ResponseEntity&lt;Room&gt; createRoom(@RequestBody Room room) {
+        try {
+<span class="nc" id="L26">            Room created = roomService.createRoom(room);</span>
+<span class="nc" id="L27">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="nc" id="L28">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L29">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Room&gt; getRoom(@PathVariable Long id) {
+<span class="nc" id="L35">        return roomService.getRoom(id)</span>
+<span class="nc" id="L36">            .map(ResponseEntity::ok)</span>
+<span class="nc" id="L37">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Room&gt;&gt; getAllRooms() {
+<span class="nc" id="L42">        return ResponseEntity.ok(roomService.getAllRooms());</span>
+    }
+
+    @GetMapping(&quot;/type/{type}&quot;)
+    public ResponseEntity&lt;List&lt;Room&gt;&gt; getRoomsByType(@PathVariable RoomType type) {
+<span class="nc" id="L47">        return ResponseEntity.ok(roomService.getRoomsByType(type));</span>
+    }
+
+    @GetMapping(&quot;/type/{type}/available&quot;)
+    public ResponseEntity&lt;List&lt;Room&gt;&gt; getAvailableRoomsByType(@PathVariable RoomType type) {
+<span class="nc" id="L52">        return ResponseEntity.ok(roomService.getAvailableRoomsByType(type));</span>
+    }
+
+    @GetMapping(&quot;/status/{status}&quot;)
+    public ResponseEntity&lt;List&lt;Room&gt;&gt; getRoomsByStatus(@PathVariable RoomStatus status) {
+<span class="nc" id="L57">        return ResponseEntity.ok(roomService.getRoomsByStatus(status));</span>
+    }
+
+    @GetMapping(&quot;/available&quot;)
+    public ResponseEntity&lt;List&lt;Room&gt;&gt; getAvailableRooms(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
+            @RequestParam Integer guests) {
+        try {
+<span class="nc" id="L66">            List&lt;Room&gt; available = roomService.getAvailableRooms(checkIn, checkOut, guests);</span>
+<span class="nc" id="L67">            return ResponseEntity.ok(available);</span>
+<span class="nc" id="L68">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L69">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}/status&quot;)
+    public ResponseEntity&lt;Room&gt; updateRoomStatus(@PathVariable Long id, @RequestParam RoomStatus status) {
+        try {
+<span class="nc" id="L76">            Room updated = roomService.updateRoomStatus(id, status);</span>
+<span class="nc" id="L77">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L78">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L79">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/maintenance&quot;)
+    public ResponseEntity&lt;Room&gt; sendToMaintenance(@PathVariable Long id) {
+        try {
+<span class="nc" id="L86">            Room room = roomService.sendToMaintenance(id);</span>
+<span class="nc" id="L87">            return ResponseEntity.ok(room);</span>
+<span class="nc" id="L88">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L89">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/available&quot;)
+    public ResponseEntity&lt;Room&gt; markAsAvailable(@PathVariable Long id) {
+        try {
+<span class="nc" id="L96">            Room room = roomService.markAsAvailable(id);</span>
+<span class="nc" id="L97">            return ResponseEntity.ok(room);</span>
+<span class="nc" id="L98">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L99">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

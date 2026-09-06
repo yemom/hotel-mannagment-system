@@ -1,0 +1,78 @@
+services:
+  # Hotel Management Application (Spring Boot API)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hotel-management-app
+    ports:
+      - "${BACKEND_PORT:-8085}:8085"
+    environment:
+      - SERVER_PORT=8085
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL:-12yemom@gmail.com}
+      - SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD:-12345678}
+      - SUPERADMIN_FIRST_NAME=${SUPERADMIN_FIRST_NAME:-Yemom}
+      - SUPERADMIN_LAST_NAME=${SUPERADMIN_LAST_NAME:-Admin}
+      - SUPERADMIN_PHONE=${SUPERADMIN_PHONE:-+251900000000}
+      - MYSQL_HOST=hotel-mysql-db
+      - MYSQL_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE:-hoteldb}
+      - MYSQL_USER=${MYSQL_USER:-hoteluser}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-hotelpass123}
+    depends_on:
+      - mysql
+    restart: on-failure
+    networks:
+      - hotel-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/api/guests"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Hotel Management Frontend (React Dashboard on Nginx)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hotel-management-frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    environment:
+      - VITE_API_URL=${VITE_API_URL:-http://localhost:8085/api}
+      - VITE_SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL:-12yemom@gmail.com}
+      - VITE_SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD:-12345678}
+      - VITE_SUPERADMIN_FIRST_NAME=${SUPERADMIN_FIRST_NAME:-Yemom}
+      - VITE_SUPERADMIN_LAST_NAME=${SUPERADMIN_LAST_NAME:-Admin}
+      - VITE_SUPERADMIN_PHONE=${SUPERADMIN_PHONE:-+251934046279}
+    depends_on:
+      - app
+    restart: on-failure
+    networks:
+      - hotel-network
+
+  # MySQL Database (for production profile)
+  mysql:
+    image: mysql:8.0
+    container_name: hotel-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-hoteldb}
+      MYSQL_USER: ${MYSQL_USER:-hoteluser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-hotelpass123}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - hotel-network
+    ports:
+      - "${MYSQL_PORT:-3307}:3306"
+    restart: on-failure
+
+volumes:
+  mysql_data:
+
+networks:
+  hotel-network:
+    driver: bridge

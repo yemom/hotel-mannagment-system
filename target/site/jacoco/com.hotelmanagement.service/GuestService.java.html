@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuestService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.service</a> &gt; <span class="el_source">GuestService.java</span></div><h1>GuestService.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.service;
+
+import com.hotelmanagement.model.Guest;
+import com.hotelmanagement.model.GuestStatus;
+import com.hotelmanagement.repository.GuestRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class GuestService {
+
+    private final GuestRepository guestRepository;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.email:12yemom@gmail.com}&quot;)
+    private String superAdminEmail;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.password:12345678}&quot;)
+    private String superAdminPassword;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.firstName:Yemom}&quot;)
+    private String superAdminFirstName;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.lastName:Admin}&quot;)
+    private String superAdminLastName;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.phone:+251934046279}&quot;)
+    private String superAdminPhone;
+
+    /**
+     * Register a new guest.
+     */
+    public Guest registerGuest(Guest guest) {
+        // Validate
+<span class="fc bfc" id="L39" title="All 2 branches covered.">        if (!isValidEmail(guest.getEmail())) {</span>
+<span class="fc" id="L40">            throw new IllegalArgumentException(&quot;Invalid email format&quot;);</span>
+        }
+<span class="fc bfc" id="L42" title="All 4 branches covered.">        if (guest.getPassword() == null || guest.getPassword().length() &lt; 6) {</span>
+<span class="fc" id="L43">            throw new IllegalArgumentException(&quot;Password must be at least 6 characters&quot;);</span>
+        }
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        if (!guest.isValidAge()) {</span>
+<span class="fc" id="L46">            throw new IllegalArgumentException(&quot;Age must be between 18 and 120&quot;);</span>
+        }
+
+        // Check if email already exists
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (guestRepository.findByEmail(guest.getEmail()).isPresent()) {</span>
+<span class="fc" id="L51">            throw new IllegalArgumentException(&quot;Email already registered&quot;);</span>
+        }
+
+<span class="fc" id="L54">        guest.setStatus(GuestStatus.ACTIVE);</span>
+<span class="fc" id="L55">        return guestRepository.save(guest);</span>
+    }
+
+    /**
+     * Authenticate guest login.
+     */
+    public Guest authenticate(String email, String password) {
+<span class="fc bfc" id="L62" title="All 4 branches covered.">        if (email == null || password == null) {</span>
+<span class="fc" id="L63">            throw new IllegalArgumentException(&quot;Email and password are required&quot;);</span>
+        }
+<span class="fc" id="L65">        String cleanEmail = email.trim();</span>
+<span class="fc" id="L66">        Optional&lt;Guest&gt; guest = guestRepository.findByEmail(cleanEmail);</span>
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (guest.isEmpty()) {</span>
+<span class="fc" id="L68">            guest = guestRepository.findByEmail(cleanEmail.toLowerCase());</span>
+        }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (guest.isEmpty()) {</span>
+<span class="fc" id="L71">            guest = guestRepository.findAll().stream()</span>
+<span class="pc bnc" id="L72" title="All 4 branches missed.">                .filter(g -&gt; g.getEmail() != null &amp;&amp; g.getEmail().equalsIgnoreCase(cleanEmail))</span>
+<span class="fc" id="L73">                .findFirst();</span>
+        }
+
+<span class="pc bpc" id="L76" title="1 of 2 branches missed.">        boolean isSuperAdmin = cleanEmail.equalsIgnoreCase(superAdminEmail) ||</span>
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">                               cleanEmail.equalsIgnoreCase(&quot;12yemom@gmail.com&quot;) ||</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">                               cleanEmail.equalsIgnoreCase(&quot;12yemom@gamail.com&quot;);</span>
+
+<span class="pc bpc" id="L80" title="3 of 6 branches missed.">        if (guest.isEmpty() &amp;&amp; isSuperAdmin &amp;&amp; superAdminPassword.equals(password)) {</span>
+<span class="nc" id="L81">            Guest autoAdmin = Guest.builder()</span>
+<span class="nc" id="L82">                .firstName(superAdminFirstName)</span>
+<span class="nc" id="L83">                .lastName(superAdminLastName)</span>
+<span class="nc" id="L84">                .email(cleanEmail)</span>
+<span class="nc" id="L85">                .password(superAdminPassword)</span>
+<span class="nc" id="L86">                .phone(superAdminPhone)</span>
+<span class="nc" id="L87">                .age(30)</span>
+<span class="nc" id="L88">                .address(&quot;የ-mom Hotel HQ&quot;)</span>
+<span class="nc" id="L89">                .city(&quot;Addis Ababa&quot;)</span>
+<span class="nc" id="L90">                .country(&quot;Ethiopia&quot;)</span>
+<span class="nc" id="L91">                .status(GuestStatus.ACTIVE)</span>
+<span class="nc" id="L92">                .build();</span>
+<span class="nc" id="L93">            return guestRepository.save(autoAdmin);</span>
+        }
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (guest.isEmpty()) {</span>
+<span class="fc" id="L97">            throw new IllegalArgumentException(&quot;Guest not found with email: &quot; + cleanEmail);</span>
+        }
+
+<span class="fc" id="L100">        Guest g = guest.get();</span>
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (!password.equals(g.getPassword())) { // In production, use BCrypt</span>
+<span class="fc" id="L102">            throw new IllegalArgumentException(&quot;Invalid password for guest&quot;);</span>
+        }
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">        if (!GuestStatus.ACTIVE.equals(g.getStatus())) {</span>
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (isSuperAdmin) {</span>
+<span class="nc" id="L107">                g.setStatus(GuestStatus.ACTIVE);</span>
+<span class="nc" id="L108">                guestRepository.save(g);</span>
+<span class="nc" id="L109">            } else {</span>
+<span class="fc" id="L110">                throw new IllegalArgumentException(&quot;Account is not active&quot;);</span>
+            }
+        }
+
+<span class="fc" id="L114">        return g;</span>
+    }
+
+    /**
+     * Update guest profile.
+     */
+    public Guest updateGuest(Guest guest) {
+<span class="fc bfc" id="L121" title="All 2 branches covered.">        if (guest.getId() == null) {</span>
+<span class="fc" id="L122">            throw new IllegalArgumentException(&quot;Guest ID is required&quot;);</span>
+        }
+
+<span class="fc" id="L125">        Guest existing = guestRepository.findById(guest.getId())</span>
+<span class="fc" id="L126">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+
+<span class="fc bfc" id="L128" title="All 2 branches covered.">        if (guest.getFirstName() != null) {</span>
+<span class="fc" id="L129">            existing.setFirstName(guest.getFirstName());</span>
+        }
+<span class="fc bfc" id="L131" title="All 2 branches covered.">        if (guest.getLastName() != null) {</span>
+<span class="fc" id="L132">            existing.setLastName(guest.getLastName());</span>
+        }
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (guest.getPhone() != null) {</span>
+<span class="fc" id="L135">            existing.setPhone(guest.getPhone());</span>
+        }
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        if (guest.getAge() != null) {</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">            if (!isValidAge(guest.getAge())) {</span>
+<span class="fc" id="L139">                throw new IllegalArgumentException(&quot;Invalid age&quot;);</span>
+            }
+<span class="fc" id="L141">            existing.setAge(guest.getAge());</span>
+        }
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">        if (guest.getAddress() != null) {</span>
+<span class="fc" id="L144">            existing.setAddress(guest.getAddress());</span>
+        }
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (guest.getCity() != null) {</span>
+<span class="fc" id="L147">            existing.setCity(guest.getCity());</span>
+        }
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (guest.getCountry() != null) {</span>
+<span class="fc" id="L150">            existing.setCountry(guest.getCountry());</span>
+        }
+
+<span class="fc" id="L153">        return guestRepository.save(existing);</span>
+    }
+
+    /**
+     * Change guest password (requires current password for verification).
+     */
+    public Guest changePassword(Long guestId, String currentPassword, String newPassword) {
+<span class="pc bpc" id="L160" title="1 of 4 branches missed.">        if (newPassword == null || newPassword.length() &lt; 6) {</span>
+<span class="fc" id="L161">            throw new IllegalArgumentException(&quot;New password must be at least 6 characters&quot;);</span>
+        }
+
+<span class="fc" id="L164">        Guest existing = guestRepository.findById(guestId)</span>
+<span class="pc" id="L165">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+
+<span class="fc bfc" id="L167" title="All 2 branches covered.">        if (!currentPassword.equals(existing.getPassword())) {</span>
+<span class="fc" id="L168">            throw new IllegalArgumentException(&quot;Current password is incorrect&quot;);</span>
+        }
+
+<span class="fc" id="L171">        existing.setPassword(newPassword);</span>
+<span class="fc" id="L172">        return guestRepository.save(existing);</span>
+    }
+
+    /**
+     * Suspend a guest account.
+     */
+    public Guest suspendGuest(Long guestId) {
+<span class="fc" id="L179">        Guest guest = guestRepository.findById(guestId)</span>
+<span class="fc" id="L180">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+<span class="fc" id="L181">        guest.setStatus(GuestStatus.SUSPENDED);</span>
+<span class="fc" id="L182">        return guestRepository.save(guest);</span>
+    }
+
+    /**
+     * Reactivate a guest account.
+     */
+    public Guest reactivateGuest(Long guestId) {
+<span class="fc" id="L189">        Guest guest = guestRepository.findById(guestId)</span>
+<span class="fc" id="L190">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+<span class="fc" id="L191">        guest.setStatus(GuestStatus.ACTIVE);</span>
+<span class="fc" id="L192">        return guestRepository.save(guest);</span>
+    }
+
+    /**
+     * Get guest by ID.
+     */
+    public Optional&lt;Guest&gt; getGuest(Long id) {
+<span class="fc" id="L199">        return guestRepository.findById(id);</span>
+    }
+
+    /**
+     * Get guest by email.
+     */
+    public Optional&lt;Guest&gt; getGuestByEmail(String email) {
+<span class="fc" id="L206">        return guestRepository.findByEmail(email);</span>
+    }
+
+    private boolean isSuperAdminOrStaffEmail(String email) {
+<span class="pc bpc" id="L210" title="1 of 2 branches missed.">        if (email == null) return false;</span>
+<span class="fc" id="L211">        String lower = email.trim().toLowerCase();</span>
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        return lower.equals(&quot;12yemom@gmail.com&quot;) ||</span>
+<span class="pc bpc" id="L213" title="1 of 2 branches missed.">               lower.equals(&quot;12yemom@gamail.com&quot;) ||</span>
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">               lower.startsWith(&quot;12yemom@&quot;) ||</span>
+<span class="pc bpc" id="L215" title="3 of 4 branches missed.">               (superAdminEmail != null &amp;&amp; lower.equals(superAdminEmail.trim().toLowerCase()));</span>
+    }
+
+    /**
+     * Get all guests (excluding Super Admin / Staff).
+     */
+    public List&lt;Guest&gt; getAllGuests() {
+<span class="fc" id="L222">        return guestRepository.findAll().stream()</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">            .filter(g -&gt; !isSuperAdminOrStaffEmail(g.getEmail()))</span>
+<span class="fc" id="L224">            .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Get all active guests (excluding Super Admin / Staff).
+     */
+    public List&lt;Guest&gt; getAllActiveGuests() {
+<span class="fc" id="L231">        return guestRepository.findByStatus(GuestStatus.ACTIVE).stream()</span>
+<span class="fc bfc" id="L232" title="All 2 branches covered.">            .filter(g -&gt; !isSuperAdminOrStaffEmail(g.getEmail()))</span>
+<span class="fc" id="L233">            .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Delete a guest account.
+     */
+    public void deleteGuest(Long guestId) {
+<span class="fc" id="L240">        Guest guest = guestRepository.findById(guestId)</span>
+<span class="fc" id="L241">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Guest not found&quot;));</span>
+<span class="fc" id="L242">        guestRepository.delete(guest);</span>
+<span class="fc" id="L243">    }</span>
+
+    private boolean isValidEmail(String email) {
+<span class="pc bpc" id="L246" title="2 of 6 branches missed.">        return email != null &amp;&amp; email.contains(&quot;@&quot;) &amp;&amp; email.contains(&quot;.&quot;);</span>
+    }
+
+    private boolean isValidAge(Integer age) {
+<span class="pc bpc" id="L250" title="2 of 6 branches missed.">        return age != null &amp;&amp; age &gt;= 18 &amp;&amp; age &lt;= 120;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

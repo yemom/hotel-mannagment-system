@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DataSeeder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.config</a> &gt; <span class="el_source">DataSeeder.java</span></div><h1>DataSeeder.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.config;
+
+import com.hotelmanagement.model.*;
+import com.hotelmanagement.repository.GuestRepository;
+import com.hotelmanagement.repository.RestaurantTableRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+/**
+ * Seeds the database with a default super-admin guest account and
+ * sample restaurant tables on every startup.
+ * Uses H2 in-memory DB so data is re-seeded fresh each time.
+ */
+@Component
+@RequiredArgsConstructor
+<span class="fc" id="L21">@Slf4j</span>
+public class DataSeeder implements ApplicationRunner {
+
+    private final GuestRepository guestRepository;
+    private final RestaurantTableRepository restaurantTableRepository;
+    private final com.hotelmanagement.repository.RoomRepository roomRepository;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.email:12yemom@gamail.com}&quot;)
+    private String superAdminEmail;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.password:12345678}&quot;)
+    private String superAdminPassword;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.firstName:Yemom}&quot;)
+    private String superAdminFirstName;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.lastName:Admin}&quot;)
+    private String superAdminLastName;
+
+    @org.springframework.beans.factory.annotation.Value(&quot;${superadmin.phone:+251900000000}&quot;)
+    private String superAdminPhone;
+
+    @Override
+    public void run(ApplicationArguments args) {
+<span class="fc" id="L45">        int maxRetries = 10;</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">        for (int attempt = 1; attempt &lt;= maxRetries; attempt++) {</span>
+            try {
+<span class="fc" id="L48">                seedSuperAdmin();</span>
+<span class="fc" id="L49">                seedRestaurantTables();</span>
+<span class="fc" id="L50">                seedRooms();</span>
+<span class="fc" id="L51">                log.info(&quot;DataSeeder completed successfully on attempt {}&quot;, attempt);</span>
+<span class="fc" id="L52">                return;</span>
+<span class="nc" id="L53">            } catch (Exception e) {</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                if (attempt &lt; maxRetries) {</span>
+<span class="nc" id="L55">                    log.warn(&quot;DataSeeder attempt {}/{} failed (tables may not be ready yet): {}. Retrying in 3s...&quot;,</span>
+<span class="nc" id="L56">                            attempt, maxRetries, e.getMessage());</span>
+                    try {
+<span class="nc" id="L58">                        Thread.sleep(3000);</span>
+<span class="nc" id="L59">                    } catch (InterruptedException ie) {</span>
+<span class="nc" id="L60">                        Thread.currentThread().interrupt();</span>
+<span class="nc" id="L61">                        return;</span>
+                    }
+                } else {
+<span class="nc" id="L64">                    log.error(&quot;DataSeeder failed after {} attempts: {}&quot;, maxRetries, e.getMessage());</span>
+                }
+            }
+        }
+<span class="nc" id="L68">    }</span>
+
+    private void seedSuperAdmin() {
+<span class="fc" id="L71">        seedSingleAdmin(&quot;12yemom@gmail.com&quot;);</span>
+<span class="fc" id="L72">        seedSingleAdmin(&quot;12yemom@gamail.com&quot;);</span>
+<span class="pc bpc" id="L73" title="2 of 4 branches missed.">        if (superAdminEmail != null &amp;&amp; !superAdminEmail.equals(&quot;12yemom@gmail.com&quot;)</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">                &amp;&amp; !superAdminEmail.equals(&quot;12yemom@gamail.com&quot;)) {</span>
+<span class="nc" id="L75">            seedSingleAdmin(superAdminEmail);</span>
+        }
+<span class="fc" id="L77">    }</span>
+
+    private void seedSingleAdmin(String email) {
+<span class="fc" id="L80">        var existing = guestRepository.findByEmail(email);</span>
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (existing.isEmpty()) {</span>
+<span class="fc" id="L82">            Guest superAdmin = Guest.builder()</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">                    .firstName(superAdminFirstName != null ? superAdminFirstName : &quot;Yemom&quot;)</span>
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">                    .lastName(superAdminLastName != null ? superAdminLastName : &quot;Admin&quot;)</span>
+<span class="fc" id="L85">                    .email(email)</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">                    .password(superAdminPassword != null ? superAdminPassword : &quot;12345678&quot;)</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">                    .phone(superAdminPhone != null ? superAdminPhone : &quot;+251934046279&quot;)</span>
+<span class="fc" id="L88">                    .age(30)</span>
+<span class="fc" id="L89">                    .address(&quot;የ-mom Hotel HQ&quot;)</span>
+<span class="fc" id="L90">                    .city(&quot;Addis Ababa&quot;)</span>
+<span class="fc" id="L91">                    .country(&quot;Ethiopia&quot;)</span>
+<span class="fc" id="L92">                    .status(GuestStatus.ACTIVE)</span>
+<span class="fc" id="L93">                    .build();</span>
+<span class="fc" id="L94">            guestRepository.save(superAdmin);</span>
+<span class="fc" id="L95">            log.info(&quot;Super-admin account secured and seeded: {}&quot;, email);</span>
+<span class="fc" id="L96">        } else {</span>
+<span class="nc" id="L97">            Guest admin = existing.get();</span>
+<span class="nc" id="L98">            admin.setStatus(GuestStatus.ACTIVE);</span>
+<span class="nc bnc" id="L99" title="All 2 branches missed.">            admin.setPassword(superAdminPassword != null ? superAdminPassword : &quot;12345678&quot;);</span>
+<span class="nc" id="L100">            guestRepository.save(admin);</span>
+<span class="nc" id="L101">            log.info(&quot;Super-admin account verified and active: {}&quot;, email);</span>
+        }
+<span class="fc" id="L103">    }</span>
+
+    private void seedRestaurantTables() {
+<span class="pc bpc" id="L106" title="1 of 2 branches missed.">        if (restaurantTableRepository.count() &gt; 0) {</span>
+<span class="nc" id="L107">            log.info(&quot;Restaurant tables already seeded&quot;);</span>
+<span class="nc" id="L108">            return;</span>
+        }
+
+<span class="fc" id="L111">        List&lt;RestaurantTable&gt; tables = List.of(</span>
+                // Main Hall — 8 tables (2–8 capacity)
+<span class="fc" id="L113">                table(&quot;MH-01&quot;, 2, DiningArea.MAIN_HALL, &quot;Window table by the main entrance with natural daylight&quot;),</span>
+<span class="fc" id="L114">                table(&quot;MH-02&quot;, 4, DiningArea.MAIN_HALL, &quot;Cozy centre booth, great for couples &amp; small families&quot;),</span>
+<span class="fc" id="L115">                table(&quot;MH-03&quot;, 4, DiningArea.MAIN_HALL, &quot;Beside grand window overlooking the courtyard fountain&quot;),</span>
+<span class="fc" id="L116">                table(&quot;MH-04&quot;, 6, DiningArea.MAIN_HALL, &quot;Large round table near the live acoustic grand piano&quot;),</span>
+<span class="fc" id="L117">                table(&quot;MH-05&quot;, 2, DiningArea.MAIN_HALL, &quot;Intimate romantic corner with candlelight&quot;),</span>
+<span class="fc" id="L118">                table(&quot;MH-06&quot;, 8, DiningArea.MAIN_HALL, &quot;Extended dining table for special group events&quot;),</span>
+<span class="fc" id="L119">                table(&quot;MH-07&quot;, 4, DiningArea.MAIN_HALL, &quot;Central chandelier table with prime restaurant view&quot;),</span>
+<span class="fc" id="L120">                table(&quot;MH-08&quot;, 4, DiningArea.MAIN_HALL, &quot;Premium panoramic window booth with skyline view&quot;),</span>
+
+                // Terrace &amp; Balcony — 6 tables (2–6 capacity)
+<span class="fc" id="L123">                table(&quot;TR-01&quot;, 2, DiningArea.TERRACE,</span>
+<span class="fc" id="L124">                        &quot;Panoramic balcony table with breathtaking open-air sunset vista&quot;),</span>
+<span class="fc" id="L125">                table(&quot;TR-02&quot;, 4, DiningArea.TERRACE, &quot;Poolside pergola terrace seating with gentle breeze&quot;),</span>
+<span class="fc" id="L126">                table(&quot;TR-03&quot;, 4, DiningArea.TERRACE, &quot;Under the olive tree, al fresco dining experience&quot;),</span>
+<span class="fc" id="L127">                table(&quot;TR-04&quot;, 6, DiningArea.TERRACE, &quot;Covered terrace deck, ideal for twilight dinners&quot;),</span>
+<span class="fc" id="L128">                table(&quot;TR-05&quot;, 2, DiningArea.TERRACE, &quot;Front-row rooftop balcony table for romantic sunsets&quot;),</span>
+<span class="fc" id="L129">                table(&quot;TR-06&quot;, 6, DiningArea.TERRACE, &quot;Terrace pavilion table with personal fire-pit&quot;),</span>
+
+                // Private Dining Suites — 4 tables (6–12 capacity)
+<span class="fc" id="L132">                table(&quot;PR-01&quot;, 8, DiningArea.PRIVATE_ROOM, &quot;Executive dining suite with dedicated sommelier &amp; full AV&quot;),</span>
+<span class="fc" id="L133">                table(&quot;PR-02&quot;, 12, DiningArea.PRIVATE_ROOM,</span>
+<span class="fc" id="L134">                        &quot;Royal banquet hall for grand celebrations &amp; family reunions&quot;),</span>
+<span class="fc" id="L135">                table(&quot;PR-03&quot;, 6, DiningArea.PRIVATE_ROOM, &quot;Intimate wine cellar private booth with reserve pairings&quot;),</span>
+<span class="fc" id="L136">                table(&quot;PR-04&quot;, 10, DiningArea.PRIVATE_ROOM, &quot;VIP penthouse dining room with private terrace access&quot;));</span>
+
+<span class="fc" id="L138">        restaurantTableRepository.saveAll(tables);</span>
+<span class="fc" id="L139">        log.info(&quot;Seeded {} restaurant tables&quot;, tables.size());</span>
+<span class="fc" id="L140">    }</span>
+
+    private RestaurantTable table(String number, int capacity, DiningArea area, String description) {
+<span class="fc" id="L143">        return RestaurantTable.builder()</span>
+<span class="fc" id="L144">                .tableNumber(number)</span>
+<span class="fc" id="L145">                .capacity(capacity)</span>
+<span class="fc" id="L146">                .area(area)</span>
+<span class="fc" id="L147">                .status(TableStatus.AVAILABLE)</span>
+<span class="fc" id="L148">                .description(description)</span>
+<span class="fc" id="L149">                .build();</span>
+    }
+
+    private void seedRooms() {
+<span class="fc" id="L153">        List&lt;Room&gt; rooms = List.of(</span>
+<span class="fc" id="L154">                room(&quot;101&quot;, RoomType.SINGLE, new java.math.BigDecimal(&quot;85.00&quot;), 1,</span>
+<span class="fc" id="L155">                        &quot;Cozy retreat with a plush queen bed, dedicated ergonomic workstation, and quiet garden views.&quot;,</span>
+<span class="fc" id="L156">                        false, false, true),</span>
+<span class="fc" id="L157">                room(&quot;102&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;140.00&quot;), 2,</span>
+<span class="fc" id="L158">                        &quot;Spacious modern room featuring two premium queen beds, artisan coffee bar, and skyline windows.&quot;,</span>
+<span class="fc" id="L159">                        true, false, true),</span>
+<span class="fc" id="L160">                room(&quot;103&quot;, RoomType.SINGLE, new java.math.BigDecimal(&quot;95.00&quot;), 1,</span>
+<span class="fc" id="L161">                        &quot;Serene corner single with floor-to-ceiling windows and acoustic soundproofing.&quot;, false, true,</span>
+<span class="fc" id="L162">                        true),</span>
+<span class="fc" id="L163">                room(&quot;104&quot;, RoomType.SINGLE, new java.math.BigDecimal(&quot;90.00&quot;), 1,</span>
+<span class="fc" id="L164">                        &quot;Sunlit garden single with French doors leading to a private botanical courtyard.&quot;, false,</span>
+<span class="fc" id="L165">                        false, false),</span>
+<span class="fc" id="L166">                room(&quot;201&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;220.00&quot;), 3,</span>
+<span class="fc" id="L167">                        &quot;Executive boutique suite with a partitioned salon lounge, Italian marble bath, and private terrace.&quot;,</span>
+<span class="fc" id="L168">                        true, true, true),</span>
+<span class="fc" id="L169">                room(&quot;202&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;155.00&quot;), 2,</span>
+<span class="fc" id="L170">                        &quot;Superior double with sweeping courtyard views and complimentary artisan refreshments.&quot;, true,</span>
+<span class="fc" id="L171">                        true, true),</span>
+<span class="fc" id="L172">                room(&quot;203&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;145.00&quot;), 2,</span>
+<span class="fc" id="L173">                        &quot;Artisan twin double with custom timber furnishings, designer reading nook, and espresso bar.&quot;,</span>
+<span class="fc" id="L174">                        false, false, true),</span>
+<span class="fc" id="L175">                room(&quot;204&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;160.00&quot;), 2,</span>
+<span class="fc" id="L176">                        &quot;Corner double suite with wrap-around city panorama, heated bathroom floors, and balcony.&quot;,</span>
+<span class="fc" id="L177">                        true, true, true),</span>
+<span class="fc" id="L178">                room(&quot;301&quot;, RoomType.DELUXE, new java.math.BigDecimal(&quot;290.00&quot;), 4,</span>
+<span class="fc" id="L179">                        &quot;Ultra-luxurious corner suite with panoramic city skyline panorama, walk-in dressing room, and deep tub.&quot;,</span>
+<span class="fc" id="L180">                        true, true, true),</span>
+<span class="fc" id="L181">                room(&quot;302&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;240.00&quot;), 3,</span>
+<span class="fc" id="L182">                        &quot;Grand family suite with dual vanity bath, private sun deck, and plush sleeper sofa.&quot;, true,</span>
+<span class="fc" id="L183">                        true, true),</span>
+<span class="fc" id="L184">                room(&quot;303&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;255.00&quot;), 3,</span>
+<span class="fc" id="L185">                        &quot;Romantic honeymoon suite with private jacuzzi, champagne service, and rose-petal turndown.&quot;,</span>
+<span class="fc" id="L186">                        true, true, true),</span>
+<span class="fc" id="L187">                room(&quot;304&quot;, RoomType.DELUXE, new java.math.BigDecimal(&quot;310.00&quot;), 4,</span>
+<span class="fc" id="L188">                        &quot;Royal deluxe family suite with dual king suites, private dining nook, and full luxury amenities.&quot;,</span>
+<span class="fc" id="L189">                        true, true, true),</span>
+<span class="fc" id="L190">                room(&quot;401&quot;, RoomType.PENTHOUSE, new java.math.BigDecimal(&quot;480.00&quot;), 4,</span>
+<span class="fc" id="L191">                        &quot;Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service pantry.&quot;,</span>
+<span class="fc" id="L192">                        true, true, true),</span>
+<span class="fc" id="L193">                room(&quot;402&quot;, RoomType.PENTHOUSE, new java.math.BigDecimal(&quot;520.00&quot;), 5,</span>
+<span class="fc" id="L194">                        &quot;Sky-level penthouse estate with private rooftop plunge pool, dedicated chef service, and helipad access.&quot;,</span>
+<span class="fc" id="L195">                        true, true, true));</span>
+
+<span class="fc" id="L197">        int added = 0;</span>
+<span class="fc bfc" id="L198" title="All 2 branches covered.">        for (Room r : rooms) {</span>
+<span class="pc bpc" id="L199" title="1 of 2 branches missed.">            if (roomRepository.findByRoomNumber(r.getRoomNumber()).isEmpty()) {</span>
+<span class="fc" id="L200">                roomRepository.save(r);</span>
+<span class="fc" id="L201">                added++;</span>
+            }
+        }
+<span class="fc" id="L204">        log.info(&quot;Ensured {} hotel rooms are registered in inventory ({} newly seeded)&quot;, rooms.size(), added);</span>
+<span class="fc" id="L205">    }</span>
+
+    private Room room(String roomNumber, RoomType roomType, java.math.BigDecimal basePrice, Integer capacity,
+            String description, Boolean hasBathtub, Boolean hasBalcony, Boolean hasMinibar) {
+<span class="fc" id="L209">        return Room.builder()</span>
+<span class="fc" id="L210">                .roomNumber(roomNumber)</span>
+<span class="fc" id="L211">                .roomType(roomType)</span>
+<span class="fc" id="L212">                .basePrice(basePrice)</span>
+<span class="fc" id="L213">                .capacity(capacity)</span>
+<span class="fc" id="L214">                .status(RoomStatus.AVAILABLE)</span>
+<span class="fc" id="L215">                .description(description)</span>
+<span class="fc" id="L216">                .hasBathtub(hasBathtub)</span>
+<span class="fc" id="L217">                .hasBalcony(hasBalcony)</span>
+<span class="fc" id="L218">                .hasMinibar(hasMinibar)</span>
+<span class="fc" id="L219">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RoomService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.service</a> &gt; <span class="el_source">RoomService.java</span></div><h1>RoomService.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.service;
+
+import com.hotelmanagement.model.Room;
+import com.hotelmanagement.model.RoomStatus;
+import com.hotelmanagement.model.RoomType;
+import com.hotelmanagement.repository.RoomRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class RoomService {
+
+    private final RoomRepository roomRepository;
+    private final PricingService pricingService;
+
+    /**
+     * Create a new room.
+     */
+    public Room createRoom(Room room) {
+<span class="fc bfc" id="L26" title="All 2 branches covered.">        if (!isValidRoom(room)) {</span>
+<span class="fc" id="L27">            throw new IllegalArgumentException(&quot;Invalid room data&quot;);</span>
+        }
+<span class="fc" id="L29">        room.setStatus(RoomStatus.AVAILABLE);</span>
+<span class="fc" id="L30">        return roomRepository.save(room);</span>
+    }
+
+    /**
+     * Update room status.
+     */
+    public Room updateRoomStatus(Long roomId, RoomStatus status) {
+<span class="nc" id="L37">        Room room = roomRepository.findById(roomId)</span>
+<span class="nc" id="L38">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Room not found&quot;));</span>
+<span class="nc" id="L39">        room.setStatus(status);</span>
+<span class="nc" id="L40">        return roomRepository.save(room);</span>
+    }
+
+    /**
+     * Get available rooms for a date range and guest count.
+     */
+    public List&lt;Room&gt; getAvailableRooms(LocalDate checkIn, LocalDate checkOut, Integer guestCount) {
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (!isValidDateRange(checkIn, checkOut)) {</span>
+<span class="fc" id="L48">            throw new IllegalArgumentException(&quot;Invalid date range&quot;);</span>
+        }
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (!isValidGuestCount(guestCount)) {</span>
+<span class="fc" id="L51">            throw new IllegalArgumentException(&quot;Invalid guest count&quot;);</span>
+        }
+
+<span class="fc" id="L54">        List&lt;Room&gt; allRooms = roomRepository.findByStatus(RoomStatus.AVAILABLE);</span>
+<span class="fc" id="L55">        return allRooms.stream()</span>
+<span class="fc" id="L56">            .filter(room -&gt; room.canAccommodate(guestCount))</span>
+<span class="fc" id="L57">            .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Get rooms by type.
+     */
+    public List&lt;Room&gt; getRoomsByType(RoomType roomType) {
+<span class="fc" id="L64">        return roomRepository.findByRoomType(roomType);</span>
+    }
+
+    /**
+     * Get available rooms by type.
+     */
+    public List&lt;Room&gt; getAvailableRoomsByType(RoomType roomType) {
+<span class="fc" id="L71">        return roomRepository.findByRoomTypeAndStatus(roomType, RoomStatus.AVAILABLE);</span>
+    }
+
+    /**
+     * Get room by ID.
+     */
+    public Optional&lt;Room&gt; getRoom(Long id) {
+<span class="fc" id="L78">        return roomRepository.findById(id);</span>
+    }
+
+    /**
+     * Get room by number.
+     */
+    public Optional&lt;Room&gt; getRoomByNumber(String roomNumber) {
+<span class="fc" id="L85">        return roomRepository.findByRoomNumber(roomNumber);</span>
+    }
+
+    /**
+     * Get all rooms.
+     */
+    public List&lt;Room&gt; getAllRooms() {
+<span class="fc" id="L92">        return roomRepository.findAll();</span>
+    }
+
+    /**
+     * Get rooms by status.
+     */
+    public List&lt;Room&gt; getRoomsByStatus(RoomStatus status) {
+<span class="fc" id="L99">        return roomRepository.findByStatus(status);</span>
+    }
+
+    /**
+     * Send room to maintenance.
+     */
+    public Room sendToMaintenance(Long roomId) {
+<span class="fc" id="L106">        Room room = roomRepository.findById(roomId)</span>
+<span class="pc" id="L107">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Room not found&quot;));</span>
+<span class="fc" id="L108">        room.setStatus(RoomStatus.MAINTENANCE);</span>
+<span class="fc" id="L109">        return roomRepository.save(room);</span>
+    }
+
+    /**
+     * Mark room as available after maintenance.
+     */
+    public Room markAsAvailable(Long roomId) {
+<span class="fc" id="L116">        Room room = roomRepository.findById(roomId)</span>
+<span class="pc" id="L117">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Room not found&quot;));</span>
+<span class="fc" id="L118">        room.setStatus(RoomStatus.AVAILABLE);</span>
+<span class="fc" id="L119">        return roomRepository.save(room);</span>
+    }
+
+    private boolean isValidRoom(Room room) {
+<span class="pc bpc" id="L123" title="2 of 6 branches missed.">        return room.getRoomNumber() != null &amp;&amp; !room.getRoomNumber().isEmpty()</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">            &amp;&amp; room.getRoomType() != null</span>
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">            &amp;&amp; room.getBasePrice() != null</span>
+<span class="fc bfc" id="L126" title="All 2 branches covered.">            &amp;&amp; pricingService.isValidPrice(room.getBasePrice())</span>
+<span class="pc bpc" id="L127" title="1 of 2 branches missed.">            &amp;&amp; room.getCapacity() != null &amp;&amp; room.getCapacity() &gt; 0;</span>
+    }
+
+    private boolean isValidDateRange(LocalDate checkIn, LocalDate checkOut) {
+<span class="pc bpc" id="L131" title="1 of 6 branches missed.">        return checkIn != null &amp;&amp; checkOut != null &amp;&amp; checkOut.isAfter(checkIn);</span>
+    }
+
+    private boolean isValidGuestCount(Integer guestCount) {
+<span class="pc bpc" id="L135" title="1 of 6 branches missed.">        return guestCount != null &amp;&amp; guestCount &gt; 0 &amp;&amp; guestCount &lt;= 20;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

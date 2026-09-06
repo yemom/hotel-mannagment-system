@@ -1,41 +1,35 @@
 # Multi-stage Docker build for Hotel Management System
 
-# Stage 1: Build stage
-FROM maven:3.8.1-openjdk-11 AS builder
+# Stage 1: Build stage — Java 21
+FROM maven:3.9.6-eclipse-temurin-21 AS builder
 
 WORKDIR /app
 
-# Copy pom.xml
+# Copy pom.xml and source code
 COPY pom.xml .
-
-# Download dependencies
-RUN mvn dependency:go-offline
-
-# Copy source code
 COPY src ./src
 
-# Build the application
+# Build JAR without running unit tests during container creation
 RUN mvn -B clean package -DskipTests
 
-# Stage 2: Runtime stage
-FROM openjdk:11-jre-slim
+# Stage 2: Runtime stage — slim JRE 21
+FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
+# Install curl for health check
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Copy JAR from builder
-COPY --from=builder /app/target/hotel-management-system-*.jar app.jar
+COPY --from=builder /app/target/hotel-management-*.jar app.jar
 
-# Expose port
-EXPOSE 8080
+EXPOSE 8085
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8080/actuator/health || exit 1
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8085/api/guests || exit 1
 
-# Run application
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
-# Labels
 LABEL maintainer="Hotel Management Team"
-LABEL description="Hotel Management System - Complete REST API with tests"
+LABEL description="የ-mom Hotel Management System - REST API"
 LABEL version="1.0.0"

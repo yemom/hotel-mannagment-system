@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Reservation.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.model</a> &gt; <span class="el_source">Reservation.java</span></div><h1>Reservation.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+@Entity
+@Table(name = &quot;reservations&quot;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Reservation {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;guest_id&quot;, nullable = false)
+    private Guest guest;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;room_id&quot;, nullable = false)
+    private Room room;
+
+    @Column(nullable = false)
+    private LocalDate checkInDate;
+
+    @Column(nullable = false)
+    private LocalDate checkOutDate;
+
+    @Column(nullable = false)
+    private Integer numberOfGuests;
+
+    @Column(nullable = false)
+    private BigDecimal totalPrice;
+
+    @Column(nullable = false)
+    private BigDecimal discountAmount;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status; // PENDING, CONFIRMED, CHECKED_IN, CHECKED_OUT, CANCELLED
+
+    private String specialRequests;
+
+    private LocalDate createdDate;
+
+    private LocalDate modifiedDate;
+
+    // State transition methods - for state transition testing
+    public boolean canConfirm() {
+<span class="fc" id="L58">        return ReservationStatus.PENDING.equals(status);</span>
+    }
+
+    public boolean canCheckIn() {
+<span class="pc bpc" id="L62" title="1 of 4 branches missed.">        return ReservationStatus.CONFIRMED.equals(status) &amp;&amp; isCheckInDateToday();</span>
+    }
+
+    public boolean canCheckOut() {
+<span class="pc bpc" id="L66" title="1 of 4 branches missed.">        return ReservationStatus.CHECKED_IN.equals(status) &amp;&amp; isCheckOutDateTodayOrEarlier();</span>
+    }
+
+    public boolean canCancel() {
+<span class="fc bfc" id="L70" title="All 4 branches covered.">        return ReservationStatus.PENDING.equals(status) || ReservationStatus.CONFIRMED.equals(status);</span>
+    }
+
+    private boolean isCheckInDateToday() {
+<span class="fc" id="L74">        LocalDate today = LocalDate.now();</span>
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">        return checkInDate.compareTo(today) &lt;= 0;</span>
+    }
+
+    private boolean isCheckOutDateTodayOrEarlier() {
+<span class="fc" id="L79">        LocalDate today = LocalDate.now();</span>
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        return checkOutDate.compareTo(today) &gt;= 0;</span>
+    }
+
+    public void confirm() {
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (canConfirm()) {</span>
+<span class="fc" id="L85">            this.status = ReservationStatus.CONFIRMED;</span>
+<span class="fc" id="L86">        } else {</span>
+<span class="fc" id="L87">            throw new IllegalStateException(&quot;Cannot confirm reservation with status: &quot; + status);</span>
+        }
+<span class="fc" id="L89">    }</span>
+
+    public void checkIn() {
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if (canCheckIn()) {</span>
+<span class="fc" id="L93">            this.status = ReservationStatus.CHECKED_IN;</span>
+<span class="fc" id="L94">        } else {</span>
+<span class="fc" id="L95">            throw new IllegalStateException(&quot;Cannot check in reservation with status: &quot; + status);</span>
+        }
+<span class="fc" id="L97">    }</span>
+
+    public void checkOut() {
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (canCheckOut()) {</span>
+<span class="fc" id="L101">            this.status = ReservationStatus.CHECKED_OUT;</span>
+<span class="fc" id="L102">        } else {</span>
+<span class="fc" id="L103">            throw new IllegalStateException(&quot;Cannot check out reservation with status: &quot; + status);</span>
+        }
+<span class="fc" id="L105">    }</span>
+
+    public void cancel() {
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (canCancel()) {</span>
+<span class="fc" id="L109">            this.status = ReservationStatus.CANCELLED;</span>
+<span class="fc" id="L110">        } else {</span>
+<span class="fc" id="L111">            throw new IllegalStateException(&quot;Cannot cancel reservation with status: &quot; + status);</span>
+        }
+<span class="fc" id="L113">    }</span>
+
+    // Validation
+    public boolean isValidDateRange() {
+<span class="pc bpc" id="L117" title="2 of 6 branches missed.">        return checkInDate != null &amp;&amp; checkOutDate != null &amp;&amp; checkOutDate.isAfter(checkInDate);</span>
+    }
+
+    public boolean isValidNumberOfGuests() {
+<span class="pc bpc" id="L121" title="2 of 6 branches missed.">        return numberOfGuests != null &amp;&amp; numberOfGuests &gt; 0 &amp;&amp; numberOfGuests &lt;= 20;</span>
+    }
+
+    public long getNumberOfNights() {
+<span class="pc bpc" id="L125" title="1 of 2 branches missed.">        if (!isValidDateRange()) {</span>
+<span class="nc" id="L126">            return 0;</span>
+        }
+<span class="fc" id="L128">        return java.time.temporal.ChronoUnit.DAYS.between(checkInDate, checkOutDate);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

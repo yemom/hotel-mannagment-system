@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuestController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.controller</a> &gt; <span class="el_source">GuestController.java</span></div><h1>GuestController.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.controller;
+
+import com.hotelmanagement.model.Guest;
+import com.hotelmanagement.service.GuestService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/api/guests&quot;)
+@RequiredArgsConstructor
+public class GuestController {
+
+    private final GuestService guestService;
+
+    @PostMapping(&quot;/register&quot;)
+    public ResponseEntity&lt;Guest&gt; register(@RequestBody Guest guest) {
+        try {
+<span class="nc" id="L22">            Guest registered = guestService.registerGuest(guest);</span>
+<span class="nc" id="L23">            return ResponseEntity.status(HttpStatus.CREATED).body(registered);</span>
+<span class="nc" id="L24">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L25">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public ResponseEntity&lt;Guest&gt; login(@RequestParam String email, @RequestParam String password) {
+        try {
+<span class="nc" id="L32">            Guest guest = guestService.authenticate(email, password);</span>
+<span class="nc" id="L33">            return ResponseEntity.ok(guest);</span>
+<span class="nc" id="L34">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L35">            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Guest&gt; getGuest(@PathVariable Long id) {
+<span class="nc" id="L41">        return guestService.getGuest(id)</span>
+<span class="nc" id="L42">            .map(ResponseEntity::ok)</span>
+<span class="nc" id="L43">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+    }
+
+    @GetMapping(&quot;/email/{email}&quot;)
+    public ResponseEntity&lt;Guest&gt; getGuestByEmail(@PathVariable String email) {
+<span class="nc" id="L48">        return guestService.getGuestByEmail(email)</span>
+<span class="nc" id="L49">            .map(ResponseEntity::ok)</span>
+<span class="nc" id="L50">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Guest&gt; updateGuest(@PathVariable Long id, @RequestBody Guest guest) {
+<span class="nc" id="L55">        guest.setId(id);</span>
+        try {
+<span class="nc" id="L57">            Guest updated = guestService.updateGuest(guest);</span>
+<span class="nc" id="L58">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L59">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L60">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;Guest&gt;&gt; getAllGuests() {
+<span class="nc" id="L66">        return ResponseEntity.ok(guestService.getAllGuests());</span>
+    }
+
+    @GetMapping(&quot;/active/list&quot;)
+    public ResponseEntity&lt;List&lt;Guest&gt;&gt; getActiveGuests() {
+<span class="nc" id="L71">        return ResponseEntity.ok(guestService.getAllActiveGuests());</span>
+    }
+
+    @PostMapping(&quot;/{id}/suspend&quot;)
+    public ResponseEntity&lt;Guest&gt; suspendGuest(@PathVariable Long id) {
+        try {
+<span class="nc" id="L77">            Guest guest = guestService.suspendGuest(id);</span>
+<span class="nc" id="L78">            return ResponseEntity.ok(guest);</span>
+<span class="nc" id="L79">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L80">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/reactivate&quot;)
+    public ResponseEntity&lt;Guest&gt; reactivateGuest(@PathVariable Long id) {
+        try {
+<span class="nc" id="L87">            Guest guest = guestService.reactivateGuest(id);</span>
+<span class="nc" id="L88">            return ResponseEntity.ok(guest);</span>
+<span class="nc" id="L89">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L90">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+    @PostMapping(&quot;/{id}/change-password&quot;)
+    public ResponseEntity&lt;Guest&gt; changePassword(
+            @PathVariable Long id,
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword) {
+        try {
+<span class="nc" id="L99">            Guest guest = guestService.changePassword(id, currentPassword, newPassword);</span>
+<span class="nc" id="L100">            return ResponseEntity.ok(guest);</span>
+<span class="nc" id="L101">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L102">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteGuest(@PathVariable Long id) {
+        try {
+<span class="nc" id="L109">            guestService.deleteGuest(id);</span>
+<span class="nc" id="L110">            return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L111">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L112">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

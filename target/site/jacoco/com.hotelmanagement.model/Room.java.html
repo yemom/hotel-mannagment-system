@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Room.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.model</a> &gt; <span class="el_source">Room.java</span></div><h1>Room.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = &quot;rooms&quot;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Room {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String roomNumber;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType;
+
+    @Column(nullable = false)
+    private BigDecimal basePrice; // Price ranges for equivalence partitioning
+
+    @Column(nullable = false)
+    private Integer capacity; // Guest capacity
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomStatus status; // AVAILABLE, OCCUPIED, MAINTENANCE, RESERVED
+
+    private String description;
+
+    private Boolean hasBathtub;
+    private Boolean hasBalcony;
+    private Boolean hasMinibar;
+
+    // Validation rules
+    public boolean isAvailableForBooking() {
+<span class="nc bnc" id="L47" title="All 4 branches missed.">        return RoomStatus.AVAILABLE.equals(status) || RoomStatus.RESERVED.equals(status);</span>
+    }
+
+    public boolean isOccupied() {
+<span class="fc" id="L51">        return RoomStatus.OCCUPIED.equals(status);</span>
+    }
+
+    public boolean canAccommodate(Integer guests) {
+<span class="pc bpc" id="L55" title="2 of 6 branches missed.">        return guests != null &amp;&amp; guests &gt; 0 &amp;&amp; guests &lt;= capacity;</span>
+    }
+
+    public boolean isPriceInValidRange() {
+<span class="nc bnc" id="L59" title="All 6 branches missed.">        return basePrice != null &amp;&amp; basePrice.compareTo(BigDecimal.ZERO) &gt; 0 </span>
+<span class="nc" id="L60">            &amp;&amp; basePrice.compareTo(new BigDecimal(&quot;10000&quot;)) &lt;= 0; // Price range validation</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

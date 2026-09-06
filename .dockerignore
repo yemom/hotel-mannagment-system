@@ -1,0 +1,12 @@
+target/
+.git/
+.gitignore
+.github/
+.idea/
+*.iml
+.vscode/
+frontend/node_modules/
+frontend/dist/
+.pnpm-store/
+*.log
+docker-compose*.override.yml

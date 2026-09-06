@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestaurantTableService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.service</a> &gt; <span class="el_source">RestaurantTableService.java</span></div><h1>RestaurantTableService.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.service;
+
+import com.hotelmanagement.model.DiningArea;
+import com.hotelmanagement.model.RestaurantTable;
+import com.hotelmanagement.model.TableReservation;
+import com.hotelmanagement.model.TableReservationStatus;
+import com.hotelmanagement.model.TableStatus;
+import com.hotelmanagement.repository.RestaurantTableRepository;
+import com.hotelmanagement.repository.TableReservationRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class RestaurantTableService {
+
+    private final RestaurantTableRepository tableRepository;
+    private final TableReservationRepository reservationRepository;
+
+    public List&lt;RestaurantTable&gt; getAll() {
+<span class="fc" id="L26">        return tableRepository.findAll();</span>
+    }
+
+    public RestaurantTable getById(Long id) {
+<span class="fc" id="L30">        return tableRepository.findById(id)</span>
+<span class="fc" id="L31">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Table not found: &quot; + id));</span>
+    }
+
+    /**
+     * Returns tables that:
+     *  1. have capacity &gt;= partySize
+     *  2. have no active (non-cancelled) reservation on that date+timeSlot
+     */
+    public List&lt;RestaurantTable&gt; getAvailable(LocalDate date, String timeSlot, int partySize) {
+        // Find table IDs that are already booked for this slot
+<span class="fc" id="L41">        Set&lt;Long&gt; bookedTableIds = reservationRepository.findByReservationDate(date)</span>
+<span class="fc" id="L42">            .stream()</span>
+<span class="fc" id="L43">            .filter(r -&gt; r.getTimeSlot().equals(timeSlot))</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            .filter(r -&gt; !TableReservationStatus.CANCELLED.equals(r.getStatus())</span>
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">                      &amp;&amp; !TableReservationStatus.NO_SHOW.equals(r.getStatus()))</span>
+<span class="pc bpc" id="L46" title="1 of 2 branches missed.">            .filter(r -&gt; r.getRestaurantTable() != null)</span>
+<span class="fc" id="L47">            .map(r -&gt; r.getRestaurantTable().getId())</span>
+<span class="fc" id="L48">            .collect(Collectors.toSet());</span>
+
+<span class="fc" id="L50">        return tableRepository.findAll().stream()</span>
+<span class="fc bfc" id="L51" title="All 2 branches covered.">            .filter(t -&gt; !bookedTableIds.contains(t.getId()))</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">            .filter(t -&gt; t.getCapacity() &gt;= partySize)</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">            .filter(t -&gt; !TableStatus.CLEANING.equals(t.getStatus()))</span>
+<span class="fc" id="L54">            .collect(Collectors.toList());</span>
+    }
+
+    public RestaurantTable updateStatus(Long id, String statusStr) {
+<span class="fc" id="L58">        RestaurantTable table = getById(id);</span>
+<span class="fc" id="L59">        TableStatus status = TableStatus.valueOf(statusStr.toUpperCase());</span>
+<span class="fc" id="L60">        table.setStatus(status);</span>
+<span class="fc" id="L61">        return tableRepository.save(table);</span>
+    }
+
+    public RestaurantTable createTable(RestaurantTable table) {
+<span class="pc bpc" id="L65" title="1 of 2 branches missed.">        if (table.getStatus() == null) {</span>
+<span class="fc" id="L66">            table.setStatus(TableStatus.AVAILABLE);</span>
+        }
+<span class="fc" id="L68">        return tableRepository.save(table);</span>
+    }
+
+    public void deleteTable(Long id) {
+<span class="fc" id="L72">        tableRepository.deleteById(id);</span>
+<span class="fc" id="L73">    }</span>
+
+    public RestaurantTable save(RestaurantTable table) {
+<span class="nc" id="L76">        return tableRepository.save(table);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

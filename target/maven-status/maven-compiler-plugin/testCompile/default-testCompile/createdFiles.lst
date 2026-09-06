@@ -1,0 +1,14 @@
+com\hotelmanagement\pages\BasePage.class
+com\hotelmanagement\service\ReservationServiceTest$ReservationCreationTests.class
+com\hotelmanagement\service\ReservationServiceTest.class
+com\hotelmanagement\system\BaseSystemTest.class
+com\hotelmanagement\pages\BookingPage.class
+com\hotelmanagement\pages\LoginPage.class
+com\hotelmanagement\system\HotelManagementSystemTest.class
+com\hotelmanagement\service\HotelManagementIntegrationTest.class
+com\hotelmanagement\service\ReservationServiceTest$StateTransitionTests.class
+com\hotelmanagement\service\ReservationServiceTest$DiscountCalculationTests.class
+com\hotelmanagement\service\RoomServiceTest.class
+com\hotelmanagement\service\PricingServiceTest.class
+com\hotelmanagement\pages\RegistrationPage.class
+com\hotelmanagement\pages\SearchRoomsPage.class
