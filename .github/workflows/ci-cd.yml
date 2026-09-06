@@ -2,76 +2,76 @@ name: Hotel Management System CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Build with Maven
-      run: mvn -B clean compile
+      - name: Build with Maven
+        run: mvn -B clean compile
 
-    - name: Run Unit and Integration Tests
-      run: mvn -B test
+      - name: Run Unit and Integration Tests
+        run: mvn -B test
 
-    - name: Generate Code Coverage Report
-      run: mvn -B jacoco:report
+      - name: Generate Code Coverage Report
+        run: mvn -B jacoco:report
 
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./target/site/jacoco/jacoco.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
-    - name: Display Coverage Report
-      run: |
-        echo "=== Code Coverage Report ==="
-        cat target/site/jacoco/index.html | grep -oP '(?<=<h2>Code Coverage</h2>).*?(?=</h2>)' || echo "Coverage data generated"
+      - name: Display Coverage Report
+        run: |
+          echo "=== Code Coverage Report ==="
+          cat target/site/jacoco/index.html | grep -oP '(?<=<h2>Code Coverage</h2>).*?(?=</h2>)' || echo "Coverage data generated"
 
-    - name: Archive Test Results
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: test-results
-        path: target/surefire-reports/
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
 
-    - name: Archive Coverage Report
-      if: always()
-      uses: actions/upload-artifact@v3
-      with:
-        name: coverage-report
-        path: target/site/jacoco/
+      - name: Archive Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: target/site/jacoco/
 
-    - name: Publish Test Results
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        files: target/surefire-reports/TEST-*.xml
-        check_name: Test Results
-        comment_mode: always
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: target/surefire-reports/TEST-*.xml
+          check_name: Test Results
+          comment_mode: always
 
-    - name: Build JAR
-      run: mvn -B package -DskipTests
+      - name: Build JAR
+        run: mvn -B package -DskipTests
 
-    - name: Archive Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: application-jar
-        path: target/hotel-management-system-*.jar
+      - name: Archive Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/hotel-management-system-*.jar
 
   regression-test:
     runs-on: ubuntu-latest
@@ -79,76 +79,76 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Introduce Test Regression (Deliberate)
-      run: |
-        echo "This step demonstrates catching a regression in the pipeline."
-        echo "In a real scenario, code changes might break a test."
+      - name: Introduce Test Regression (Deliberate)
+        run: |
+          echo "This step demonstrates catching a regression in the pipeline."
+          echo "In a real scenario, code changes might break a test."
 
-    - name: Run Full Test Suite for Regression Detection
-      run: mvn -B clean test
+      - name: Run Full Test Suite for Regression Detection
+        run: mvn -B clean test
 
-    - name: Check Test Results
-      if: failure()
-      run: |
-        echo "::error::Regression detected - tests are failing!"
-        echo "Review the test output above for details."
-        exit 1
+      - name: Check Test Results
+        if: failure()
+        run: |
+          echo "::error::Regression detected - tests are failing!"
+          echo "Review the test output above for details."
+          exit 1
 
   code-quality:
     runs-on: ubuntu-latest
     needs: build-and-test
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Run Maven checkstyle
-      run: mvn checkstyle:check || echo "Checkstyle issues found (non-blocking)"
+      - name: Run Maven checkstyle
+        run: mvn checkstyle:check || echo "Checkstyle issues found (non-blocking)"
 
-    - name: Build with Maven (including all plugins)
-      run: mvn -B clean verify
+      - name: Build with Maven (including all plugins)
+        run: mvn -B clean verify
 
   code-coverage-check:
     runs-on: ubuntu-latest
     needs: build-and-test
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v3
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Generate Coverage Report
-      run: mvn -B clean test jacoco:report
+      - name: Generate Coverage Report
+        run: mvn -B clean test jacoco:report
 
-    - name: Verify Minimum Coverage Threshold (80%)
-      run: |
-        COVERAGE=$(grep -oP '(?<=<span class="counter">)[^%]*' target/site/jacoco/index.html | head -1 | sed 's/[^0-9]//g' || echo 0)
-        echo "Current Coverage: $COVERAGE%"
-        if [ "$COVERAGE" -lt 80 ]; then
-          echo "::warning::Coverage ($COVERAGE%) is below target (80%)"
-        else
-          echo "::notice::Coverage ($COVERAGE%) meets target (80%)"
-        fi
+      - name: Verify Minimum Coverage Threshold (80%)
+        run: |
+          COVERAGE=$(grep -oP '(?<=<span class="counter">)[^%]*' target/site/jacoco/index.html | head -1 | sed 's/[^0-9]//g' || echo 0)
+          echo "Current Coverage: $COVERAGE%"
+          if [ "$COVERAGE" -lt 80 ]; then
+            echo "::warning::Coverage ($COVERAGE%) is below target (80%)"
+          else
+            echo "::notice::Coverage ($COVERAGE%) meets target (80%)"
+          fi
 
   summary:
     runs-on: ubuntu-latest
@@ -156,10 +156,10 @@ jobs:
     if: always()
 
     steps:
-    - name: Pipeline Summary
-      run: |
-        echo "=== Hotel Management System CI/CD Pipeline Summary ==="
-        echo "Build Status: ${{ needs.build-and-test.result }}"
-        echo "Code Quality: ${{ needs.code-quality.result }}"
-        echo "Coverage Check: ${{ needs.code-coverage-check.result }}"
-        echo "Pipeline execution completed"
+      - name: Pipeline Summary
+        run: |
+          echo "=== Hotel Management System CI/CD Pipeline Summary ==="
+          echo "Build Status: ${{ needs.build-and-test.result }}"
+          echo "Code Quality: ${{ needs.code-quality.result }}"
+          echo "Coverage Check: ${{ needs.code-coverage-check.result }}"
+          echo "Pipeline execution completed"
