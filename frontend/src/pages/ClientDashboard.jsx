@@ -8,12 +8,48 @@ import { useAuth } from '../context/AuthContext';
 import { reservationAPI, roomAPI, tableReservationAPI } from '../services/api';
 
 // Curated high-resolution hospitality room images
+const TABLE_RESERVATION_IMAGE =
+  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=85';
+
+const TABLE_RESERVATION_SHOWCASE = [
+  {
+    img: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80',
+    label: 'Beside Window Table',
+    sub: 'Fountain view · 2 Guests',
+    badge: 'Dining View',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80',
+    label: 'Balcony Terrace',
+    sub: 'Open-air table · 4 Guests',
+    badge: 'Terrace',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?auto=format&fit=crop&w=1000&q=80',
+    label: 'Poolside Pergola',
+    sub: 'Private evening seating',
+    badge: 'Lounge',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80',
+    label: 'Chef Table',
+    sub: 'Signature dining · 6 Guests',
+    badge: 'Culinary',
+  },
+  {
+    img: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1000&q=80',
+    label: 'Private Suite Table',
+    sub: 'Executive private room',
+    badge: 'Private',
+  },
+];
+
 const ROOM_IMAGES = {
-  SINGLE: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=900&q=80',
-  DOUBLE: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80',
-  SUITE: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=900&q=80',
-  DELUXE: 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?auto=format&fit=crop&w=900&q=80',
-  PENTHOUSE: 'https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=900&q=80',
+  SINGLE: TABLE_RESERVATION_SHOWCASE[0].img,
+  DOUBLE: TABLE_RESERVATION_SHOWCASE[1].img,
+  SUITE: TABLE_RESERVATION_SHOWCASE[2].img,
+  DELUXE: TABLE_RESERVATION_SHOWCASE[3].img,
+  PENTHOUSE: TABLE_RESERVATION_SHOWCASE[4].img,
 };
 
 // Seed catalog in case backend starts with blank H2 DB
@@ -202,7 +238,7 @@ const ClientDashboard = () => {
   const { currentUser } = useAuth();
 
   // Active navigation tab: 'book' | 'restaurant' | 'reservations' | 'profile'
-  const [activeTab, setActiveTab] = useState('book');
+  const [activeTab, setActiveTab] = useState('restaurant');
   // Sub-tab within 'reservations': 'all' | 'rooms' | 'tables'
   const [resSubTab, setResSubTab] = useState('all');
 
@@ -223,6 +259,9 @@ const ClientDashboard = () => {
   const [tableReservations, setTableReservations] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
   const [loadingReservations, setLoadingReservations] = useState(false);
+  const [loadingTableRes, setLoadingTableRes] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
   // Booking modal
   const [selectedRoomForBooking, setSelectedRoomForBooking] = useState(null);
   const [alertNotice, setAlertNotice] = useState(null);
@@ -282,42 +321,79 @@ const ClientDashboard = () => {
     }
   };
 
-  // Load client reservations
+  // Load client reservations with comprehensive multi-layer fallback
   const loadReservations = async () => {
     setLoadingReservations(true);
     try {
       let clientBookings = [];
-      if (currentUser?.id) {
+      const userEmail = currentUser?.email?.toLowerCase().trim();
+      const userId = currentUser?.id;
+
+      // 1. Try backend API by guest id
+      if (userId) {
         try {
-          const res = await reservationAPI.getByGuestId(currentUser.id);
-          if (res.data && Array.isArray(res.data)) {
-            clientBookings = res.data;
+          const res = await reservationAPI.getByGuestId(userId);
+          if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+            clientBookings = [...res.data];
           }
-        } catch {
-          // Fallback: filter all reservations by guest id/email
-          try {
-            const allRes = await reservationAPI.getAll();
-            if (allRes.data) {
-              clientBookings = allRes.data.filter(
-                (r) =>
-                  r.guest?.id === currentUser.id ||
-                  r.guest?.email === currentUser?.email
-              );
-            }
-          } catch (innerErr) {
-            console.warn('Could not load reservations from backend:', innerErr);
-          }
+        } catch (e) {
+          console.warn('Backend getByGuestId failed:', e);
         }
       }
 
-      // Merge in any locally created reservations (created while backend was offline)
-      const storedLocal = localStorage.getItem(`client_res_${currentUser?.email}`);
-      if (storedLocal) {
-        const local = JSON.parse(storedLocal);
-        // Only keep local entries that aren't already from the backend
-        const backendIds = new Set(clientBookings.map((r) => r.id));
-        const localOnly = local.filter((r) => !backendIds.has(r.id));
-        clientBookings = [...clientBookings, ...localOnly];
+      // 2. Also check backend getAll for any matching records
+      try {
+        const allRes = await reservationAPI.getAll();
+        if (allRes.data && Array.isArray(allRes.data)) {
+          const matched = allRes.data.filter((r) => {
+            const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
+            const rGuestId = r.guest?.id || r.guestId;
+            return (userId && String(rGuestId) === String(userId)) ||
+                   (userEmail && rEmail === userEmail);
+          });
+          const existingIds = new Set(clientBookings.map((r) => String(r.id)));
+          for (const m of matched) {
+            if (!existingIds.has(String(m.id))) {
+              clientBookings.push(m);
+              existingIds.add(String(m.id));
+            }
+          }
+        }
+      } catch (innerErr) {
+        console.warn('Could not load all reservations from backend:', innerErr);
+      }
+
+      // 3. Merge local storage reservations
+      const storageKeys = [
+        `client_res_${currentUser?.email}`,
+        `client_res_${currentUser?.id}`,
+        'client_res_last',
+        'hotel_global_room_reservations',
+      ];
+      const existingIds = new Set(clientBookings.map((r) => String(r.id)));
+
+      for (const key of storageKeys) {
+        try {
+          const stored = localStorage.getItem(key);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              for (const r of parsed) {
+                const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
+                const rGuestId = r.guest?.id || r.guestId;
+                const match = !userEmail ||
+                  rEmail === userEmail ||
+                  (userId && String(rGuestId) === String(userId)) ||
+                  key.includes(userEmail);
+
+                if (match && !existingIds.has(String(r.id))) {
+                  clientBookings.push(r);
+                  existingIds.add(String(r.id));
+                }
+              }
+            }
+          }
+        } catch (_) {}
       }
 
       setReservations(clientBookings);
@@ -328,48 +404,82 @@ const ClientDashboard = () => {
     }
   };
 
-
-  // Load client table reservations
+  // Load client table reservations with comprehensive multi-layer fallback
   const loadTableReservations = async () => {
     setLoadingTableRes(true);
     try {
       let clientTableBookings = [];
-      if (currentUser?.id) {
+      const userEmail = currentUser?.email?.toLowerCase().trim();
+      const userId = currentUser?.id;
+
+      // 1. Try backend by guest id
+      if (userId) {
         try {
-          const res = await tableReservationAPI.getByGuestId(currentUser.id);
-          if (res.data && Array.isArray(res.data)) {
-            clientTableBookings = res.data;
+          const res = await tableReservationAPI.getByGuestId(userId);
+          if (res.data && Array.isArray(res.data) && res.data.length > 0) {
+            clientTableBookings = [...res.data];
           }
         } catch (e) {
-          console.warn('Could not load by guest id, fallback to all:', e);
+          console.warn('Could not load table reservations by guest id:', e);
         }
       }
 
-      if (clientTableBookings.length === 0) {
-        try {
-          const all = await tableReservationAPI.getAll();
-          if (all.data && Array.isArray(all.data)) {
-            clientTableBookings = all.data.filter(
-              (r) =>
-                (currentUser?.id && r.guest?.id === currentUser.id) ||
-                (currentUser?.email && r.guest?.email?.toLowerCase() === currentUser.email.toLowerCase())
-            );
-          }
-        } catch (err) {
-          console.warn('Table reservation fetch all error:', err);
-        }
-      }
-
-      const storageKey = `client_table_res_${currentUser?.email || 'guest'}`;
-      let local = [];
+      // 2. Try backend getAll
       try {
-        local = JSON.parse(localStorage.getItem(storageKey) || '[]');
-      } catch {}
-      const backendIds = new Set(clientTableBookings.map((r) => r.id));
-      const localOnly = local.filter((r) => !backendIds.has(r.id));
-      const merged = [...clientTableBookings, ...localOnly];
+        const all = await tableReservationAPI.getAll();
+        if (all.data && Array.isArray(all.data)) {
+          const matched = all.data.filter((r) => {
+            const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
+            const rGuestId = r.guest?.id || r.guestId;
+            return (userId && String(rGuestId) === String(userId)) ||
+                   (userEmail && rEmail === userEmail);
+          });
+          const existingIds = new Set(clientTableBookings.map((r) => String(r.id)));
+          for (const m of matched) {
+            if (!existingIds.has(String(m.id))) {
+              clientTableBookings.push(m);
+              existingIds.add(String(m.id));
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('Table reservation fetch all error:', err);
+      }
 
-      setTableReservations(merged);
+      // 3. Merge local storage table reservations
+      const tableKeys = [
+        `client_table_res_${currentUser?.email || 'guest'}`,
+        'client_table_res_last',
+        'hotel_table_reservations',
+        'hotel_restaurant_table_reservations',
+      ];
+      const existingIds = new Set(clientTableBookings.map((r) => String(r.id)));
+
+      for (const key of tableKeys) {
+        try {
+          const stored = localStorage.getItem(key);
+          if (stored) {
+            const parsed = JSON.parse(stored);
+            if (Array.isArray(parsed)) {
+              for (const r of parsed) {
+                const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
+                const rGuestId = r.guest?.id || r.guestId;
+                const match = !userEmail ||
+                  rEmail === userEmail ||
+                  (userId && String(rGuestId) === String(userId)) ||
+                  key.includes(userEmail);
+
+                if (match && !existingIds.has(String(r.id))) {
+                  clientTableBookings.push(r);
+                  existingIds.add(String(r.id));
+                }
+              }
+            }
+          }
+        } catch (_) {}
+      }
+
+      setTableReservations(clientTableBookings);
     } catch (err) {
       console.warn('Could not load table reservations:', err);
     } finally {
@@ -382,6 +492,14 @@ const ClientDashboard = () => {
     loadReservations();
     loadTableReservations();
   }, [currentUser]);
+
+  // Re-fetch whenever user switches to reservations tab
+  useEffect(() => {
+    if (activeTab === 'reservations') {
+      loadReservations();
+      loadTableReservations();
+    }
+  }, [activeTab]);
 
   // Handle Search Availability button
   const handleSearchAvailability = async (e) => {
@@ -412,8 +530,9 @@ const ClientDashboard = () => {
     }
   };
 
-  // Filter rooms
+  // Filter rooms reactively by type, price, guests, and search query
   const filteredRooms = useMemo(() => {
+    const q = (searchQuery || '').trim().toLowerCase();
     return rooms.filter((room) => {
       const matchesType =
         selectedType === 'ALL' || room.roomType === selectedType;
@@ -421,9 +540,18 @@ const ClientDashboard = () => {
       const matchesCapacity =
         !searchDates.guests ||
         Number(room.capacity || 1) >= Number(searchDates.guests);
-      return matchesType && matchesPrice && matchesCapacity;
+      const matchesQuery =
+        !q ||
+        (room.roomNumber && String(room.roomNumber).toLowerCase().includes(q)) ||
+        (room.roomType && room.roomType.toLowerCase().includes(q)) ||
+        (room.description && room.description.toLowerCase().includes(q)) ||
+        (q.includes('bath') && room.hasBathtub) ||
+        (q.includes('balcony') && room.hasBalcony) ||
+        (q.includes('bar') && room.hasMinibar);
+
+      return matchesType && matchesPrice && matchesCapacity && matchesQuery;
     });
-  }, [rooms, selectedType, maxPrice, searchDates.guests]);
+  }, [rooms, selectedType, maxPrice, searchDates.guests, searchQuery]);
 
   // Handle Confirm Booking
   const handleConfirmBooking = async (bookingData) => {
@@ -601,48 +729,79 @@ const ClientDashboard = () => {
 
       {/* Tab 1: Book a Room (Consumer Booking Flow with Luxury Sanctuary & Slidable Carousel) */}
       {activeTab === 'book' && (
-        <main className="client-main-content" style={{ padding: '0 0 40px' }}>
-          {/* Luxury Hero Banner matching Image 5 */}
+        <main style={{ width: '100%', maxWidth: '100%', margin: 0, padding: '0 0 60px', overflowX: 'hidden' }}>
+          {/* Luxury Full-Screen Hero Banner */}
           <section
             style={{
-              background: 'linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.85)), url("https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=1600&q=80") center/cover no-repeat',
+              width: '100%',
+              background: `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.88)), url("${TABLE_RESERVATION_IMAGE}") center/cover no-repeat`,
               color: '#ffffff',
-              padding: '64px 24px 50px',
+              minHeight: 'calc(100vh - 76px)',
+              padding: 'clamp(56px, 8vh, 96px) 24px clamp(38px, 7vh, 72px)',
               textAlign: 'center',
               borderBottom: '1px solid rgba(255,255,255,0.1)',
+              boxSizing: 'border-box',
+              display: 'flex',
+              alignItems: 'center',
             }}
           >
-            <div style={{ maxWidth: '960px', margin: '0 auto' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', padding: '5px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }} />
+            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', padding: '5px 16px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981' }} />
                 THE SANCTUARY COLLECTION &bull; PARIS &bull; 874 BOULEVARD MONTAIGNE
               </div>
-              <h1 style={{ fontSize: '38px', fontWeight: 800, margin: '0 0 12px', letterSpacing: '-0.02em', lineHeight: 1.2, color: '#ffffff' }}>
+              <h1 style={{ fontSize: '42px', fontWeight: 800, margin: '0 0 14px', letterSpacing: '-0.02em', lineHeight: 1.2, color: '#ffffff' }}>
                 A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
               </h1>
-              <p style={{ fontSize: '15px', color: '#cbd5e1', maxWidth: '720px', margin: '0 auto 28px', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '15px', color: '#cbd5e1', maxWidth: '780px', margin: '0 auto 32px', lineHeight: 1.65 }}>
                 Experience quintessential European grace where quiet architecture meets intuitive white-glove service. Welcome to our private hotel, grand residences, and Michelin-accorded culinary salon.
               </p>
 
-              {/* Booking Search Bar Card with Promo Code Verification */}
+              {/* Active Modern Booking & Search Ribbon */}
               <form
                 onSubmit={handleSearchAvailability}
                 style={{
                   background: 'rgba(255, 255, 255, 0.98)',
                   backdropFilter: 'blur(16px)',
                   borderRadius: '16px',
-                  padding: '18px 22px',
-                  boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+                  padding: '18px 24px',
+                  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)',
                   display: 'grid',
-                  gridTemplateColumns: '1fr 1fr 1fr 1.1fr 1.2fr auto',
+                  gridTemplateColumns: '1.4fr 1fr 1fr 1.1fr 1.1fr 1.1fr auto',
                   gap: '12px',
                   alignItems: 'center',
                   textAlign: 'left',
-                  maxWidth: '1080px',
+                  maxWidth: '1240px',
                   margin: '0 auto',
+                  border: '1px solid rgba(255,255,255,0.5)',
                 }}
               >
                 <div>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    KEYWORD / SUITE
+                  </label>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#64748b' }}>search</span>
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="e.g. Penthouse, Ocean, Balcony, 201..."
+                      style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery('')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: '#94a3b8' }}
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
                   <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
                     CHECK-IN
                   </label>
@@ -744,7 +903,7 @@ const ClientDashboard = () => {
                   }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>search</span>
-                  <span>Check Availability</span>
+                  <span>Check &amp; Search</span>
                 </button>
               </form>
 
@@ -766,36 +925,38 @@ const ClientDashboard = () => {
             </div>
           </section>
 
-          {/* ─── Seamless Auto-Scrolling Showcase Reel (Image 5 & Stitch Specs) ─── */}
-          <section style={{ maxWidth: '1240px', margin: '40px auto 20px', padding: '0 20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '18px' }}>
+          {/* ─── Full-Screen Seamless Auto-Scrolling Showcase Reel (Room & Table Reservations) ─── */}
+          <section style={{ width: '100%', margin: '48px 0 24px', padding: '0 32px', boxSizing: 'border-box' }}>
+            <div style={{ maxWidth: '1380px', margin: '0 auto 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: 800, color: '#065f46', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   EXCLUSIVE RESIDENTIAL WINGS &bull; ACCLAIMED DINING
                 </span>
-                <h2 style={{ fontSize: '24px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
+                <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
                   Signature Living &amp; Culinary Tables
                 </h2>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', background: '#f1f5f9', padding: '4px 10px', borderRadius: '20px' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>auto_awesome</span>
-                  Auto-scrolling &bull; Hover to pause
+                  Auto-scrolling Reel &bull; Hover to pause
                 </span>
                 <div style={{ display: 'flex', gap: '6px' }}>
                   <button
                     type="button"
                     onClick={() => scrollCarousel('left')}
-                    style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    title="Previous visual"
+                    style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_left</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>chevron_left</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => scrollCarousel('right')}
-                    style={{ width: '32px', height: '32px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                    title="Next visual"
+                    style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>chevron_right</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>chevron_right</span>
                   </button>
                 </div>
               </div>
@@ -833,7 +994,7 @@ const ClientDashboard = () => {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   padding: '24px',
-                  backgroundImage: 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1000&q=80")',
+                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[0].img}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -894,7 +1055,7 @@ const ClientDashboard = () => {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   padding: '24px',
-                  backgroundImage: 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80")',
+                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[1].img}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -950,7 +1111,7 @@ const ClientDashboard = () => {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   padding: '24px',
-                  backgroundImage: 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("https://images.unsplash.com/photo-1578683010236-d716f9a3f461?auto=format&fit=crop&w=1000&q=80")',
+                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[2].img}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -1011,7 +1172,7 @@ const ClientDashboard = () => {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   padding: '24px',
-                  backgroundImage: 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=1000&q=80")',
+                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[3].img}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -1072,7 +1233,7 @@ const ClientDashboard = () => {
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                   padding: '24px',
-                  backgroundImage: 'linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80")',
+                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[4].img}")`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                 }}
@@ -1146,6 +1307,26 @@ const ClientDashboard = () => {
                 ))}
               </div>
             </div>
+
+            {/* Active Search & Filter Indicator */}
+            {searchQuery && (
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '20px', background: '#ecfdf5', padding: '10px 16px', borderRadius: '10px', border: '1px solid #a7f3d0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#065f46' }}>search</span>
+                  <span style={{ fontSize: '13px', color: '#065f46', fontWeight: 600 }}>
+                    Keyword filter: <strong>"{searchQuery}"</strong> &bull; {filteredRooms.length} {filteredRooms.length === 1 ? 'room' : 'rooms'} matched
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  style={{ background: '#065f46', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
+                  Clear Search
+                </button>
+              </div>
+            )}
 
             {/* Room Cards Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
@@ -1452,7 +1633,21 @@ const ClientDashboard = () => {
               <h1>My Reservations</h1>
               <p>Review your upcoming retreats, confirmed stays, and restaurant reservations.</p>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="outline-button"
+                onClick={() => {
+                  loadReservations();
+                  loadTableReservations();
+                }}
+                disabled={loadingReservations || loadingTableRes}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Fetch latest room and table reservations"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>refresh</span>
+                <span>Refresh</span>
+              </button>
               <button
                 type="button"
                 className="outline-button"
@@ -1766,7 +1961,7 @@ const ClientDashboard = () => {
 
       {/* Tab 2b: Restaurant — Reserve a Table */}
       {activeTab === 'restaurant' && (
-        <main className="client-main-content">
+        <main style={{ width: '100%', maxWidth: '100%', margin: 0, padding: 0, overflowX: 'hidden' }}>
           <RestaurantPage
             onReservationSuccess={(created) => {
               loadTableReservations();

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { guestAPI, reservationAPI, roomAPI, restaurantTableAPI, tableReservationAPI } from "../services/api";
 import StatusBadge from "../components/StatusBadge";
@@ -114,7 +114,12 @@ const getLocalTableReservations = () => {
   try {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('client_table_res_')) {
+      if (
+        key &&
+        (key.startsWith('client_table_res_') ||
+          key === 'hotel_table_reservations' ||
+          key === 'hotel_restaurant_table_reservations')
+      ) {
         const val = localStorage.getItem(key);
         if (val) {
           const parsed = JSON.parse(val);
@@ -358,6 +363,42 @@ const Dashboard = () => {
       { id: 4, guestName: 'Arthur W. Kirkland', tier: null, resNo: 'AT-88256', nights: 1, room: 'Room 105', category: 'Classic Queen Garden', eta: '02:00 PM', travel: 'Standard Window', housekeeping: 'Pre-Assigned', hkStatus: 'pre', folio: '$310.00', folioStatus: 'Deposit $100' },
     ];
   }, [reservations]);
+
+  const liveReservationItems = useMemo(() => {
+    const roomsBooked = reservations.map((r) => ({
+      id: `room-${r.id}`,
+      kind: 'Room',
+      icon: 'hotel',
+      guestName: r.guest ? `${r.guest.firstName || ''} ${r.guest.lastName || ''}`.trim() : 'Guest',
+      primary: `Room ${r.room?.roomNumber || 'TBD'}`,
+      secondary: r.room?.roomType || 'Boutique stay',
+      schedule: `${r.checkInDate || 'TBD'} to ${r.checkOutDate || 'TBD'}`,
+      size: `${r.numberOfGuests || 1} guest${Number(r.numberOfGuests || 1) === 1 ? '' : 's'}`,
+      status: r.status || 'CONFIRMED',
+      accent: '#065f46',
+      actionPath: '/staff/reservations',
+    }));
+
+    const tablesBooked = tableReservations.map((r) => ({
+      id: `table-${r.id}`,
+      kind: 'Table',
+      icon: 'restaurant',
+      guestName: r.guest ? `${r.guest.firstName || ''} ${r.guest.lastName || ''}`.trim() : 'Diner',
+      primary: `Table ${r.restaurantTable?.tableNumber || 'TBD'}`,
+      secondary: r.restaurantTable?.area?.replace('_', ' ') || 'Dining room',
+      schedule: `${r.reservationDate || 'TBD'} at ${formatTime(r.timeSlot)}`,
+      size: `${r.partySize || 1} guest${Number(r.partySize || 1) === 1 ? '' : 's'}`,
+      status: r.status || 'CONFIRMED',
+      accent: '#b45309',
+      actionPath: '/staff/table-reservations',
+    }));
+
+    return [...roomsBooked, ...tablesBooked].sort((a, b) => {
+      const aId = Number(String(a.id).replace(/\D/g, '')) || 0;
+      const bId = Number(String(b.id).replace(/\D/g, '')) || 0;
+      return bId - aId;
+    });
+  }, [reservations, tableReservations]);
 
   return (
     <section className="page-section" style={{ maxWidth: '1440px', margin: '0 auto' }}>
@@ -672,6 +713,74 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ─── Live Room and Table Reservation Board ─── */}
+      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f5f9', flexWrap: 'wrap', gap: '10px' }}>
+          <div>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LIVE RESERVATION BOARD</span>
+            <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
+              Room Bookings &amp; Table Reservations
+            </h2>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ background: '#ecfdf5', color: '#065f46', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
+              {reservations.length} Rooms
+            </span>
+            <span style={{ background: '#fffbeb', color: '#b45309', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
+              {tableReservations.length} Tables
+            </span>
+          </div>
+        </div>
+
+        {liveReservationItems.length === 0 ? (
+          <div style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '34px', color: '#94a3b8' }}>event_busy</span>
+            <p style={{ margin: '8px 0 0', fontSize: '13px' }}>No room or table reservations are waiting yet.</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', padding: '16px' }}>
+            {liveReservationItems.slice(0, 8).map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => navigate(item.actionPath)}
+                style={{
+                  textAlign: 'left',
+                  border: '1px solid #e2e8f0',
+                  borderLeft: `4px solid ${item.accent}`,
+                  borderRadius: '10px',
+                  background: '#f8fafc',
+                  padding: '14px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  gap: '12px',
+                  minHeight: '128px',
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#ffffff', color: item.accent, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
+                  {item.icon}
+                </span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center' }}>
+                    <strong style={{ fontSize: '13px', color: '#0f172a' }}>{item.guestName || 'Guest'}</strong>
+                    <span style={{ background: '#ffffff', color: item.accent, padding: '2px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 800 }}>
+                      {item.kind}
+                    </span>
+                  </span>
+                  <strong style={{ display: 'block', color: '#0f172a', fontSize: '15px', marginTop: '7px' }}>{item.primary}</strong>
+                  <span style={{ display: 'block', color: '#64748b', fontSize: '12px', marginTop: '2px' }}>{item.secondary}</span>
+                  <span style={{ display: 'block', color: '#334155', fontSize: '12px', marginTop: '8px', fontWeight: 700 }}>{item.schedule}</span>
+                  <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', gap: '8px' }}>
+                    <span style={{ color: '#64748b', fontSize: '11px' }}>{item.size}</span>
+                    <StatusBadge status={item.status} />
+                  </span>
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ─── Bottom Section: Live Arrival Manifest & Duty Dispatch / Quick Actions ─── */}

@@ -11,6 +11,29 @@ import StaffManagement from './StaffManagement.jsx';
 import { useAuth } from '../context/AuthContext';
 import { reservationAPI, tableReservationAPI } from '../services/api';
 
+const mergeById = (serverList = [], localList = []) => {
+  const seen = new Set();
+  return [...serverList, ...localList].filter((item) => {
+    const id = String(item?.id || '');
+    if (!id || seen.has(id)) return false;
+    seen.add(id);
+    return true;
+  });
+};
+
+const readLocalReservations = (matchKey) => {
+  const list = [];
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !matchKey(key)) continue;
+      const parsed = JSON.parse(localStorage.getItem(key) || '[]');
+      if (Array.isArray(parsed)) list.push(...parsed);
+    }
+  } catch (_) {}
+  return list;
+};
+
 const pageTitles = {
   '/staff': 'Front-Desk Overview',
   '/staff/rooms': 'Room Management',
@@ -94,20 +117,55 @@ const StaffTopBar = ({
   }, [roomReservations, tableReservations]);
 
   const unreadNotifications = useMemo(() => {
-    return allNotifications.filter(
-      (n) => n.status === 'PENDING' && !readIds.includes(n.id)
-    );
+    return allNotifications.filter((n) => !readIds.includes(n.id));
   }, [allNotifications, readIds]);
 
   const unreadCount = unreadNotifications.length;
 
-  const markAllAsRead = () => {
-    const allIds = allNotifications.map((n) => n.id);
-    setReadIds(allIds);
+  const markNotificationsAsRead = (type = 'ALL') => {
+    const nextIds = allNotifications
+      .filter((n) => type === 'ALL' || n.type === type)
+      .map((n) => n.id);
+    setReadIds((previous) => {
+      const merged = Array.from(new Set([...previous, ...nextIds]));
+      try {
+        localStorage.setItem('staff_read_notifs', JSON.stringify(merged));
+      } catch {}
+      return merged;
+    });
+  };
+
+  const markAllAsRead = () => markNotificationsAsRead('ALL');
+
+  useEffect(() => {
+    if (location.pathname === '/staff/reservations') {
+      markNotificationsAsRead('ROOM');
+    }
+    if (location.pathname === '/staff/table-reservations') {
+      markNotificationsAsRead('TABLE');
+    }
+  }, [location.pathname, allNotifications]);
+
+  const handleNotificationClick = (notification) => {
+    markNotificationsAsRead(notification.type);
+    setShowNotifications(false);
+    navigate(notification.link);
+  };
+
+  const removeClearedReadIds = () => {
+    const activeIds = allNotifications.map((n) => n.id);
+    const activeIdSet = new Set(activeIds);
+    const nextReadIds = readIds.filter((id) => activeIdSet.has(id));
+    if (nextReadIds.length === readIds.length) return;
+    setReadIds(nextReadIds);
     try {
-      localStorage.setItem('staff_read_notifs', JSON.stringify(allIds));
+      localStorage.setItem('staff_read_notifs', JSON.stringify(nextReadIds));
     } catch {}
   };
+
+  useEffect(() => {
+    removeClearedReadIds();
+  }, [allNotifications]);
 
   const displayedNotifications = useMemo(() => {
     if (notifFilter === 'ROOM') return allNotifications.filter((n) => n.type === 'ROOM');
@@ -241,10 +299,7 @@ const StaffTopBar = ({
                   {displayedNotifications.slice(0, 10).map((n) => (
                     <div
                       key={n.id}
-                      onClick={() => {
-                        setShowNotifications(false);
-                        navigate(n.link);
-                      }}
+                      onClick={() => handleNotificationClick(n)}
                       style={{
                         display: 'flex',
                         gap: '10px',
@@ -411,10 +466,28 @@ const StaffDashboard = () => {
         reservationAPI.getAll(),
         tableReservationAPI.getAll(),
       ]);
-      setRoomReservations(resRoom.data || []);
-      setTableReservations(resTable.data || []);
+      const localRooms = readLocalReservations(
+        (key) => key.startsWith('client_res_') || key === 'hotel_global_room_reservations'
+      );
+      const localTables = readLocalReservations(
+        (key) =>
+          key.startsWith('client_table_res_') ||
+          key === 'hotel_table_reservations' ||
+          key === 'hotel_restaurant_table_reservations'
+      );
+      setRoomReservations(mergeById(resRoom.data || [], localRooms));
+      setTableReservations(mergeById(resTable.data || [], localTables));
     } catch (err) {
       console.warn('Failed to refresh reservations in StaffDashboard:', err);
+      setRoomReservations(readLocalReservations(
+        (key) => key.startsWith('client_res_') || key === 'hotel_global_room_reservations'
+      ));
+      setTableReservations(readLocalReservations(
+        (key) =>
+          key.startsWith('client_table_res_') ||
+          key === 'hotel_table_reservations' ||
+          key === 'hotel_restaurant_table_reservations'
+      ));
     }
   };
 

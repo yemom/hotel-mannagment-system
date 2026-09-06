@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL =
+let rawBase =
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
     import.meta.env.VITE_API_URL) ||
@@ -8,6 +8,17 @@ const API_BASE_URL =
     process.env &&
     (process.env.REACT_APP_API_URL || process.env.VITE_API_URL)) ||
   "http://localhost:8085/api/api";
+
+const cleanUrl = rawBase.replace(/\/+$/, "");
+if (cleanUrl.endsWith("/api/api")) {
+  rawBase = cleanUrl;
+} else if (cleanUrl.endsWith("/api")) {
+  rawBase = `${cleanUrl}/api`;
+} else {
+  rawBase = `${cleanUrl}/api/api`;
+}
+
+const API_BASE_URL = rawBase;
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

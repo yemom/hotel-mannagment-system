@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { restaurantTableAPI, tableReservationAPI } from '../services/api';
 
@@ -223,6 +223,15 @@ const RestaurantPage = ({ onReservationSuccess }) => {
       const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
       const updated = [createdRecord, ...existing.filter((r) => r.id !== createdRecord.id)];
       localStorage.setItem(storageKey, JSON.stringify(updated));
+
+      const globalKey = 'hotel_restaurant_table_reservations';
+      const existingGlobal = JSON.parse(localStorage.getItem(globalKey) || '[]');
+      const updatedGlobal = [
+        createdRecord,
+        ...existingGlobal.filter((r) => String(r.id) !== String(createdRecord.id)),
+      ];
+      localStorage.setItem(globalKey, JSON.stringify(updatedGlobal));
+      localStorage.setItem('client_table_res_last', JSON.stringify([createdRecord]));
     } catch (e) {
       console.warn('Failed to save to localStorage:', e);
     }
@@ -258,6 +267,33 @@ const RestaurantPage = ({ onReservationSuccess }) => {
     return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
   };
 
+  // Carousel images for auto-scrolling showcase
+  const CAROUSEL_ITEMS = [
+    { img: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=900&q=80', label: 'Window Booth', sub: 'Fountain view · 2 Guests' },
+    { img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=900&q=80', label: 'Romantic Booth', sub: 'Candlelit · 2 Guests' },
+    { img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80', label: 'Grand Hall', sub: 'Chandelier · 4-8 Guests' },
+    { img: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?auto=format&fit=crop&w=900&q=80', label: 'Piano Lounge', sub: 'Jazz ambiance · 4 Guests' },
+    { img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80', label: 'Balcony Vista', sub: 'Panoramic · 4 Guests' },
+    { img: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=900&q=80', label: 'Executive Suite', sub: 'Private dining · 6 Guests' },
+    { img: 'https://images.unsplash.com/photo-1528605248644-14dd04022da1?auto=format&fit=crop&w=900&q=80', label: 'Royal Banquet', sub: 'VIP event · 8-12 Guests' },
+  ];
+  const carouselRef = useRef(null);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+
+  useEffect(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const iv = setInterval(() => {
+      if (!carouselPaused) {
+        el.scrollLeft += 1.5;
+        if (el.scrollLeft >= el.scrollWidth - el.clientWidth - 2) {
+          el.scrollLeft = 0;
+        }
+      }
+    }, 22);
+    return () => clearInterval(iv);
+  }, [carouselPaused]);
+
   // Filter tables by selected area
   const displayedTables = (availableTables || []).filter((table) => {
     if (selectedAreaFilter === 'ALL') return true;
@@ -272,21 +308,62 @@ const RestaurantPage = ({ onReservationSuccess }) => {
 
   return (
     <div className="restaurant-page">
-      {/* ─── Hero Banner ─── */}
+      {/* ─── Full-Screen Hero Banner ─── */}
       <div className="restaurant-hero">
         <div className="restaurant-hero-overlay">
-          <div className="restaurant-hero-text">
-            <span className="material-symbols-outlined restaurant-hero-icon">restaurant</span>
-            <h2>የ-mom Restaurant &amp; Lounge</h2>
-            <p>Artisanal Ethiopian &amp; Mediterranean fusion · Panoramic balcony &amp; intimate window seating · Open daily 17:00 – 22:30</p>
-            <div className="restaurant-cuisine-tags">
+          <div style={{ maxWidth: '1280px', width: '100%', padding: '0 48px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.45)', padding: '5px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#f59e0b' }} />
+              Open Now · 17:00 – 22:30
+            </div>
+            <div>
+              <span className="material-symbols-outlined restaurant-hero-icon">restaurant</span>
+            </div>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, margin: '0 0 16px', letterSpacing: '-0.03em', lineHeight: 1.05, textShadow: '0 2px 24px rgba(0,0,0,0.45)', color: '#ffffff', maxWidth: '700px' }}>የ-mom Restaurant<br />&amp; Lounge</h2>
+            <p style={{ fontSize: '18px', color: '#cbd5e1', margin: '0 0 32px', lineHeight: 1.6, maxWidth: '560px' }}>Artisanal Ethiopian &amp; Mediterranean fusion · Panoramic balcony &amp; intimate window seating</p>
+            <div className="restaurant-cuisine-tags" style={{ marginBottom: '32px' }}>
               <span className="cuisine-tag">Beside Window</span>
               <span className="cuisine-tag">Balcony &amp; Terrace</span>
               <span className="cuisine-tag">Poolside Pergola</span>
               <span className="cuisine-tag">Sommelier Pairing</span>
               <span className="cuisine-tag">Private Suites</span>
+              <span className="cuisine-tag">Wine Cellar</span>
+            </div>
+            <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+              <button type="button" className="primary-button" style={{ background: '#f59e0b', color: '#0f172a', fontWeight: 800, fontSize: '15px', padding: '14px 32px', borderRadius: '999px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
+                <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>event_seat</span>
+                Reserve a Table
+              </button>
+              <button type="button" style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', color: '#ffffff', fontWeight: 600, fontSize: '14px', padding: '14px 28px', borderRadius: '999px', border: '1px solid rgba(255,255,255,0.25)', cursor: 'pointer' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
+                View Dining Areas
+              </button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* ─── Auto-Scrolling Dining Showcase Carousel ─── */}
+      <div style={{ background: '#0f172a', padding: '32px 0 28px', position: 'relative' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 48px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', margin: '0 0 4px' }}>Dining Experiences</h3>
+            <p style={{ fontSize: '13px', color: '#475569', margin: 0 }}>Hover to pause · Click to reserve</p>
+          </div>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button type="button" onClick={() => { if(carouselRef.current) carouselRef.current.scrollLeft -= 280; }} style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#ffffff', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&#8249;</button>
+            <button type="button" onClick={() => { if(carouselRef.current) carouselRef.current.scrollLeft += 280; }} style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#ffffff', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&#8250;</button>
+          </div>
+        </div>
+        <div ref={carouselRef} onMouseEnter={() => setCarouselPaused(true)} onMouseLeave={() => setCarouselPaused(false)} style={{ display: 'flex', gap: '14px', overflowX: 'auto', scrollBehavior: 'auto', paddingLeft: '48px', paddingRight: '48px', paddingBottom: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {[...CAROUSEL_ITEMS, ...CAROUSEL_ITEMS].map((item, idx) => (
+            <div key={idx} style={{ flexShrink: 0, width: '260px', borderRadius: '14px', overflow: 'hidden', background: '#1e293b', cursor: 'pointer' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
+              <img src={item.img} alt={item.label} style={{ width: '100%', height: '170px', objectFit: 'cover', display: 'block' }} loading="lazy" />
+              <div style={{ padding: '10px 12px' }}>
+                <strong style={{ fontSize: '13px', color: '#f1f5f9', display: 'block', marginBottom: '2px' }}>{item.label}</strong>
+                <span style={{ fontSize: '11px', color: '#64748b' }}>{item.sub}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

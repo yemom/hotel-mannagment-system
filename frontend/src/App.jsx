@@ -1,10 +1,10 @@
-import React from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import ClientDashboard from './pages/ClientDashboard';
-import StaffDashboard from './pages/StaffDashboard';
+import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import ClientDashboard from "./pages/ClientDashboard";
+import StaffDashboard from "./pages/StaffDashboard";
 
 const RootRedirect = () => {
   const { currentUser, role } = useAuth();
@@ -13,7 +13,7 @@ const RootRedirect = () => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role === 'receptionist') {
+  if (role === "receptionist") {
     return <Navigate to="/staff" replace />;
   }
 
@@ -69,10 +69,19 @@ const AppRoutes = () => {
 
       {/* Backward-compatibility redirects for staff subroutes */}
       <Route path="/rooms" element={<Navigate to="/staff/rooms" replace />} />
-      <Route path="/reservations" element={<Navigate to="/staff/reservations" replace />} />
+      <Route
+        path="/reservations"
+        element={<Navigate to="/staff/reservations" replace />}
+      />
       <Route path="/guests" element={<Navigate to="/staff/guests" replace />} />
-      <Route path="/pricing" element={<Navigate to="/staff/pricing" replace />} />
-      <Route path="/reports" element={<Navigate to="/staff/reports" replace />} />
+      <Route
+        path="/pricing"
+        element={<Navigate to="/staff/pricing" replace />}
+      />
+      <Route
+        path="/reports"
+        element={<Navigate to="/staff/reports" replace />}
+      />
       <Route path="/booking" element={<Navigate to="/client" replace />} />
 
       {/* Fallback */}

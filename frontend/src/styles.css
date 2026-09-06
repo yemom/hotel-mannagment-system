@@ -2388,25 +2388,33 @@ p {
 
 /* Client Restaurant Page */
 .restaurant-page {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 20px 60px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 0 60px;
+  overflow-x: hidden;
 }
 
 .restaurant-hero {
-  border-radius: 20px;
+  width: 100%;
+  border-radius: 0;
   overflow: hidden;
-  margin-bottom: 28px;
-  background-image: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(30, 58, 95, 0.75)),
-    url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80');
+  margin-bottom: 0;
+  background-image: linear-gradient(160deg, rgba(10, 18, 40, 0.92), rgba(20, 45, 85, 0.80)),
+    url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=85');
   background-size: cover;
   background-position: center;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+  box-shadow: none;
+  position: relative;
 }
 
 .restaurant-hero-overlay {
-  padding: 48px 36px;
+  padding: clamp(72px, 10vh, 128px) 60px clamp(56px, 8vh, 96px);
   color: #ffffff;
+  min-height: calc(100vh - 76px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .restaurant-hero-text {
@@ -2816,6 +2824,113 @@ p {
 /* Staff: Table Reservations Table */
 .table-reservations-page {
   padding: 24px;
+}
+
+.table-reservation-heading {
+  margin-bottom: 18px;
+}
+
+.table-reservation-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.table-reservation-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 82px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+}
+
+.table-reservation-stat > .material-symbols-outlined {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  font-size: 23px;
+  flex: 0 0 auto;
+}
+
+.table-reservation-stat strong {
+  display: block;
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.table-reservation-stat small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.table-reservation-panel {
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.table-reservation-toolbar {
+  padding: 18px 20px;
+}
+
+.table-reservation-toolbar .field {
+  max-width: 360px;
+}
+
+.table-reservation-filters {
+  margin: 0;
+  padding: 0 20px 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.staff-reservation-table th {
+  padding: 12px 16px;
+}
+
+.staff-reservation-table td {
+  height: 68px;
+  padding: 14px 16px;
+}
+
+.staff-reservation-table .action-buttons {
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+}
+
+.staff-reservation-table .secondary-button,
+.staff-reservation-table .danger-button {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
+.guest-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.guest-cell strong {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.guest-cell small {
+  color: #64748b;
+  font-size: 11px;
 }
 
 .reservation-filter-bar {
