@@ -1,4 +1,5 @@
-# Hotel Management System
+
+# Hotel Management System - Complete Test Suite & Application
 
 [![CI/CD](https://github.com/yemom/hotel-mannagment-system/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yemom/hotel-mannagment-system/actions)
 
