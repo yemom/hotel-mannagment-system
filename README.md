@@ -1,3 +1,8 @@
+# Hotel Management System
+
+![CI/CD](https://github.com/yemom/hotel-mannagment-system/actions/workflows/ci.yaml/badge.svg)
+
+A brief description of your project...
 # Hotel Management System - Complete Test Suite & Application
 
 A comprehensive Spring Boot hotel management application with 134 automated tests, CI/CD pipelines, Docker support, and formal test design documentation. Implements guest registration, room management, and reservation workflows with full test coverage and defect tracking.
