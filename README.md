@@ -1,828 +1,1260 @@
-
-# Hotel Management System - Complete Test Suite & Application
-
+#  Hotel Management System
 [![CI/CD](https://github.com/yemom/hotel-mannagment-system/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/yemom/hotel-mannagment-system/actions)
 
-A comprehensive Spring Boot hotel management application with 134 automated tests, CI/CD pipelines, Docker support, and formal test design documentation. Implements guest registration, room management, and reservation workflows with full test coverage and defect tracking.
+A comprehensive **Hotel Management System** built with **Spring Boot** and Java, providing RESTful APIs for guest management, room inventory, reservations, pricing, and reservation lifecycle management.
 
-## Quick Start
+The project also includes a structured **software testing and quality-assurance framework** with unit, integration, and Selenium system tests, code-coverage analysis, defect tracking, CI/CD automation, Docker support, and formal test-design techniques.
 
-### Prerequisites
-
-- **Java 11** or higher
-- **Maven 3.8.1** or higher
-- **Git**
-- **Docker & Docker Compose** (optional, for containerized deployment)
-
-### Install Prerequisites (Windows)
-
-**Java 11 Installation**:
-
-```powershell
-# Using Chocolatey (recommended)
-choco install openjdk11
-
-# Or download from https://adoptium.net/
-```
-
-**Maven Installation**:
-
-```powershell
-# Using Chocolatey
-choco install maven
-
-# Or download from https://maven.apache.org/download.cgi
-```
-
-**Verify Installation**:
-
-```powershell
-java -version
-mvn -version
-```
+> **Academic Project — Software Testing & Validation**
+> Repository: [yemom/hotel-mannagment-system](https://github.com/yemom/hotel-mannagment-system)
 
 ---
 
-## Project Structure
+##  Project Overview
 
+The Hotel Management System is designed as a backend-oriented hotel operations platform that manages the core lifecycle of:
+
+*  Guests
+*  Rooms
+*  Reservations
+*  Pricing and discount rules
+*  Reservation status transitions
+*  Automated testing
+*  Code coverage and quality metrics
+*  CI/CD execution
+*  Containerized deployment
+
+The application follows a layered architecture separating domain models, business services, repositories, and REST controllers.
+
+The repository currently contains **134 documented automated tests** distributed across unit, integration, and system-testing levels.
+
+---
+
+##  Key Features
+
+###  Guest Management
+
+The guest-management module provides functionality for:
+
+* Guest registration
+* Guest authentication/login
+* Guest lookup by ID
+* Guest lookup by email
+* Listing all guests
+* Listing active guests
+* Updating guest profiles
+* Suspending guest accounts
+* Reactivating guest accounts
+* Duplicate-email validation
+* Age validation
+
+The documented validation rules define a supported guest age range of **18–120 years** and require unique, valid email addresses.
+
+---
+
+###  Room Management
+
+The room-management module supports:
+
+* Creating rooms
+* Retrieving rooms
+* Listing all rooms
+* Searching by room type
+* Finding available rooms by type
+* Searching by room status
+* Searching room availability by date and guest capacity
+* Updating room status
+* Sending rooms to maintenance
+* Returning rooms to available status
+
+The documented room validation rules include:
+
+| Rule        | Valid Range                            |
+| ----------- | -------------------------------------- |
+| Room price  | `> 0` and `<= 10,000`                  |
+| Capacity    | `1–20` guests                          |
+| Room status | `AVAILABLE`, `OCCUPIED`, `MAINTENANCE` |
+
+Boundary tests specifically target values such as `0`, `0.01`, `10,000`, `10,001`, `0`, `1`, `20`, and `21`.
+
+---
+
+###  Reservation Management
+
+The reservation module manages the complete reservation lifecycle:
+
+```text
+PENDING
+   │
+   ├── confirm() ──────► CONFIRMED
+   │                       │
+   │                       ├── checkIn() ──► CHECKED_IN
+   │                       │                     │
+   │                       │                     └── checkOut() ──► CHECKED_OUT
+   │                       │
+   │                       └── cancel() ──► CANCELLED
+   │
+   └── cancel() ──────► CANCELLED
 ```
-hotel-management/
+
+Invalid transitions are explicitly tested and rejected.
+
+Examples include:
+
+* `CHECKED_IN → CANCELLED` 
+* `PENDING → CHECKED_IN` 
+* `CHECKED_OUT → CANCELLED` 
+
+Valid transitions include:
+
+* `PENDING → CONFIRMED`
+* `CONFIRMED → CHECKED_IN`
+* `CHECKED_IN → CHECKED_OUT`
+* `PENDING → CANCELLED`
+* `CONFIRMED → CANCELLED`
+
+These state-transition rules are part of the formal test design.
+
+---
+
+###  Pricing & Discount Management
+
+The pricing logic evaluates several business conditions:
+
+* Length of stay
+* Guest age
+* VIP status
+* Season/off-peak status
+
+The documented decision-table rules include:
+
+| Condition      | Rule                               |
+| -------------- | ---------------------------------- |
+| Long stay      | `>= 3 nights`                      |
+| Very long stay | `7+ nights`                        |
+| Senior guest   | `>= 60 years`                      |
+| VIP guest      | Email ending in `@vip.com`         |
+| Off-peak       | Based on documented seasonal rules |
+
+Examples of documented discount rules include:
+
+* Senior + VIP + off-peak → **25%**
+* Senior + non-VIP + off-peak → **15%**
+* VIP long stay → **15%**
+* Senior + non-VIP + off-peak → **10%**
+* 7+ night stay → **12%**
+* 3–6 night stay → **5%**
+* No qualifying condition → **0%**
+
+The test design documents seven pricing rules and reports full rule coverage.
+
+---
+
+#  Architecture
+
+The application follows a layered Spring architecture:
+
+```text
+                    ┌──────────────────────┐
+                    │      REST API        │
+                    │    Controllers      │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Services        │
+                    │                      │
+                    │ GuestService         │
+                    │ RoomService          │
+                    │ ReservationService   │
+                    │ PricingService       │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │    Repositories      │
+                    │                      │
+                    │ GuestRepository      │
+                    │ RoomRepository       │
+                    │ ReservationRepository│
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │       Database       │
+                    │ H2 / MySQL           │
+                    └──────────────────────┘
+```
+
+The repository structure separates models, services, repositories, controllers, and automated tests.
+
+---
+
+#  Technology Stack
+
+| Technology             | Purpose                            |
+| ---------------------- | ---------------------------------- |
+| **Java 11**            | Application runtime                |
+| **Spring Boot 2.7.14** | Backend framework                  |
+| **Spring REST**        | REST API                           |
+| **Maven 3.8.1+**       | Build and dependency management    |
+| **JPA**                | Persistence/data access            |
+| **H2**                 | In-memory testing database         |
+| **MySQL**              | Containerized database environment |
+| **JUnit 5**            | Unit/integration testing           |
+| **Mockito 4.11.0**     | Mocking                            |
+| **AssertJ 3.24.1**     | Assertions                         |
+| **Selenium 4.10.0**    | System/browser testing             |
+| **JaCoCo 0.8.8**       | Code coverage                      |
+| **GitHub Actions**     | CI/CD                              |
+| **Jenkins**            | CI/CD automation                   |
+| **Docker**             | Containerization                   |
+| **Docker Compose**     | Multi-service orchestration        |
+
+## The versions and toolchain are documented in the repository and QA documents.
+
+#  Project Structure
+
+```text
+hotel-mannagment-system/
+│
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml
+│
 ├── src/
-│   ├── main/java/com/hotelmanagement/
-│   │   ├── HotelManagementApplication.java      (Application entry point)
-│   │   ├── model/                               (Domain models)
+│   ├── main/
+│   │   ├── java/com/hotelmanagement/
+│   │   │
+│   │   ├── HotelManagementApplication.java
+│   │   │
+│   │   ├── model/
 │   │   │   ├── Guest.java
 │   │   │   ├── Room.java
 │   │   │   ├── Reservation.java
-│   │   │   └── enums/ (Status enums)
-│   │   ├── service/                             (Business logic)
+│   │   │   └── enums/
+│   │   │
+│   │   ├── service/
 │   │   │   ├── GuestService.java
 │   │   │   ├── RoomService.java
 │   │   │   ├── ReservationService.java
 │   │   │   └── PricingService.java
-│   │   ├── repository/                          (Data access)
+│   │   │
+│   │   ├── repository/
 │   │   │   ├── GuestRepository.java
 │   │   │   ├── RoomRepository.java
 │   │   │   └── ReservationRepository.java
-│   │   └── controller/                          (REST API)
+│   │   │
+│   │   └── controller/
 │   │       ├── GuestController.java
 │   │       ├── RoomController.java
 │   │       └── ReservationController.java
-│   ├── test/java/com/hotelmanagement/
-│   │   ├── GuestServiceTest.java                (50 unit tests)
-│   │   ├── RoomServiceTest.java                 (20 unit tests)
-│   │   ├── ReservationServiceTest.java          (30 unit tests)
-│   │   ├── PricingServiceTest.java              (15 unit tests)
-│   │   ├── HotelManagementIntegrationTest.java  (7 integration tests)
-│   │   ├── HotelManagementSystemTest.java       (12 system tests with Selenium)
-│   │   ├── pageobjects/                         (Selenium Page Object Pattern)
-│   │   │   ├── BasePage.java
-│   │   │   ├── LoginPage.java
-│   │   │   ├── RegistrationPage.java
-│   │   │   ├── SearchRoomsPage.java
-│   │   │   ├── BookingPage.java
-│   │   │   └── BaseSystemTest.java
+│   │
+│   ├── test/
+│   │   └── java/com/hotelmanagement/
+│   │       ├── GuestServiceTest.java
+│   │       ├── RoomServiceTest.java
+│   │       ├── ReservationServiceTest.java
+│   │       ├── PricingServiceTest.java
+│   │       ├── HotelManagementIntegrationTest.java
+│   │       ├── HotelManagementSystemTest.java
+│   │       │
+│   │       └── pageobjects/
+│   │           ├── BasePage.java
+│   │           ├── LoginPage.java
+│   │           ├── RegistrationPage.java
+│   │           ├── SearchRoomsPage.java
+│   │           ├── BookingPage.java
+│   │           └── BaseSystemTest.java
+│   │
 │   └── resources/
 │       └── application.properties
-├── pom.xml                                      (Maven dependencies)
-├── Dockerfile                                   (Docker image definition)
-├── docker-compose.yml                           (Multi-service setup)
-├── Jenkinsfile                                  (Jenkins CI/CD pipeline)
-├── .github/workflows/ci-cd.yml                  (GitHub Actions pipeline)
-└── docs/
-    ├── TEST_PLAN.md                             (Part A: Test strategy)
-    ├── TEST_DESIGN.md                           (Part B: Test design techniques)
-    ├── DEFECT_LOG.md                            (Part F: 16 defects identified)
-    ├── METRICS_REPORT.md                        (Part G: Coverage & metrics)
-    ├── TEST_SUMMARY.md                          (Part H: Test results & release decision)
-    └── FOUNDATIONS_REFLECTION.md                (Part I: Testing theory)
+│
+├── Dockerfile
+├── docker-compose.yml
+├── Jenkinsfile
+├── pom.xml
+│
+├── DEFECT_LOG.md
+├── FOUNDATIONS_REFLECTION.md
+├── METRICS_REPORT.md
+├── TEST_DESIGN.md
+├── TEST_PLAN.md
+└── TEST_SUMMARY.md
+```
+
+The repository documents this layered structure and its associated test classes.
+
+---
+
+#  Getting Started
+
+## Prerequisites
+
+Install the following:
+
+* Java 11 or later
+* Maven 3.8.1 or later
+* Git
+* Docker and Docker Compose — optional
+
+Verify the installations:
+
+```bash
+java -version
+mvn -version
+git --version
+docker --version
+docker-compose --version
 ```
 
 ---
 
-## Building the Application
-
-### Standard Build
+#  Clone the Repository
 
 ```bash
-cd "d:\AAiT PROJECTS\QA TEST\final project"
+git clone https://github.com/yemom/hotel-mannagment-system.git
+cd hotel-mannagment-system
+```
 
-# Clean and build
+---
+
+#  Build the Application
+
+Run a clean Maven build:
+
+```bash
 mvn clean package
-
-# Build output
-# Target: target/hotel-management-1.0.0.jar
-# Tests: All tests executed, must pass
-# Coverage: JaCoCo report in target/site/jacoco/index.html
 ```
 
-### Build Without Tests (Not Recommended)
+The generated JAR is:
 
-```bash
-mvn clean package -DskipTests
+```text
+target/hotel-management-1.0.0.jar
 ```
 
-### Build with Specific Java Version
+The repository also generates a JaCoCo coverage report under:
 
-```bash
-mvn clean package -source 11 -target 11
+```text
+target/site/jacoco/index.html
 ```
 
 ---
 
-## Running the Application
+#  Run the Application
 
-### Option 1: Maven Spring Boot Plugin
+## Option 1 — Spring Boot
 
 ```bash
 mvn spring-boot:run
 ```
 
-**Output**:
+The documented application configuration uses:
 
-```
-Started HotelManagementApplication in 3.5 seconds
-Application started on http://localhost:8080
-Context path: /api
+```text
+Host:        localhost
+Port:        8080
+Context:     /api
 ```
 
-### Option 2: Java Command (After Building)
+Therefore, the API base URL is:
+
+```text
+http://localhost:8080/api
+```
+
+---
+
+## Option 2 — Run the JAR
 
 ```bash
 java -jar target/hotel-management-1.0.0.jar
 ```
 
-### Option 3: Docker Container
+---
+
+#  Docker
+
+## Build Docker Image
 
 ```bash
-# Build Docker image
 docker build -t hotel-management:latest .
+```
 
-# Run container
+## Run Container
+
+```bash
 docker run -d \
   --name hotel-app \
   -p 8080:8080 \
   hotel-management:latest
+```
 
-# View logs
+View logs:
+
+```bash
 docker logs hotel-app
+```
 
-# Stop container
+Stop the application:
+
+```bash
 docker stop hotel-app
-```
-
-### Option 4: Docker Compose (Full Stack)
-
-```bash
-# Start all services (app + MySQL + Jenkins)
-docker-compose up -d
-
-# Access services:
-# Application: http://localhost:8080/api
-# Jenkins: http://localhost:8081
-# MySQL: localhost:3306
-
-# View logs
-docker-compose logs -f
-
-# Stop services
-docker-compose down
-```
-
-### Verify Application is Running
-
-```bash
-# Check health endpoint
-curl http://localhost:8080/api/actuator/health
-
-# Expected response:
-# {"status":"UP"}
 ```
 
 ---
 
-## Running Tests
+#  Docker Compose
 
-### Run All Tests
+The project includes a Docker Compose environment containing the documented application, MySQL, and Jenkins services.
+
+Start the environment:
+
+```bash
+docker-compose up -d
+```
+
+Services:
+
+| Service     | Address                     |
+| ----------- | --------------------------- |
+| Application | `http://localhost:8080/api` |
+| Jenkins     | `http://localhost:8081`     |
+| MySQL       | `localhost:3306`            |
+
+View logs:
+
+```bash
+docker-compose logs -f
+```
+
+Stop everything:
+
+```bash
+docker-compose down
+```
+
+The Compose configuration uses the `hotel-network` network and persistent volumes for MySQL and Jenkins data.
+
+---
+
+#  Health Check
+
+The application exposes the documented actuator health endpoint:
+
+```bash
+curl http://localhost:8080/api/actuator/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "UP"
+}
+```
+
+---
+
+#  REST API
+
+All API endpoints are exposed under:
+
+```text
+/api
+```
+
+##  Guest API
+
+| Method | Endpoint                      | Description         |
+| ------ | ----------------------------- | ------------------- |
+| `POST` | `/api/guests/register`        | Register guest      |
+| `POST` | `/api/guests/login`           | Authenticate guest  |
+| `GET`  | `/api/guests/{id}`            | Get guest           |
+| `GET`  | `/api/guests/email/{email}`   | Find guest by email |
+| `GET`  | `/api/guests/all`             | Get all guests      |
+| `GET`  | `/api/guests/active/list`     | Get active guests   |
+| `PUT`  | `/api/guests/{id}`            | Update guest        |
+| `POST` | `/api/guests/{id}/suspend`    | Suspend guest       |
+| `POST` | `/api/guests/{id}/reactivate` | Reactivate guest    |
+
+---
+
+##  Room API
+
+| Method | Endpoint                           | Description                 |
+| ------ | ---------------------------------- | --------------------------- |
+| `POST` | `/api/rooms`                       | Create room                 |
+| `GET`  | `/api/rooms/{id}`                  | Get room                    |
+| `GET`  | `/api/rooms/all`                   | Get all rooms               |
+| `GET`  | `/api/rooms/type/{type}`           | Get rooms by type           |
+| `GET`  | `/api/rooms/type/{type}/available` | Get available rooms by type |
+| `GET`  | `/api/rooms/status/{status}`       | Get rooms by status         |
+| `GET`  | `/api/rooms/available`             | Search available rooms      |
+| `PUT`  | `/api/rooms/{id}/status`           | Update room status          |
+| `POST` | `/api/rooms/{id}/maintenance`      | Set room to maintenance     |
+| `POST` | `/api/rooms/{id}/available`        | Mark room available         |
+
+---
+
+##  Reservation API
+
+| Method | Endpoint                            | Description            |
+| ------ | ----------------------------------- | ---------------------- |
+| `POST` | `/api/reservations`                 | Create reservation     |
+| `GET`  | `/api/reservations/{id}`            | Get reservation        |
+| `GET`  | `/api/reservations/all`             | Get all reservations   |
+| `GET`  | `/api/reservations/guest/{guestId}` | Get guest reservations |
+| `GET`  | `/api/reservations/room/{roomId}`   | Get room reservations  |
+| `POST` | `/api/reservations/{id}/confirm`    | Confirm reservation    |
+| `POST` | `/api/reservations/{id}/check-in`   | Check in guest         |
+| `POST` | `/api/reservations/{id}/check-out`  | Check out guest        |
+| `POST` | `/api/reservations/{id}/cancel`     | Cancel reservation     |
+
+The endpoint inventory above is taken from the repository's documented API section.
+
+---
+
+#  Testing Strategy
+
+Testing is one of the central components of this project.
+
+The test strategy uses three primary levels:
+
+```text
+                 ┌───────────────────┐
+                 │   System / E2E    │
+                 │    Selenium       │
+                 └─────────▲─────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 │   Integration     │
+                 │    Spring + H2    │
+                 └─────────▲─────────┘
+                           │
+                 ┌─────────┴─────────┐
+                 │       Unit        │
+                 │ JUnit + Mockito   │
+                 └───────────────────┘
+```
+
+### Unit Testing
+
+**115 tests**
+
+| Test Class               |   Tests |
+| ------------------------ | ------: |
+| `GuestServiceTest`       |      50 |
+| `ReservationServiceTest` |      30 |
+| `RoomServiceTest`        |      20 |
+| `PricingServiceTest`     |      15 |
+| **Total**                | **115** |
+
+Unit tests primarily validate service-layer business logic and validation rules.
+
+### Integration Testing
+
+**7 tests**
+
+Integration tests validate:
+
+* Multi-component workflows
+* Persistence
+* Reservation lifecycle
+* Cross-component behavior
+* Database interactions
+
+The integration layer uses Spring's test infrastructure and H2.
+
+### System Testing
+
+**12 Selenium tests**
+
+System testing uses:
+
+* Selenium WebDriver
+* Page Object Model
+* Browser automation
+* End-to-end scenarios
+
+Page objects include:
+
+```text
+BasePage
+LoginPage
+RegistrationPage
+SearchRoomsPage
+BookingPage
+BaseSystemTest
+```
+
+---
+
+#  Formal Test Design Techniques
+
+The project applies four formal testing techniques.
+
+## 1. Equivalence Partitioning
+
+The project partitions input values into valid and invalid classes.
+
+Examples:
+
+```text
+Guest Age
+├── < 18       → Invalid
+├── 18–120     → Valid
+└── > 120      → Invalid
+
+Room Price
+├── <= 0       → Invalid
+├── > 0–10,000 → Valid
+└── > 10,000   → Invalid
+
+Capacity
+├── 0          → Invalid
+├── 1–20       → Valid
+└── > 20       → Invalid
+```
+
+The documented design contains **17 equivalence partitions and 34 test cases**.
+
+---
+
+## 2. Boundary Value Analysis
+
+Boundary tests focus on values immediately around business limits.
+
+Examples:
+
+| Input         | Boundary Values       |
+| ------------- | --------------------- |
+| Age minimum   | 17, 18, 19            |
+| Age maximum   | 119, 120, 121         |
+| Price minimum | 0, 0.01, 0.99         |
+| Price maximum | 9,999, 10,000, 10,001 |
+| Capacity      | 0, 1, 19, 20, 21      |
+
+The metrics report documents **24 boundary tests** and six detected defects.
+
+---
+
+## 3. Decision Table Testing
+
+Decision tables are used primarily for pricing and discount logic.
+
+Conditions include:
+
+* Long stay
+* Senior guest
+* VIP guest
+* Off-peak season
+
+The design contains **seven documented rules** and reports full rule coverage.
+
+---
+
+## 4. State Transition Testing
+
+Reservation lifecycle transitions are explicitly tested.
+
+```text
+PENDING
+   │
+   ├── CONFIRM ──────► CONFIRMED
+   │                       │
+   │                       └── CHECK-IN ──► CHECKED_IN
+   │                                           │
+   │                                           └── CHECK-OUT ──► CHECKED_OUT
+   │
+   └── CANCEL ───────► CANCELLED
+```
+
+Invalid transitions are also included in the test suite.
+
+---
+
+#  Quality Metrics
+
+The repository reports the following testing baseline:
+
+| Metric                       | Reported Value | Target |
+| ---------------------------- | -------------: | -----: |
+| Automated tests              |            134 |   100+ |
+| Passed                       |            132 |      — |
+| Failed                       |              2 |      — |
+| Pass rate                    |          98.5% |    95% |
+| Line coverage                |            92% |    80% |
+| Branch coverage              |            88% |    80% |
+| Method coverage              |            95% |    85% |
+| Class coverage               |           100% |    90% |
+| Reported defects             |             16 |      — |
+| Reported resolved defects    |             16 |      — |
+| Reported outstanding defects |              0 |      0 |
+
+The repository reports these values as its documented QA baseline.
+
+The metrics report independently records the same 134-test execution, 132 passes, 2 failures, and coverage figures.
+
+> **Evidence note:** These are repository-reported measurements. They were not freshly executed during this README-generation session. The QA documentation explicitly states that the repository was inspected but the Maven/Selenium suite was not executed in the review environment.
+
+---
+
+#  Defect Management
+
+The project includes a formal defect-management process:
+
+```text
+OPEN
+  ↓
+IN_PROGRESS
+  ↓
+RESOLVED
+  ↓
+VERIFIED
+  ↓
+CLOSED
+```
+
+Defects are documented with:
+
+* Unique defect ID
+* Description
+* Severity
+* Priority
+* Root cause
+* Resolution
+* Verification
+* Closure evidence
+
+The detailed defect register contains examples involving:
+
+* Age validation
+* Duplicate email handling
+* Room capacity
+* Room price validation
+* Reservation overlap
+* Reservation state transitions
+* Guest suspension
+* Discount calculation
+* Room status
+* Date validation
+* Guest reservation lookup
+
+### Important Documentation Note
+
+The QA documentation reports **16 defects**, but the visible detailed defect register contains **15 IDs (`DEFECT-001` through `DEFECT-015`)**.
+
+This discrepancy should be reconciled against the source test results before the defect count is treated as a final auditable metric.
+
+---
+
+#  Defect Distribution
+
+The metrics documentation reports:
+
+| Component     |  LOC | Reported Defects | Density / 100 LOC |
+| ------------- | ---: | ---------------: | ----------------: |
+| Domain Models |  350 |                6 |               1.7 |
+| Services      |  600 |                8 |               1.3 |
+| Repositories  |   50 |                2 |               4.0 |
+| Overall       | ~800 |               16 |               2.0 |
+
+The repository identifies data-access/repository logic as an area requiring continued attention.
+
+---
+
+#  CI/CD
+
+The project supports both **GitHub Actions** and **Jenkins**.
+
+## GitHub Actions
+
+The documented workflow performs:
+
+1. Build and test
+2. Regression testing
+3. Optional SonarQube analysis
+4. Coverage verification
+5. Test-result summary
+
+The coverage quality gate is documented at **80%**.
+
+---
+
+## Jenkins
+
+The project contains an **11-stage Jenkins pipeline**:
+
+```text
+1.  Checkout
+2.  Clean
+3.  Build
+4.  Unit Tests
+5.  Integration Tests
+6.  Code Coverage
+7.  Verify Threshold
+8.  Package
+9.  Archive
+10. Regression Test
+11. Post-Actions
+```
+
+The pipeline publishes JUnit results and HTML coverage reports.
+
+---
+
+#  Quality Gates
+
+The documented release criteria include:
+
+* At least 80% line coverage
+* At least 80% branch coverage
+* At least 95% test pass rate
+* Zero critical defects
+* High-priority defects resolved
+* Regression suite passing
+* Documentation complete
+
+---
+
+#  Traceability
+
+The project uses a structured traceability chain:
+
+```text
+Business Requirement
+        ↓
+Risk
+        ↓
+Test Design Technique
+        ↓
+Test Case
+        ↓
+Automated Test
+        ↓
+Defect
+        ↓
+Regression Verification
+        ↓
+Quality Metric
+```
+
+Examples include:
+
+| Requirement           | Risk                  | Test Technique   | Test Layer       |
+| --------------------- | --------------------- | ---------------- | ---------------- |
+| Guest age validation  | Invalid guests        | EP + BVA         | Unit             |
+| Unique email          | Duplicate accounts    | EP               | Unit/Integration |
+| Room price            | Financial/data errors | EP + BVA         | Unit             |
+| Room capacity         | Overbooking           | EP + BVA         | Unit             |
+| Discount calculation  | Incorrect charges     | Decision Table   | Unit             |
+| Reservation lifecycle | Invalid workflow      | State Transition | Unit/Integration |
+| Overlap prevention    | Double booking        | EP + Integration | Integration      |
+| End-to-end journeys   | Cross-layer defects   | Scenario testing | System           |
+
+---
+
+#  Running Tests
+
+## Run Complete Test Suite
 
 ```bash
 mvn test
 ```
 
-**Output**:
+The repository's documented baseline is:
 
-```
-Tests run: 134
-Passed: 132
-Failed: 2 (System tests - UI not implemented)
-Pass Rate: 98.5%
-Execution Time: ~45 seconds
-```
-
-### Run Specific Test Class
-
-```bash
-# Unit tests for a specific service
-mvn test -Dtest=GuestServiceTest
-
-# Or multiple classes
-mvn test -Dtest=GuestServiceTest,RoomServiceTest,ReservationServiceTest
-```
-
-### Run Tests with Coverage Report
-
-```bash
-# Run tests and generate JaCoCo coverage
-mvn verify
-
-# Coverage report location:
-# target/site/jacoco/index.html
-
-# Coverage results:
-# Line Coverage: 92%
-# Branch Coverage: 88%
-# Method Coverage: 95%
-```
-
-### Run Specific Test Categories
-
-```bash
-# Run only unit tests (exclude integration/system)
-mvn test -Dgroups="unit"
-
-# Run only integration tests
-mvn test -Dgroups="integration"
-
-# Run only system tests (Selenium)
-mvn test -Dgroups="system"
-```
-
-### View Test Results
-
-```bash
-# Test results XML
-cat target/surefire-reports/TEST-*.xml
-
-# Or open in IDE:
-# VS Code: Test Explorer
-# IntelliJ: Test Results window
+```text
+Tests:       134
+Passed:      132
+Failed:      2
+Pass Rate:   98.5%
+Duration:    ~45 seconds
 ```
 
 ---
 
-## Code Coverage Analysis
+## Run Individual Test Class
 
-### Generate Coverage Report
+```bash
+mvn test -Dtest=GuestServiceTest
+```
+
+Multiple classes:
+
+```bash
+mvn test \
+  -Dtest=GuestServiceTest,RoomServiceTest,ReservationServiceTest
+```
+
+---
+
+## Generate Coverage
 
 ```bash
 mvn clean verify
 ```
 
-### Access Coverage Report
+Coverage report:
+
+```text
+target/site/jacoco/index.html
+```
+
+Open on Windows:
 
 ```bash
-# Open in browser
 start target/site/jacoco/index.html
+```
 
-# Or on Linux/Mac:
+Linux/macOS:
+
+```bash
 open target/site/jacoco/index.html
 ```
 
-### Coverage Metrics
+---
 
-| Component    | Line    | Branch  | Method  | Class   |
-| ------------ | ------- | ------- | ------- | ------- |
-| **Overall**  | 92%     | 88%     | 95%     | 100%    |
-| **Services** | 90%     | 85%     | 93%     | 100%    |
-| **Models**   | 98%     | 92%     | 98%     | 100%    |
-| **Target**   | 80%     | 80%     | 85%     | 90%     |
-| **Status**   | ✅ PASS | ✅ PASS | ✅ PASS | ✅ PASS |
+#  Test Distribution
+
+```text
+Unit Tests
+├── GuestServiceTest ............... 50
+├── ReservationServiceTest ......... 30
+├── RoomServiceTest ................ 20
+└── PricingServiceTest ............. 15
+                                     ──
+                                     115
+
+Integration Tests ................... 7
+
+System / Selenium Tests ............. 12
+                                     ──
+Total .............................. 134
+```
+
+## The repository and metrics report both document this overall test distribution.
+
+#  Configuration
+
+The main application configuration is located at:
+
+```text
+src/main/resources/application.properties
+```
+
+Documented settings include:
+
+```text
+Server Port:       8080
+Context Path:      /api
+Test Database:     H2
+Persistence:       JPA
+```
+
+The Docker Compose configuration additionally provides a MySQL service for the containerized environment.
 
 ---
 
-## Continuous Integration / Continuous Deployment
+#  Development Workflow
 
-### GitHub Actions Pipeline
+Recommended workflow:
 
-The `.github/workflows/ci-cd.yml` workflow automatically runs when you push to the repository.
+```text
+1. Clone repository
+       ↓
+2. Create/update tests
+       ↓
+3. Implement feature
+       ↓
+4. Run unit tests
+       ↓
+5. Run integration tests
+       ↓
+6. Generate coverage
+       ↓
+7. Run regression tests
+       ↓
+8. Commit changes
+       ↓
+9. Push to GitHub
+       ↓
+10. CI/CD validation
+```
 
-**Manual Trigger**:
+Example:
 
 ```bash
+git clone https://github.com/yemom/hotel-mannagment-system.git
+
+cd hotel-mannagment-system
+
+mvn clean package
+
+mvn test
+
+mvn verify
+
+git add .
+
+git commit -m "Add feature with tests"
+
 git push origin main
 ```
 
-**Pipeline Jobs**:
-
-1. **Build and Test** - Maven compile, unit tests, integration tests
-2. **Regression Test** - Run full test suite
-3. **Code Quality** - SonarQube analysis (optional)
-4. **Code Coverage** - Verify 80% threshold
-5. **Summary** - Generate test report
-
-**View Pipeline Results**:
-
-- GitHub: Settings → Actions → Select workflow run
-- Status badge: [![CI/CD](https://img.shields.io/badge/CI%2FCD-passing-green)]()
-
-### Jenkins Pipeline
-
-The `Jenkinsfile` contains a comprehensive 11-stage pipeline.
-
-**Prerequisites**:
-
-- Jenkins server running (docker-compose up)
-- Jenkins available at http://localhost:8081
-
-**Configure Pipeline**:
-
-1. Create new "Pipeline" job in Jenkins
-2. Point to this repository
-3. Pipeline script from SCM: Jenkinsfile
-4. Build triggers: Poll SCM or GitHub webhook
-
-**Pipeline Stages**:
-
-1. Checkout - Clone repository
-2. Clean - Remove previous build artifacts
-3. Build - Maven compile
-4. Unit Tests - Run 115 unit tests
-5. Integration Tests - Run 7 integration tests
-6. Code Coverage - JaCoCo analysis
-7. Verify Threshold - Fail if < 80%
-8. Package - Create JAR
-9. Archive - Store artifacts
-10. Regression Test - Full test suite
-11. Post-Actions - JUnit report + HTML coverage
-
-**Trigger Build**:
-
-```bash
-# Push to repository (webhook configured)
-git push origin main
-
-# Or trigger manually in Jenkins UI
-# Click "Build Now"
-```
+The repository documents a test-first development workflow and CI/CD execution after changes are pushed.
 
 ---
 
-## API Endpoints
+#  Troubleshooting
 
-### Guest Management
+## `Cannot find javac`
 
-```
-POST   /api/guests/register           - Register new guest
-POST   /api/guests/login              - Authenticate guest
-GET    /api/guests/{id}               - Get guest by ID
-GET    /api/guests/email/{email}      - Get guest by email
-GET    /api/guests/all                - Get all guests
-GET    /api/guests/active/list        - Get active guests only
-PUT    /api/guests/{id}               - Update guest profile
-POST   /api/guests/{id}/suspend       - Suspend guest account
-POST   /api/guests/{id}/reactivate    - Reactivate guest
-```
-
-### Room Management
-
-```
-POST   /api/rooms                     - Create new room
-GET    /api/rooms/{id}                - Get room by ID
-GET    /api/rooms/all                 - Get all rooms
-GET    /api/rooms/type/{type}         - Get rooms by type
-GET    /api/rooms/type/{type}/available - Get available rooms by type
-GET    /api/rooms/status/{status}     - Get rooms by status
-GET    /api/rooms/available           - Get available rooms (params: checkIn, checkOut, guests)
-PUT    /api/rooms/{id}/status         - Update room status
-POST   /api/rooms/{id}/maintenance    - Send room for maintenance
-POST   /api/rooms/{id}/available      - Mark room as available
-```
-
-### Reservation Management
-
-```
-POST   /api/reservations              - Create reservation
-GET    /api/reservations/{id}         - Get reservation by ID
-GET    /api/reservations/all          - Get all reservations
-GET    /api/reservations/guest/{guestId} - Get guest's reservations
-GET    /api/reservations/room/{roomId}   - Get room's reservations
-POST   /api/reservations/{id}/confirm - Confirm reservation
-POST   /api/reservations/{id}/check-in  - Check in guest
-POST   /api/reservations/{id}/check-out - Check out guest
-POST   /api/reservations/{id}/cancel  - Cancel reservation
-```
-
-### Example Requests
-
-**Register Guest**:
+Verify:
 
 ```bash
-curl -X POST http://localhost:8080/api/guests/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john@example.com",
-    "password": "Pass123",
-    "phone": "555-0001",
-    "age": 35,
-    "address": "123 Main St",
-    "city": "Boston",
-    "country": "USA"
-  }'
+java -version
 ```
 
-**Create Room**:
+Set `JAVA_HOME` to your JDK installation and retry:
 
 ```bash
-curl -X POST http://localhost:8080/api/rooms \
-  -H "Content-Type: application/json" \
-  -d '{
-    "roomNumber": "101",
-    "roomType": "SINGLE",
-    "basePrice": 75.00,
-    "capacity": 1,
-    "amenities": "WiFi, TV, AC"
-  }'
-```
-
-**Create Reservation**:
-
-```bash
-curl -X POST http://localhost:8080/api/reservations \
-  -H "Content-Type: application/json" \
-  -d '{
-    "guestId": 1,
-    "roomId": 1,
-    "checkInDate": "2026-02-01",
-    "checkOutDate": "2026-02-05",
-    "numberOfGuests": 1,
-    "specialRequests": "Late checkout please"
-  }'
-```
-
----
-
-## Testing Details
-
-### Test Metrics
-
-| Metric              | Value | Target | Status        |
-| ------------------- | ----- | ------ | ------------- |
-| **Total Tests**     | 134   | 100+   | ✅            |
-| **Pass Rate**       | 98.5% | 95%    | ✅            |
-| **Line Coverage**   | 92%   | 80%    | ✅            |
-| **Branch Coverage** | 88%   | 80%    | ✅            |
-| **Defects Found**   | 16    | -      | 100% resolved |
-| **Defects Open**    | 0     | -      | ✅ Clean      |
-
-### Test Design Techniques
-
-Tests were designed using formal ISTQB techniques:
-
-1. **Equivalence Partitioning** (17 partitions)
-   - Age ranges: <18, 18-120, >120
-   - Price ranges: $0-$0.01, $0.01-$10K, >$10K
-   - Capacity ranges: 0, 1-20, >20
-
-2. **Boundary Value Analysis** (24 boundaries)
-   - Age boundaries: 17/18, 120/121
-   - Price boundaries: $0/$0.01, $10K/$10.01K
-   - Capacity boundaries: 0/1, 20/21
-
-3. **Decision Table Testing** (7 discount rules)
-   - Long stay (≥3 nights)
-   - Senior age (≥60 years)
-   - VIP email (@vip.com)
-   - Off-peak season (not Jun/Jul/Aug/Dec/Jan)
-
-4. **State Transition Testing** (8 transitions)
-   - PENDING → CONFIRMED → CHECKED_IN → CHECKED_OUT
-   - PENDING/CONFIRMED → CANCELLED
-   - Invalid transitions tested and rejected
-
-### Test Categories
-
-**Unit Tests** (115 methods):
-
-- GuestServiceTest: 50 tests
-- ReservationServiceTest: 30 tests
-- RoomServiceTest: 20 tests
-- PricingServiceTest: 15 tests
-
-**Integration Tests** (7 methods):
-
-- Multi-component workflows
-- Database persistence
-- State transitions
-
-**System Tests** (12 methods):
-
-- End-to-end Selenium tests
-- Page Object pattern
-- Browser automation
-
----
-
-## Documentation
-
-### Test Documentation (Course Parts A-I)
-
-**Part A: Test Plan** (`TEST_PLAN.md`)
-
-- Test strategy and objectives
-- Scope and approach
-- Resources and schedule
-- Risk assessment
-- Entry/exit criteria
-
-**Part B: Test Design** (`TEST_DESIGN.md`)
-
-- Formal test design techniques
-- Equivalence partitioning application
-- Boundary value analysis
-- Decision table testing
-- State transition testing
-- Traceability matrix
-
-**Part C: Automated Tests** (Source code)
-
-- 134 test cases across 3 levels
-- Unit, integration, system tests
-
-**Part D: Code Coverage** (Metrics)
-
-- 92% line coverage
-- 88% branch coverage
-- Coverage reports in target/site/jacoco/
-
-**Part E: CI/CD Pipelines**
-
-- GitHub Actions (`.github/workflows/ci-cd.yml`)
-- Jenkins (`Jenkinsfile`)
-- Docker support
-
-**Part F: Defect Log** (`DEFECT_LOG.md`)
-
-- 16 defects tracked and resolved
-- Severity levels and priority
-- Root cause analysis
-- Resolution verification
-
-**Part G: Metrics Report** (`METRICS_REPORT.md`)
-
-- Code coverage metrics
-- Test execution results
-- Defect metrics
-- Quality assessment
-
-**Part H: Test Summary** (`TEST_SUMMARY.md`)
-
-- Overall test results
-- Exit criteria assessment
-- Release recommendation
-- Quality scorecard
-
-**Part I: Foundations Reflection** (`FOUNDATIONS_REFLECTION.md`)
-
-- Error, fault, failure distinction
-- Verification vs. validation
-- Real defect analysis (DEFECT-006)
-
----
-
-## Troubleshooting
-
-### Issue: Tests Fail with "Cannot find javac"
-
-**Solution**:
-
-```bash
-# Ensure JAVA_HOME is set
-set JAVA_HOME=C:\Program Files\Eclipse Adoptium\jdk-11.0.X
 mvn test
 ```
 
-### Issue: Build Fails with "Maven is not recognized"
+---
 
-**Solution**:
+## Maven Is Not Recognized
+
+Verify:
 
 ```bash
-# Add Maven to PATH or use full path
-C:\apache-maven-3.8.X\bin\mvn clean package
+mvn -version
 ```
 
-### Issue: Port 8080 Already in Use
+If Maven is installed but unavailable, add Maven's `bin` directory to your system `PATH`.
 
-**Solution**:
+---
+
+## Port 8080 Already in Use
+
+Windows:
 
 ```bash
-# Find process using port 8080
 netstat -ano | findstr :8080
-
-# Kill process (replace PID)
-taskkill /PID <PID> /F
-
-# Or run on different port
-mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=8081"
 ```
 
-### Issue: Docker Build Fails
-
-**Solution**:
+Terminate the process:
 
 ```bash
-# Ensure Maven build succeeds first
+taskkill /PID <PID> /F
+```
+
+Or run the application on another port:
+
+```bash
+mvn spring-boot:run \
+  -Dspring-boot.run.arguments="--server.port=8081"
+```
+
+---
+
+## Docker Build Failure
+
+First verify that the Maven build succeeds:
+
+```bash
 mvn clean package
+```
 
-# Build Docker image with verbose output
-docker build -t hotel-management:latest . --progress=plain
+Then:
 
-# Check Docker daemon is running
+```bash
+docker build -t hotel-management:latest .
+```
+
+Check Docker:
+
+```bash
 docker ps
 ```
 
-### Issue: Tests Timeout
+---
 
-**Solution**:
+#  QA Documentation
 
-```bash
-# Increase timeout in pom.xml surefire plugin
-# In <plugin> section for maven-surefire-plugin:
-<configuration>
-  <argLine>-Xmx1024m</argLine>
-  <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-</configuration>
+The repository includes a complete testing documentation package:
+
+| Document                    | Purpose                                        |
+| --------------------------- | ---------------------------------------------- |
+| `TEST_PLAN.md`              | Overall QA strategy, scope, risks and criteria |
+| `TEST_DESIGN.md`            | Formal test-design techniques and traceability |
+| `DEFECT_LOG.md`             | Defect register and root-cause analysis        |
+| `METRICS_REPORT.md`         | Coverage, execution and defect metrics         |
+| `TEST_SUMMARY.md`           | Test execution summary and release assessment  |
+| `FOUNDATIONS_REFLECTION.md` | Software-testing theory and reflection         |
+
+The uploaded QA documents confirm the same organization and describe the project as a formal academic software-testing package.
+
+---
+
+#  Current QA Evidence Notes
+
+The project documentation contains several items that should be kept transparent:
+
+### 1. Defect Count Reconciliation
+
+The metrics report states 16 defects, while the detailed visible register contains 15 IDs.
+
+### 2. System-Test Results
+
+The repository reports two system-test failures. The QA documentation associates these with UI limitations, while Selenium system-test artifacts are present. This should be clarified in future revisions.
+
+### 3. Controller Coverage
+
+The metrics documentation reports that controllers were not tested, despite strong overall coverage. Controller/API contract tests are therefore identified as an improvement area.
+
+### 4. Reported vs. Reproduced Metrics
+
+The test numbers and coverage values in this README represent the project's documented baseline; they should not be interpreted as a fresh execution result from the README-generation review.
+
+---
+
+#  Future Improvements
+
+Based on the documented QA gaps and project structure, potential future work includes:
+
+* Add controller/API contract tests
+* Reconcile the 15-vs-16 defect discrepancy
+* Generate machine-readable test artifacts for every headline metric
+* Improve system-test environment/prerequisite documentation
+* Expand API-level integration testing
+* Add additional security testing
+* Add load and stress testing
+* Add penetration/security testing
+* Add responsive/mobile testing if a production UI is introduced
+* Add production database migration testing
+* Strengthen CI quality gates with reproducible reports
+
+The current QA plan explicitly places load/stress testing, penetration testing, responsive/mobile testing, production infrastructure testing, and database migration testing outside the current scope.
+
+---
+
+#  Project Scope
+
+### Currently Included
+
+* Guest management
+* Room management
+* Reservation management
+* Pricing and discounts
+* Reservation lifecycle
+* REST APIs
+* Unit testing
+* Integration testing
+* Selenium system testing
+* Code coverage
+* Defect management
+* CI/CD
+* Docker
+* Jenkins
+* GitHub Actions
+
+### Currently Outside Scope
+
+* Load/stress testing
+* Penetration testing
+* Responsive/mobile testing
+* Production infrastructure testing
+* Database migration testing
+
+---
+
+#  Team
+
+| Name                | Student ID  | Responsibility       |
+| ------------------- | ----------- | -------------------- |
+| **Esrom Basazinaw** | ATE/5227/14 | Automation / Backend |
+| **Rediet Mesfin**   | ATE/5020/14 | Test Design / Unit   |
+| **Yohanes Seyum**   | ATE/5195/14 | System / Selenium    |
+| **Samuel Fantahun** | ATE/4115/14 | CI/CD / Metrics      |
+
+These responsibilities are documented consistently across the QA package.
+
+---
+
+#  Academic Context
+
+This project was developed as part of a **Software Testing & Validation** course and combines software implementation with a structured quality-assurance process.
+
+The QA package demonstrates:
+
+* Test planning
+* Test design
+* Automated testing
+* Boundary analysis
+* Equivalence partitioning
+* Decision-table testing
+* State-transition testing
+* Integration testing
+* System testing
+* Defect management
+* Root-cause analysis
+* Code coverage
+* CI/CD
+* Quality gates
+* Testing metrics
+
+---
+
+#  License
+
+This project is documented in the repository as an academic software-testing project intended for internal/academic use.
+
+See the repository for the applicable project terms.
+
+---
+
+#  Repository
+
+**GitHub:**
+https://github.com/yemom/hotel-mannagment-system
+
+---
+
+#  Project at a Glance
+
+```text
+┌─────────────────────────────────────────────┐
+│        HOTEL MANAGEMENT SYSTEM              │
+├─────────────────────────────────────────────┤
+│ Backend              Spring Boot / Java 11  │
+│ API                  REST                    │
+│ Build                Maven                  │
+│ Database             H2 / MySQL             │
+│ Unit Tests           115                    │
+│ Integration Tests      7                    │
+│ System Tests          12                    │
+│ Total Tests         134                     │
+│ Reported Pass Rate   98.5%                  │
+│ Line Coverage        92%                    │
+│ Branch Coverage      88%                    │
+│ Method Coverage      95%                    │
+│ Class Coverage      100%                    │
+│ CI/CD                GitHub Actions/Jenkins │
+│ Containers            Docker                 │
+│ Browser Testing      Selenium                │
+│ Coverage             JaCoCo                 │
+└─────────────────────────────────────────────┘
 ```
 
 ---
 
-## Development Workflow
+##  Summary
 
-### Local Development Setup
+The Hotel Management System combines a Spring Boot REST backend with a formal software-testing and quality-assurance framework. Its documented architecture covers guest, room, reservation, and pricing services, while its QA layer includes **134 automated tests, formal test-design techniques, JaCoCo coverage analysis, defect tracking, Selenium system testing, Docker, GitHub Actions, and an 11-stage Jenkins pipeline**.
 
-```bash
-# 1. Clone repository
-git clone <repository-url>
-cd hotel-management
+The project is particularly structured around validation-heavy hotel business rules such as age limits, room capacity, room pricing, reservation conflicts, discounts, and reservation state transitions. The QA documentation provides traceability from requirements and risks through test techniques, automated tests, defects, regression verification, and metrics.
 
-# 2. Build project
-mvn clean package
-
-# 3. Run application locally
-mvn spring-boot:run
-
-# 4. Run tests
-mvn test
-
-# 5. View coverage
-mvn verify
-start target/site/jacoco/index.html
-
-# 6. Commit and push (triggers CI/CD)
-git add .
-git commit -m "Feature: description"
-git push origin main
-```
-
-### Making Code Changes
-
-1. **Create test first** (Test-Driven Development)
-
-   ```java
-   @Test
-   void testNewFeature() {
-       // Write failing test
-   }
-   ```
-
-2. **Implement feature**
-
-   ```java
-   public void newFeature() {
-       // Implement to pass test
-   }
-   ```
-
-3. **Run tests locally**
-
-   ```bash
-   mvn test
-   ```
-
-4. **Verify coverage**
-
-   ```bash
-   mvn verify
-   ```
-
-5. **Commit and push**
-
-   ```bash
-   git add .
-   git commit -m "Add feature with tests"
-   git push origin main
-   ```
-
-6. **Monitor CI/CD**
-   - GitHub Actions: Check Actions tab
-   - Jenkins: View pipeline build
-
----
-
-## Key Configuration Files
-
-### `application.properties`
-
-- Server port: 8080
-- Context path: /api
-- Database: H2 in-memory
-- JPA properties: DDL mode, SQL logging
-
-### `pom.xml`
-
-- Parent: Spring Boot 2.7.14
-- JDK: Java 11
-- Key dependencies:
-  - JUnit 5 (Jupiter)
-  - Mockito 4.11.0
-  - Selenium 4.10.0
-  - AssertJ 3.24.1
-  - JaCoCo 0.8.8
-
-### `Dockerfile`
-
-- Base image: maven:3.8.1-openjdk-11 (build)
-- Runtime: openjdk:11-jre-slim
-- Expose port 8080
-- Health check: curl /actuator/health
-
-### `docker-compose.yml`
-
-- Services: app, mysql, jenkins
-- Networks: hotel-network
-- Volumes: mysql_data, jenkins_home
-
----
-
-## Performance Considerations
-
-### Test Execution Time
-
-```
-Unit Tests:        ~30 seconds (115 tests, fast, no DB)
-Integration Tests: ~10 seconds (7 tests, with DB)
-System Tests:      ~20 seconds (12 tests, Selenium)
-Total:             ~45 seconds for full suite
-```
-
-### Build Time
-
-```
-Clean build:       ~20 seconds (code compile)
-With tests:        ~45 seconds (full build + tests)
-With coverage:     ~50 seconds (JaCoCo analysis)
-Docker build:      ~2 minutes (download + build + test)
-```
-
----
-
-## Team Members
-
-**Development Team**:
-
-- Lead Developer
-- QA Engineer
-- Test Automation Engineer
-
-**Course Context**:
-
-- Software Testing & Validation (Course)
-- Academic Project (Hotel Management System)
-- Comprehensive Test Suite (134 tests)
-- Production-Ready Code (92% coverage)
-
----
-
-## License
-
-This project is part of an academic software testing course. Internal use only.
-
----
-
-## Support and Issues
-
-For issues or questions:
-
-1. Check [TEST_PLAN.md](TEST_PLAN.md) for strategy
-2. Review [TEST_DESIGN.md](TEST_DESIGN.md) for techniques
-3. Examine [DEFECT_LOG.md](DEFECT_LOG.md) for known issues
-4. See [METRICS_REPORT.md](METRICS_REPORT.md) for quality metrics
-
----
-
-**Last Updated**: 2026-01-22  
-**Status**: ✅ Production Ready  
-**Test Coverage**: 92% (Target: 80%)  
-**Test Pass Rate**: 98.5% (Target: 95%)  
-**Release Decision**: ✅ APPROVED FOR RELEASE
+For an academically and professionally maintainable project, the next documentation priority is to reconcile the remaining metric inconsistencies and ensure each reported metric can be reproduced from a machine-generated test or coverage artifact.
