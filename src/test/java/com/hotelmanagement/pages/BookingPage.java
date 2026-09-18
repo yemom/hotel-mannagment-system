@@ -2,103 +2,133 @@ package com.hotelmanagement.pages;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
 
-/**
- * Page Object for Room Booking page.
- */
 public class BookingPage extends BasePage {
 
-    // Locators
-    private static final By ROOM_DETAILS = By.id("roomDetails");
-    private static final By CHECK_IN_DISPLAY = By.id("checkInDisplay");
-    private static final By CHECK_OUT_DISPLAY = By.id("checkOutDisplay");
-    private static final By GUESTS_DISPLAY = By.id("guestsDisplay");
-    private static final By PRICE_DISPLAY = By.id("priceDisplay");
-    private static final By DISCOUNT_DISPLAY = By.id("discountDisplay");
-    private static final By TOTAL_PRICE_DISPLAY = By.id("totalPriceDisplay");
-    private static final By SPECIAL_REQUESTS = By.id("specialRequests");
-    private static final By CONFIRM_BOOKING_BUTTON = By.id("confirmBookingBtn");
-    private static final By CANCEL_BUTTON = By.id("cancelBtn");
-    private static final By SUCCESS_MESSAGE = By.className("booking-success");
-    private static final By ERROR_MESSAGE = By.className("booking-error");
+    private static final By MODAL = By.cssSelector(
+            ".booking-summary-modal");
+
+    private static final By CHECK_IN = By.id("modal-checkin");
+
+    private static final By CHECK_OUT = By.id("modal-checkout");
+
+    private static final By GUESTS = By.id("modal-guests");
+
+    private static final By SPECIAL_REQUESTS = By.cssSelector(
+            ".booking-summary-modal textarea.textarea");
+
+    private static final By CONFIRM_BUTTON = By.cssSelector(
+            ".booking-summary-modal "
+                    + "button.confirm-booking-btn");
+
+    private static final By TOTAL = By.cssSelector(
+            ".grand-total-amount");
+
+    private static final By SUCCESS_TOAST = By.cssSelector(
+            ".client-toast.client-toast-success");
 
     public BookingPage(WebDriver driver) {
         super(driver);
     }
 
-    public void navigateToBooking(String baseUrl, String roomId) {
-        if (baseUrl != null && baseUrl.startsWith("data:")) {
-            navigateTo(baseUrl);
-        } else {
-            navigateTo(baseUrl + "/booking/" + roomId);
-        }
+    public boolean isBookingSummaryDisplayed() {
+
+        return visible(MODAL);
     }
 
     public String getCheckInDate() {
-        return getText(CHECK_IN_DISPLAY);
+
+        return find(CHECK_IN)
+                .getAttribute("value");
     }
 
     public String getCheckOutDate() {
-        return getText(CHECK_OUT_DISPLAY);
+
+        return find(CHECK_OUT)
+                .getAttribute("value");
     }
 
     public String getNumberOfGuests() {
-        return getText(GUESTS_DISPLAY);
+
+        return new Select(
+                find(GUESTS))
+                .getFirstSelectedOption()
+                .getAttribute("value");
     }
 
     public String getBasePrice() {
-        return getText(PRICE_DISPLAY);
+        return text(TOTAL);
     }
 
     public String getDiscount() {
-        if (isElementPresent(DISCOUNT_DISPLAY)) {
-            return getText(DISCOUNT_DISPLAY);
-        }
         return "0";
     }
 
     public String getTotalPrice() {
-        return getText(TOTAL_PRICE_DISPLAY);
+        return text(TOTAL);
     }
 
-    public void enterSpecialRequests(String requests) {
-        typeText(SPECIAL_REQUESTS, requests);
+    public void setCheckInDate(String date) {
+        setDate(CHECK_IN, date);
     }
 
-    public void clickConfirmBookingButton() {
-        click(CONFIRM_BOOKING_BUTTON);
+    public void setCheckOutDate(String date) {
+        setDate(CHECK_OUT, date);
     }
 
-    public void clickCancelButton() {
-        click(CANCEL_BUTTON);
+    public void setGuests(String guests) {
+
+        new Select(
+                find(GUESTS)).selectByValue(guests);
     }
 
-    public void confirmBooking(String specialRequests) {
-        if (!specialRequests.isEmpty()) {
-            enterSpecialRequests(specialRequests);
+    public void enterSpecialRequest(
+            String request) {
+
+        type(
+                SPECIAL_REQUESTS,
+                request);
+    }
+
+    public void confirmBooking(
+            String specialRequest) {
+
+        if (specialRequest != null
+                && !specialRequest.isBlank()) {
+
+            enterSpecialRequest(
+                    specialRequest);
         }
-        clickConfirmBookingButton();
-    }
 
-    public String getSuccessMessage() {
-        if (isElementPresent(SUCCESS_MESSAGE)) {
-            return getText(SUCCESS_MESSAGE);
-        }
-        return "";
-    }
+        click(CONFIRM_BUTTON);
 
-    public String getErrorMessage() {
-        if (isElementPresent(ERROR_MESSAGE)) {
-            return getText(ERROR_MESSAGE);
-        }
-        return "";
-    }
+        /*
+         * The real frontend closes the modal after the
+         * reservation is successfully created.
+         */
+        wait.until(
+                ExpectedConditions.invisibilityOfElementLocated(
+                        MODAL));
 
-    public boolean isBookingSummaryDisplayed() {
-        return isElementPresent(ROOM_DETAILS) && isElementPresent(TOTAL_PRICE_DISPLAY);
+        /*
+         * Then it displays the success toast.
+         */
+        wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        SUCCESS_TOAST));
     }
 
     public boolean isSuccessMessageDisplayed() {
-        return isElementPresent(SUCCESS_MESSAGE);
+
+        return visible(
+                SUCCESS_TOAST);
+    }
+
+    public String getSuccessMessage() {
+
+        return text(
+                SUCCESS_TOAST);
     }
 }

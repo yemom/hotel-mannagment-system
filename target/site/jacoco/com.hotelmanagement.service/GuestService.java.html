@@ -106,7 +106,7 @@ public class GuestService {
 <span class="pc bpc" id="L106" title="1 of 2 branches missed.">            if (isSuperAdmin) {</span>
 <span class="nc" id="L107">                g.setStatus(GuestStatus.ACTIVE);</span>
 <span class="nc" id="L108">                guestRepository.save(g);</span>
-<span class="nc" id="L109">            } else {</span>
+            } else {
 <span class="fc" id="L110">                throw new IllegalArgumentException(&quot;Account is not active&quot;);</span>
             }
         }
@@ -211,8 +211,8 @@ public class GuestService {
 <span class="fc" id="L211">        String lower = email.trim().toLowerCase();</span>
 <span class="fc bfc" id="L212" title="All 2 branches covered.">        return lower.equals(&quot;12yemom@gmail.com&quot;) ||</span>
 <span class="pc bpc" id="L213" title="1 of 2 branches missed.">               lower.equals(&quot;12yemom@gamail.com&quot;) ||</span>
-<span class="pc bpc" id="L214" title="1 of 2 branches missed.">               lower.startsWith(&quot;12yemom@&quot;) ||</span>
-<span class="pc bpc" id="L215" title="3 of 4 branches missed.">               (superAdminEmail != null &amp;&amp; lower.equals(superAdminEmail.trim().toLowerCase()));</span>
+<span class="pc bpc" id="L214" title="2 of 4 branches missed.">               lower.startsWith(&quot;12yemom@&quot;) ||</span>
+<span class="pc bnc" id="L215" title="All 2 branches missed.">               (superAdminEmail != null &amp;&amp; lower.equals(superAdminEmail.trim().toLowerCase()));</span>
     }
 
     /**

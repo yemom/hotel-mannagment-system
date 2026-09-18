@@ -59,7 +59,7 @@ public class DataSeeder implements ApplicationRunner {
 <span class="nc" id="L59">                    } catch (InterruptedException ie) {</span>
 <span class="nc" id="L60">                        Thread.currentThread().interrupt();</span>
 <span class="nc" id="L61">                        return;</span>
-                    }
+<span class="nc" id="L62">                    }</span>
                 } else {
 <span class="nc" id="L64">                    log.error(&quot;DataSeeder failed after {} attempts: {}&quot;, maxRetries, e.getMessage());</span>
                 }
@@ -121,7 +121,7 @@ public class DataSeeder implements ApplicationRunner {
 
                 // Terrace &amp; Balcony — 6 tables (2–6 capacity)
 <span class="fc" id="L123">                table(&quot;TR-01&quot;, 2, DiningArea.TERRACE,</span>
-<span class="fc" id="L124">                        &quot;Panoramic balcony table with breathtaking open-air sunset vista&quot;),</span>
+                        &quot;Panoramic balcony table with breathtaking open-air sunset vista&quot;),
 <span class="fc" id="L125">                table(&quot;TR-02&quot;, 4, DiningArea.TERRACE, &quot;Poolside pergola terrace seating with gentle breeze&quot;),</span>
 <span class="fc" id="L126">                table(&quot;TR-03&quot;, 4, DiningArea.TERRACE, &quot;Under the olive tree, al fresco dining experience&quot;),</span>
 <span class="fc" id="L127">                table(&quot;TR-04&quot;, 6, DiningArea.TERRACE, &quot;Covered terrace deck, ideal for twilight dinners&quot;),</span>
@@ -131,7 +131,7 @@ public class DataSeeder implements ApplicationRunner {
                 // Private Dining Suites — 4 tables (6–12 capacity)
 <span class="fc" id="L132">                table(&quot;PR-01&quot;, 8, DiningArea.PRIVATE_ROOM, &quot;Executive dining suite with dedicated sommelier &amp; full AV&quot;),</span>
 <span class="fc" id="L133">                table(&quot;PR-02&quot;, 12, DiningArea.PRIVATE_ROOM,</span>
-<span class="fc" id="L134">                        &quot;Royal banquet hall for grand celebrations &amp; family reunions&quot;),</span>
+                        &quot;Royal banquet hall for grand celebrations &amp; family reunions&quot;),
 <span class="fc" id="L135">                table(&quot;PR-03&quot;, 6, DiningArea.PRIVATE_ROOM, &quot;Intimate wine cellar private booth with reserve pairings&quot;),</span>
 <span class="fc" id="L136">                table(&quot;PR-04&quot;, 10, DiningArea.PRIVATE_ROOM, &quot;VIP penthouse dining room with private terrace access&quot;));</span>
 
@@ -152,10 +152,10 @@ public class DataSeeder implements ApplicationRunner {
     private void seedRooms() {
 <span class="fc" id="L153">        List&lt;Room&gt; rooms = List.of(</span>
 <span class="fc" id="L154">                room(&quot;101&quot;, RoomType.SINGLE, new java.math.BigDecimal(&quot;85.00&quot;), 1,</span>
-<span class="fc" id="L155">                        &quot;Cozy retreat with a plush queen bed, dedicated ergonomic workstation, and quiet garden views.&quot;,</span>
+                        &quot;Cozy retreat with a plush queen bed, dedicated ergonomic workstation, and quiet garden views.&quot;,
 <span class="fc" id="L156">                        false, false, true),</span>
 <span class="fc" id="L157">                room(&quot;102&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;140.00&quot;), 2,</span>
-<span class="fc" id="L158">                        &quot;Spacious modern room featuring two premium queen beds, artisan coffee bar, and skyline windows.&quot;,</span>
+                        &quot;Spacious modern room featuring two premium queen beds, artisan coffee bar, and skyline windows.&quot;,
 <span class="fc" id="L159">                        true, false, true),</span>
 <span class="fc" id="L160">                room(&quot;103&quot;, RoomType.SINGLE, new java.math.BigDecimal(&quot;95.00&quot;), 1,</span>
 <span class="fc" id="L161">                        &quot;Serene corner single with floor-to-ceiling windows and acoustic soundproofing.&quot;, false, true,</span>
@@ -164,34 +164,34 @@ public class DataSeeder implements ApplicationRunner {
 <span class="fc" id="L164">                        &quot;Sunlit garden single with French doors leading to a private botanical courtyard.&quot;, false,</span>
 <span class="fc" id="L165">                        false, false),</span>
 <span class="fc" id="L166">                room(&quot;201&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;220.00&quot;), 3,</span>
-<span class="fc" id="L167">                        &quot;Executive boutique suite with a partitioned salon lounge, Italian marble bath, and private terrace.&quot;,</span>
+                        &quot;Executive boutique suite with a partitioned salon lounge, Italian marble bath, and private terrace.&quot;,
 <span class="fc" id="L168">                        true, true, true),</span>
 <span class="fc" id="L169">                room(&quot;202&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;155.00&quot;), 2,</span>
 <span class="fc" id="L170">                        &quot;Superior double with sweeping courtyard views and complimentary artisan refreshments.&quot;, true,</span>
 <span class="fc" id="L171">                        true, true),</span>
 <span class="fc" id="L172">                room(&quot;203&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;145.00&quot;), 2,</span>
-<span class="fc" id="L173">                        &quot;Artisan twin double with custom timber furnishings, designer reading nook, and espresso bar.&quot;,</span>
+                        &quot;Artisan twin double with custom timber furnishings, designer reading nook, and espresso bar.&quot;,
 <span class="fc" id="L174">                        false, false, true),</span>
 <span class="fc" id="L175">                room(&quot;204&quot;, RoomType.DOUBLE, new java.math.BigDecimal(&quot;160.00&quot;), 2,</span>
-<span class="fc" id="L176">                        &quot;Corner double suite with wrap-around city panorama, heated bathroom floors, and balcony.&quot;,</span>
+                        &quot;Corner double suite with wrap-around city panorama, heated bathroom floors, and balcony.&quot;,
 <span class="fc" id="L177">                        true, true, true),</span>
 <span class="fc" id="L178">                room(&quot;301&quot;, RoomType.DELUXE, new java.math.BigDecimal(&quot;290.00&quot;), 4,</span>
-<span class="fc" id="L179">                        &quot;Ultra-luxurious corner suite with panoramic city skyline panorama, walk-in dressing room, and deep tub.&quot;,</span>
+                        &quot;Ultra-luxurious corner suite with panoramic city skyline panorama, walk-in dressing room, and deep tub.&quot;,
 <span class="fc" id="L180">                        true, true, true),</span>
 <span class="fc" id="L181">                room(&quot;302&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;240.00&quot;), 3,</span>
 <span class="fc" id="L182">                        &quot;Grand family suite with dual vanity bath, private sun deck, and plush sleeper sofa.&quot;, true,</span>
 <span class="fc" id="L183">                        true, true),</span>
 <span class="fc" id="L184">                room(&quot;303&quot;, RoomType.SUITE, new java.math.BigDecimal(&quot;255.00&quot;), 3,</span>
-<span class="fc" id="L185">                        &quot;Romantic honeymoon suite with private jacuzzi, champagne service, and rose-petal turndown.&quot;,</span>
+                        &quot;Romantic honeymoon suite with private jacuzzi, champagne service, and rose-petal turndown.&quot;,
 <span class="fc" id="L186">                        true, true, true),</span>
 <span class="fc" id="L187">                room(&quot;304&quot;, RoomType.DELUXE, new java.math.BigDecimal(&quot;310.00&quot;), 4,</span>
-<span class="fc" id="L188">                        &quot;Royal deluxe family suite with dual king suites, private dining nook, and full luxury amenities.&quot;,</span>
+                        &quot;Royal deluxe family suite with dual king suites, private dining nook, and full luxury amenities.&quot;,
 <span class="fc" id="L189">                        true, true, true),</span>
 <span class="fc" id="L190">                room(&quot;401&quot;, RoomType.PENTHOUSE, new java.math.BigDecimal(&quot;480.00&quot;), 4,</span>
-<span class="fc" id="L191">                        &quot;Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service pantry.&quot;,</span>
+                        &quot;Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service pantry.&quot;,
 <span class="fc" id="L192">                        true, true, true),</span>
 <span class="fc" id="L193">                room(&quot;402&quot;, RoomType.PENTHOUSE, new java.math.BigDecimal(&quot;520.00&quot;), 5,</span>
-<span class="fc" id="L194">                        &quot;Sky-level penthouse estate with private rooftop plunge pool, dedicated chef service, and helipad access.&quot;,</span>
+                        &quot;Sky-level penthouse estate with private rooftop plunge pool, dedicated chef service, and helipad access.&quot;,
 <span class="fc" id="L195">                        true, true, true));</span>
 
 <span class="fc" id="L197">        int added = 0;</span>
@@ -200,7 +200,7 @@ public class DataSeeder implements ApplicationRunner {
 <span class="fc" id="L200">                roomRepository.save(r);</span>
 <span class="fc" id="L201">                added++;</span>
             }
-        }
+<span class="fc" id="L203">        }</span>
 <span class="fc" id="L204">        log.info(&quot;Ensured {} hotel rooms are registered in inventory ({} newly seeded)&quot;, rooms.size(), added);</span>
 <span class="fc" id="L205">    }</span>
 

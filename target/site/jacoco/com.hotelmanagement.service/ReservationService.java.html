@@ -37,8 +37,8 @@ public class ReservationService {
         }
 
         // Check room availability
-<span class="fc" id="L40">        if (!isRoomAvailable(reservation.getRoom(), reservation.getCheckInDate(), </span>
-<span class="pc bpc" id="L41" title="1 of 2 branches missed.">            reservation.getCheckOutDate())) {</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (!isRoomAvailable(reservation.getRoom(), reservation.getCheckInDate(), </span>
+<span class="fc" id="L41">            reservation.getCheckOutDate())) {</span>
 <span class="nc" id="L42">            throw new IllegalArgumentException(&quot;Room is not available for the requested dates&quot;);</span>
         }
 
@@ -171,10 +171,10 @@ public class ReservationService {
     private boolean isRoomAvailable(Room room, LocalDate checkIn, LocalDate checkOut) {
 <span class="fc" id="L172">        List&lt;Reservation&gt; conflictingReservations = reservationRepository</span>
 <span class="fc" id="L173">            .findByRoomAndStatusNotAndCheckOutDateGreaterThanAndCheckInDateLessThan(</span>
-<span class="fc" id="L174">                room,</span>
-<span class="fc" id="L175">                com.hotelmanagement.model.ReservationStatus.CANCELLED,</span>
-<span class="fc" id="L176">                checkIn,</span>
-<span class="fc" id="L177">                checkOut</span>
+                room,
+                com.hotelmanagement.model.ReservationStatus.CANCELLED,
+                checkIn,
+                checkOut
             );
 <span class="fc" id="L179">        return conflictingReservations.isEmpty();</span>
     }

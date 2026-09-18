@@ -56,8 +56,8 @@ public class Room {
     }
 
     public boolean isPriceInValidRange() {
-<span class="nc bnc" id="L59" title="All 6 branches missed.">        return basePrice != null &amp;&amp; basePrice.compareTo(BigDecimal.ZERO) &gt; 0 </span>
-<span class="nc" id="L60">            &amp;&amp; basePrice.compareTo(new BigDecimal(&quot;10000&quot;)) &lt;= 0; // Price range validation</span>
+<span class="nc bnc" id="L59" title="All 4 branches missed.">        return basePrice != null &amp;&amp; basePrice.compareTo(BigDecimal.ZERO) &gt; 0 </span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            &amp;&amp; basePrice.compareTo(new BigDecimal(&quot;10000&quot;)) &lt;= 0; // Price range validation</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

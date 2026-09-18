@@ -41,9 +41,9 @@ import java.math.BigDecimal;
      * Validate price is within acceptable range.
      */
     public boolean isValidPrice(BigDecimal price) {
-<span class="fc bfc" id="L44" title="All 4 branches covered.">        return price != null </span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        return price != null </span>
 <span class="fc bfc" id="L45" title="All 2 branches covered.">            &amp;&amp; price.compareTo(BigDecimal.ZERO) &gt; 0</span>
-<span class="fc" id="L46">            &amp;&amp; price.compareTo(new BigDecimal(&quot;10000&quot;)) &lt;= 0;</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            &amp;&amp; price.compareTo(new BigDecimal(&quot;10000&quot;)) &lt;= 0;</span>
     }
 
     /**
