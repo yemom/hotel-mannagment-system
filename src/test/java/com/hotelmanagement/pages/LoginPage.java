@@ -100,23 +100,10 @@ public class LoginPage extends BasePage {
     }
 
     public boolean isErrorMessageDisplayed() {
-        try {
-            return wait.until(
-                    ExpectedConditions.visibilityOfElementLocated(
-                            ERROR_ALERT))
-                    .isDisplayed();
-        } catch (org.openqa.selenium.TimeoutException e) {
-            try {
-                String html = (String) ((org.openqa.selenium.JavascriptExecutor) driver)
-                        .executeScript("return document.body.innerHTML;");
-                System.err.println("===== LOGIN ERROR LOCATOR TIMED OUT =====");
-                System.err.println(html);
-                System.err.println("===== END DIAGNOSTIC =====");
-            } catch (Exception ex) {
-                System.err.println("Could not extract document.body.innerHTML: " + ex.getMessage());
-            }
-            throw e;
-        }
+        return wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        ERROR_ALERT))
+                .isDisplayed();
     }
 
     public String getErrorMessage() {

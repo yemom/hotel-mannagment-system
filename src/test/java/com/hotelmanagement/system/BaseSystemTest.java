@@ -79,6 +79,13 @@ public abstract class BaseSystemTest {
                 options.addArguments(
                                 "--disable-backgrounding-occluded-windows");
 
+                if (Boolean.getBoolean("chrome.headless")
+                                || "true".equalsIgnoreCase(System.getenv("HEADLESS"))
+                                || System.getenv("CI") != null) {
+                        options.addArguments("--headless=new");
+                        options.addArguments("--window-size=1920,1080");
+                }
+
                 driver = new ChromeDriver(options);
 
                 driver.manage()

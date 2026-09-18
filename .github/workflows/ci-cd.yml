@@ -149,7 +149,8 @@ jobs:
         COVERAGE=$(grep -oP '(?<=<span class="counter">)[^%]*' target/site/jacoco/index.html | head -1 | sed 's/[^0-9]//g' || echo 0)
         echo "Current Coverage: $COVERAGE%"
         if [ "$COVERAGE" -lt 80 ]; then
-          echo "::warning::Coverage ($COVERAGE%) is below target (80%)"
+          echo "::error::Coverage ($COVERAGE%) is below target (80%)"
+          exit 1
         else
           echo "::notice::Coverage ($COVERAGE%) meets target (80%)"
         fi

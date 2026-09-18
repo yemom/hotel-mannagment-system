@@ -1047,6 +1047,7 @@ netstat -ano | findstr :8080
 
 Terminate the process:
 
+:
 ```bash
 taskkill /PID <PID> /F
 ```
