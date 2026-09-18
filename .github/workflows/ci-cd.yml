@@ -27,6 +27,19 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean compile
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Start Backend and Frontend
+      run: |
+        nohup mvn spring-boot:run > backend.log 2>&1 &
+        cd frontend
+        npm install
+        nohup npm run dev > frontend.log 2>&1 &
+        sleep 45
+
     - name: Run Unit and Integration Tests
       run: mvn -B test
 
@@ -98,6 +111,19 @@ jobs:
         echo "This step demonstrates catching a regression in the pipeline."
         echo "In a real scenario, code changes might break a test."
 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Start Backend and Frontend
+      run: |
+        nohup mvn spring-boot:run > backend.log 2>&1 &
+        cd frontend
+        npm install
+        nohup npm run dev > frontend.log 2>&1 &
+        sleep 45
+
     - name: Run Full Test Suite for Regression Detection
       run: mvn -B clean test
 
@@ -141,6 +167,19 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
         cache: maven
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Start Backend and Frontend
+      run: |
+        nohup mvn spring-boot:run > backend.log 2>&1 &
+        cd frontend
+        npm install
+        nohup npm run dev > frontend.log 2>&1 &
+        sleep 45
 
     - name: Generate Coverage Report
       run: mvn -B clean test jacoco:report
