@@ -67,6 +67,7 @@ jobs:
         files: target/surefire-reports/TEST-*.xml
         check_name: Test Results
         comment_mode: always
+        large_files: true
 
     - name: Build JAR
       run: mvn -B package -DskipTests
