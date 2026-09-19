@@ -46,6 +46,7 @@
         <httpcore5.version>5.4.3</httpcore5.version>
 
         <jacoco.version>0.8.11</jacoco.version>
+        <system.test.exclude>**/*SystemTest.java</system.test.exclude>
     </properties>
 
     <dependencies>
@@ -212,6 +213,9 @@
                         <include>**/*Test.java</include>
                         <include>**/*Tests.java</include>
                     </includes>
+                    <excludes>
+                        <exclude>${system.test.exclude}</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
 

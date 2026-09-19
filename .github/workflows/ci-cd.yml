@@ -41,7 +41,7 @@ jobs:
         sleep 45
 
     - name: Run Unit and Integration Tests
-      run: mvn -B test
+      run: mvn -B test -Dsystem.test.exclude="none"
 
     - name: Generate Code Coverage Report
       run: mvn -B jacoco:report
@@ -125,7 +125,7 @@ jobs:
         sleep 45
 
     - name: Run Full Test Suite for Regression Detection
-      run: mvn -B clean test
+      run: mvn -B clean test -Dsystem.test.exclude="none"
 
     - name: Check Test Results
       if: failure()
@@ -182,7 +182,7 @@ jobs:
         sleep 45
 
     - name: Generate Coverage Report
-      run: mvn -B clean test jacoco:report
+      run: mvn -B clean test -Dsystem.test.exclude="none" jacoco:report
 
     - name: Verify Minimum Coverage Threshold (80%)
       run: |
