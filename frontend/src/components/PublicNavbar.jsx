@@ -65,7 +65,25 @@ const PublicNavbar = () => {
             to="/spa"
             className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
           >
-            Spa Sanctuary
+            Spa
+          </NavLink>
+          <NavLink
+            to="/services"
+            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
+          >
+            Services
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
+          >
+            About
+          </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
+          >
+            Contact
           </NavLink>
         </div>
 
@@ -157,6 +175,27 @@ const PublicNavbar = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             Spa Sanctuary
+          </Link>
+          <Link
+            to="/services"
+            className="public-mobile-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Hotel Services
+          </Link>
+          <Link
+            to="/about"
+            className="public-mobile-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            About Us
+          </Link>
+          <Link
+            to="/contact"
+            className="public-mobile-link"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Contact &amp; Concierge
           </Link>
           <div className="public-mobile-divider" />
           {currentUser ? (

@@ -565,12 +565,18 @@ const PublicRooms = () => {
                   </div>
 
                   <div className="card-actions">
+                    <Link
+                      to={`/rooms/${room.roomNumber}`}
+                      className="card-details-btn"
+                    >
+                      View Details
+                    </Link>
                     <button
                       type="button"
-                      className="public-cta-btn"
+                      className="card-book-btn"
                       onClick={() => handleBookNowClick(room)}
                     >
-                      Book Now
+                      {currentUser ? 'Book Now' : 'Reserve'}
                     </button>
                   </div>
                 </div>

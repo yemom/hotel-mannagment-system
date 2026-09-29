@@ -7,8 +7,12 @@ import ClientDashboard from "./pages/ClientDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 import LandingPage from "./pages/LandingPage";
 import PublicRooms from "./pages/PublicRooms";
+import RoomDetail from "./pages/RoomDetail";
 import SpaPage from "./pages/SpaPage";
 import PublicRestaurant from "./pages/PublicRestaurant";
+import ServicesPage from "./pages/ServicesPage";
+import AboutPage from "./pages/AboutPage";
+import ContactPage from "./pages/ContactPage";
 
 const ProtectedStaffRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -29,35 +33,33 @@ const ProtectedClientRoute = ({ children }) => {
 const AppRoutes = () => {
   return (
     <Routes>
-      {/* Public Landing Page — always accessible, no auth required */}
+      {/* ── Public Pages (no authentication required) ── */}
       <Route path="/" element={<LandingPage />} />
-
-      {/* Public Catalog Pages */}
       <Route path="/rooms" element={<PublicRooms />} />
+      <Route path="/rooms/:id" element={<RoomDetail />} />
       <Route path="/spa" element={<SpaPage />} />
       <Route path="/restaurant" element={<PublicRestaurant />} />
+      <Route path="/services" element={<ServicesPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
 
-      {/* Shared Auth Pages */}
+      {/* ── Auth Pages ── */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
 
-      {/* Access Denied */}
+      {/* ── Access Denied ── */}
       <Route
         path="/access-denied"
         element={
           <div style={{ textAlign: "center", padding: "80px 24px" }}>
             <h1>403 — Access Denied</h1>
-            <p style={{ color: "#64748b" }}>
-              You don't have permission to view this page.
-            </p>
-            <a href="/" style={{ color: "#064e3b", fontWeight: 600 }}>
-              Return to Home
-            </a>
+            <p style={{ color: "#64748b" }}>You don't have permission to view this page.</p>
+            <a href="/" style={{ color: "#064e3b", fontWeight: 600 }}>Return to Home</a>
           </div>
         }
       />
 
-      {/* Client Dashboard (Guest Consumer Experience) */}
+      {/* ── Protected Client Dashboard ── */}
       <Route
         path="/client/*"
         element={
@@ -67,7 +69,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Staff Dashboard (Receptionist / Admin) */}
+      {/* ── Protected Staff Dashboard ── */}
       <Route
         path="/staff/*"
         element={
@@ -77,7 +79,7 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Fallback */}
+      {/* ── Fallback ── */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

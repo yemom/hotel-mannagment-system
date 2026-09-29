@@ -51,8 +51,9 @@ const PublicFooter = () => {
               <li><Link to="/login">Guest Sign In</Link></li>
               <li><Link to="/signup">Member Privileges</Link></li>
               <li><Link to="/client">My Reservations</Link></li>
-              <li><Link to="/staff">Staff Terminal</Link></li>
-              <li><Link to="/spa">Spa Appointments</Link></li>
+              <li><Link to="/services">Hotel Services</Link></li>
+              <li><Link to="/about">About Us</Link></li>
+              <li><Link to="/contact">Contact Concierge</Link></li>
             </ul>
           </div>
 
