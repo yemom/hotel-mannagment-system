@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(&quot;/api/guests&quot;)
+@RequestMapping({&quot;/api/guests&quot;, &quot;/guests&quot;})
 @RequiredArgsConstructor
 public class GuestController {
 
@@ -19,35 +19,35 @@ public class GuestController {
     @PostMapping(&quot;/register&quot;)
     public ResponseEntity&lt;Guest&gt; register(@RequestBody Guest guest) {
         try {
-<span class="nc" id="L22">            Guest registered = guestService.registerGuest(guest);</span>
-<span class="nc" id="L23">            return ResponseEntity.status(HttpStatus.CREATED).body(registered);</span>
-<span class="nc" id="L24">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L25">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+<span class="fc" id="L22">            Guest registered = guestService.registerGuest(guest);</span>
+<span class="fc" id="L23">            return ResponseEntity.status(HttpStatus.CREATED).body(registered);</span>
+<span class="fc" id="L24">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L25">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
     }
 
     @PostMapping(&quot;/login&quot;)
     public ResponseEntity&lt;Guest&gt; login(@RequestParam String email, @RequestParam String password) {
         try {
-<span class="nc" id="L32">            Guest guest = guestService.authenticate(email, password);</span>
-<span class="nc" id="L33">            return ResponseEntity.ok(guest);</span>
-<span class="nc" id="L34">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L35">            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();</span>
+<span class="fc" id="L32">            Guest guest = guestService.authenticate(email, password);</span>
+<span class="fc" id="L33">            return ResponseEntity.ok(guest);</span>
+<span class="fc" id="L34">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L35">            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();</span>
         }
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Guest&gt; getGuest(@PathVariable Long id) {
-<span class="nc" id="L41">        return guestService.getGuest(id)</span>
-<span class="nc" id="L42">            .map(ResponseEntity::ok)</span>
-<span class="nc" id="L43">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+<span class="fc" id="L41">        return guestService.getGuest(id)</span>
+<span class="fc" id="L42">            .map(ResponseEntity::ok)</span>
+<span class="fc" id="L43">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
     }
 
     @GetMapping(&quot;/email/{email}&quot;)
     public ResponseEntity&lt;Guest&gt; getGuestByEmail(@PathVariable String email) {
-<span class="nc" id="L48">        return guestService.getGuestByEmail(email)</span>
-<span class="nc" id="L49">            .map(ResponseEntity::ok)</span>
-<span class="nc" id="L50">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+<span class="fc" id="L48">        return guestService.getGuestByEmail(email)</span>
+<span class="fc" id="L49">            .map(ResponseEntity::ok)</span>
+<span class="pc" id="L50">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
     }
 
     @PutMapping(&quot;/{id}&quot;)
@@ -63,19 +63,19 @@ public class GuestController {
 
     @GetMapping
     public ResponseEntity&lt;List&lt;Guest&gt;&gt; getAllGuests() {
-<span class="nc" id="L66">        return ResponseEntity.ok(guestService.getAllGuests());</span>
+<span class="fc" id="L66">        return ResponseEntity.ok(guestService.getAllGuests());</span>
     }
 
     @GetMapping(&quot;/active/list&quot;)
     public ResponseEntity&lt;List&lt;Guest&gt;&gt; getActiveGuests() {
-<span class="nc" id="L71">        return ResponseEntity.ok(guestService.getAllActiveGuests());</span>
+<span class="fc" id="L71">        return ResponseEntity.ok(guestService.getAllActiveGuests());</span>
     }
 
     @PostMapping(&quot;/{id}/suspend&quot;)
     public ResponseEntity&lt;Guest&gt; suspendGuest(@PathVariable Long id) {
         try {
-<span class="nc" id="L77">            Guest guest = guestService.suspendGuest(id);</span>
-<span class="nc" id="L78">            return ResponseEntity.ok(guest);</span>
+<span class="fc" id="L77">            Guest guest = guestService.suspendGuest(id);</span>
+<span class="fc" id="L78">            return ResponseEntity.ok(guest);</span>
 <span class="nc" id="L79">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L80">            return ResponseEntity.notFound().build();</span>
         }
@@ -84,8 +84,8 @@ public class GuestController {
     @PostMapping(&quot;/{id}/reactivate&quot;)
     public ResponseEntity&lt;Guest&gt; reactivateGuest(@PathVariable Long id) {
         try {
-<span class="nc" id="L87">            Guest guest = guestService.reactivateGuest(id);</span>
-<span class="nc" id="L88">            return ResponseEntity.ok(guest);</span>
+<span class="fc" id="L87">            Guest guest = guestService.reactivateGuest(id);</span>
+<span class="fc" id="L88">            return ResponseEntity.ok(guest);</span>
 <span class="nc" id="L89">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L90">            return ResponseEntity.notFound().build();</span>
         }
@@ -96,8 +96,8 @@ public class GuestController {
             @RequestParam String currentPassword,
             @RequestParam String newPassword) {
         try {
-<span class="nc" id="L99">            Guest guest = guestService.changePassword(id, currentPassword, newPassword);</span>
-<span class="nc" id="L100">            return ResponseEntity.ok(guest);</span>
+<span class="fc" id="L99">            Guest guest = guestService.changePassword(id, currentPassword, newPassword);</span>
+<span class="fc" id="L100">            return ResponseEntity.ok(guest);</span>
 <span class="nc" id="L101">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L102">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
@@ -106,8 +106,8 @@ public class GuestController {
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; deleteGuest(@PathVariable Long id) {
         try {
-<span class="nc" id="L109">            guestService.deleteGuest(id);</span>
-<span class="nc" id="L110">            return ResponseEntity.noContent().build();</span>
+<span class="fc" id="L109">            guestService.deleteGuest(id);</span>
+<span class="fc" id="L110">            return ResponseEntity.noContent().build();</span>
 <span class="nc" id="L111">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L112">            return ResponseEntity.notFound().build();</span>
         }

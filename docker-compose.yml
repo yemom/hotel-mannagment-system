@@ -37,6 +37,13 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://localhost:8085/api}
+        - VITE_SUPERADMIN_EMAIL=${SUPERADMIN_EMAIL:-12yemom@gmail.com}
+        - VITE_SUPERADMIN_PASSWORD=${SUPERADMIN_PASSWORD:-12345678}
+        - VITE_SUPERADMIN_FIRST_NAME=${SUPERADMIN_FIRST_NAME:-Yemom}
+        - VITE_SUPERADMIN_LAST_NAME=${SUPERADMIN_LAST_NAME:-Admin}
+        - VITE_SUPERADMIN_PHONE=${SUPERADMIN_PHONE:-+251934046279}
     container_name: hotel-management-frontend
     ports:
       - "${FRONTEND_PORT:-3000}:80"

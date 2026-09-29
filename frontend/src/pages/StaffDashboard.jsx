@@ -8,6 +8,7 @@ import Pricing from './Pricing.jsx';
 import RestaurantTables from './RestaurantTables.jsx';
 import TableReservations from './TableReservations.jsx';
 import StaffManagement from './StaffManagement.jsx';
+import SpaManagement from './SpaManagement.jsx';
 import { useAuth } from '../context/AuthContext';
 import { reservationAPI, tableReservationAPI } from '../services/api';
 
@@ -40,6 +41,7 @@ const pageTitles = {
   '/staff/reservations': 'Reservation Management (All Guests)',
   '/staff/restaurant': 'Restaurant Tables',
   '/staff/table-reservations': 'Table Reservations',
+  '/staff/spa': 'Spa Sanctuary Management',
   '/staff/team': 'Staff Team',
   '/staff/guests': 'Guest Management',
   '/staff/pricing': 'Pricing & Rates',
@@ -457,6 +459,7 @@ const StaffReports = () => (
 );
 
 const StaffDashboard = () => {
+  const { currentUser, role } = useAuth();
   const [roomReservations, setRoomReservations] = useState([]);
   const [tableReservations, setTableReservations] = useState([]);
 
@@ -501,27 +504,40 @@ const StaffDashboard = () => {
   const pendingRoomCount = roomReservations.filter((r) => r.status === 'PENDING').length;
   const pendingTableCount = tableReservations.filter((t) => t.status === 'PENDING').length;
 
-  const navItems = [
-    { path: '/staff', icon: 'dashboard', label: 'Dashboard', end: true },
-    { path: '/staff/rooms', icon: 'meeting_room', label: 'Rooms' },
+  const userRole = (currentUser?.role || role || '').toUpperCase();
+  const isSuper = currentUser?.isSuperAdmin || userRole === 'SUPER_ADMIN';
+  const isHousekeeping = userRole === 'HOUSEKEEPING';
+
+  const allNavItems = [
+    { path: '/staff', icon: 'dashboard', label: 'Dashboard', end: true, roles: ['SUPER_ADMIN', 'RECEPTIONIST', 'HOUSEKEEPING'] },
+    { path: '/staff/rooms', icon: 'meeting_room', label: 'Rooms', roles: ['SUPER_ADMIN', 'RECEPTIONIST', 'HOUSEKEEPING'] },
     {
       path: '/staff/reservations',
       icon: 'calendar_month',
       label: 'Room Reservations',
       badge: pendingRoomCount > 0 ? pendingRoomCount : null,
+      roles: ['SUPER_ADMIN', 'RECEPTIONIST'],
     },
-    { path: '/staff/restaurant', icon: 'restaurant', label: 'Restaurant Tables' },
+    { path: '/staff/restaurant', icon: 'restaurant', label: 'Restaurant Tables', roles: ['SUPER_ADMIN', 'RECEPTIONIST'] },
     {
       path: '/staff/table-reservations',
       icon: 'event_seat',
       label: 'Table Reservations',
       badge: pendingTableCount > 0 ? pendingTableCount : null,
+      roles: ['SUPER_ADMIN', 'RECEPTIONIST'],
     },
-    { path: '/staff/team', icon: 'badge', label: 'Staff Team (Create Staff)' },
-    { path: '/staff/guests', icon: 'group', label: 'Guests' },
-    { path: '/staff/pricing', icon: 'sell', label: 'Pricing' },
-    { path: '/staff/reports', icon: 'bar_chart', label: 'Reports' },
+    { path: '/staff/spa', icon: 'spa', label: 'Spa Appointments', roles: ['SUPER_ADMIN', 'RECEPTIONIST'] },
+    { path: '/staff/team', icon: 'badge', label: 'Staff Team (Create Staff)', roles: ['SUPER_ADMIN'] },
+    { path: '/staff/guests', icon: 'group', label: 'Guests', roles: ['SUPER_ADMIN', 'RECEPTIONIST'] },
+    { path: '/staff/pricing', icon: 'sell', label: 'Pricing', roles: ['SUPER_ADMIN'] },
+    { path: '/staff/reports', icon: 'bar_chart', label: 'Reports', roles: ['SUPER_ADMIN', 'RECEPTIONIST'] },
   ];
+
+  const navItems = allNavItems.filter((item) => {
+    if (isSuper) return true;
+    if (isHousekeeping) return item.roles.includes('HOUSEKEEPING');
+    return item.roles.includes('RECEPTIONIST');
+  });
 
   return (
     <div className="app-shell">
@@ -590,6 +606,7 @@ const StaffDashboard = () => {
             <Route path="/reservations" element={<Reservations />} />
             <Route path="/restaurant" element={<RestaurantTables />} />
             <Route path="/table-reservations" element={<TableReservations />} />
+            <Route path="/spa" element={<SpaManagement />} />
             <Route path="/team" element={<StaffManagement />} />
             <Route path="/guests" element={<Guests />} />
             <Route path="/pricing" element={<Pricing />} />

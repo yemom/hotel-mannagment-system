@@ -18,6 +18,9 @@ public class Guest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
+    private String role = "CLIENT";
+
     @Column(nullable = false)
     private String firstName;
 

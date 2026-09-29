@@ -52,6 +52,7 @@ public class GuestService {
         }
 
         guest.setStatus(GuestStatus.ACTIVE);
+        guest.setRole("CLIENT");
         return guestRepository.save(guest);
     }
 
@@ -89,6 +90,7 @@ public class GuestService {
                 .city("Addis Ababa")
                 .country("Ethiopia")
                 .status(GuestStatus.ACTIVE)
+                .role("SUPER_ADMIN")
                 .build();
             return guestRepository.save(autoAdmin);
         }
@@ -105,10 +107,14 @@ public class GuestService {
         if (!GuestStatus.ACTIVE.equals(g.getStatus())) {
             if (isSuperAdmin) {
                 g.setStatus(GuestStatus.ACTIVE);
+                g.setRole("SUPER_ADMIN");
                 guestRepository.save(g);
             } else {
                 throw new IllegalArgumentException("Account is not active");
             }
+        } else if (isSuperAdmin && !"SUPER_ADMIN".equals(g.getRole())) {
+            g.setRole("SUPER_ADMIN");
+            guestRepository.save(g);
         }
 
         return g;

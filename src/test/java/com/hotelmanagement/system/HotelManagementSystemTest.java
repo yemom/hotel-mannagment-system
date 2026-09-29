@@ -1,9 +1,12 @@
 package com.hotelmanagement.system;
 
 import com.hotelmanagement.pages.BookingPage;
+import com.hotelmanagement.pages.LandingPageObject;
 import com.hotelmanagement.pages.LoginPage;
+import com.hotelmanagement.pages.PublicRoomsPageObject;
 import com.hotelmanagement.pages.RegistrationPage;
 import com.hotelmanagement.pages.SearchRoomsPage;
+import com.hotelmanagement.pages.SpaPageObject;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -30,20 +33,20 @@ class HotelManagementSystemTest extends BaseSystemTest {
         }
 
         @Test
-        @DisplayName("E2E: application opens in the real Chrome browser")
+        @DisplayName("E2E: application opens on the public landing page")
         void testApplicationOpens() {
 
-                LoginPage login = new LoginPage(driver);
+                LandingPageObject landing = new LandingPageObject(driver);
 
-                login.open(FRONTEND_URL);
+                landing.open(FRONTEND_URL);
 
                 pauseForVisual();
-                screenshot("01-login-page");
+                screenshot("01-landing-page");
 
                 assertThat(driver.getCurrentUrl())
-                                .contains("/login");
+                                .doesNotContain("/login");
 
-                assertThat(login.isDisplayed())
+                assertThat(landing.isDisplayed())
                                 .isTrue();
         }
 
@@ -272,5 +275,45 @@ class HotelManagementSystemTest extends BaseSystemTest {
 
                 assertThat(pageText)
                                 .contains("2 Guests");
+        }
+
+        @Test
+        @DisplayName("E2E: public hotel landing page renders brand, navigation, and features")
+        void testPublicLandingPage() {
+                LandingPageObject landing = new LandingPageObject(driver);
+                landing.open(FRONTEND_URL);
+
+                pauseForVisual();
+                screenshot("14-public-landing-page");
+
+                assertThat(landing.isDisplayed()).isTrue();
+                assertThat(landing.getHeadlineText())
+                                .contains("Timeless Luxury");
+        }
+
+        @Test
+        @DisplayName("E2E: public rooms browsing displays suites and allows filtering")
+        void testPublicRoomsBrowsing() {
+                PublicRoomsPageObject rooms = new PublicRoomsPageObject(driver);
+                rooms.open(FRONTEND_URL);
+
+                pauseForVisual();
+                screenshot("15-public-rooms-catalog");
+
+                assertThat(rooms.isDisplayed()).isTrue();
+                assertThat(rooms.getRoomCardsCount()).isGreaterThan(0);
+        }
+
+        @Test
+        @DisplayName("E2E: public spa page displays active wellness rituals")
+        void testPublicSpaBrowsing() {
+                SpaPageObject spa = new SpaPageObject(driver);
+                spa.open(FRONTEND_URL);
+
+                pauseForVisual();
+                screenshot("16-public-spa-page");
+
+                assertThat(spa.isDisplayed()).isTrue();
+                assertThat(spa.getTreatmentCardsCount()).isGreaterThan(0);
         }
 }

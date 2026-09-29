@@ -24,6 +24,7 @@ public class DataSeeder implements ApplicationRunner {
     private final GuestRepository guestRepository;
     private final RestaurantTableRepository restaurantTableRepository;
     private final com.hotelmanagement.repository.RoomRepository roomRepository;
+    private final com.hotelmanagement.repository.SpaServiceRepository spaServiceRepository;
 
     @org.springframework.beans.factory.annotation.Value("${superadmin.email:12yemom@gamail.com}")
     private String superAdminEmail;
@@ -48,6 +49,7 @@ public class DataSeeder implements ApplicationRunner {
                 seedSuperAdmin();
                 seedRestaurantTables();
                 seedRooms();
+                seedSpaServices();
                 log.info("DataSeeder completed successfully on attempt {}", attempt);
                 return;
             } catch (Exception e) {
@@ -90,6 +92,7 @@ public class DataSeeder implements ApplicationRunner {
                     .city("Addis Ababa")
                     .country("Ethiopia")
                     .status(GuestStatus.ACTIVE)
+                    .role("SUPER_ADMIN")
                     .build();
             guestRepository.save(superAdmin);
             log.info("Super-admin account secured and seeded: {}", email);
@@ -97,6 +100,7 @@ public class DataSeeder implements ApplicationRunner {
             Guest admin = existing.get();
             admin.setStatus(GuestStatus.ACTIVE);
             admin.setPassword(superAdminPassword != null ? superAdminPassword : "12345678");
+            admin.setRole("SUPER_ADMIN");
             guestRepository.save(admin);
             log.info("Super-admin account verified and active: {}", email);
         }
@@ -216,6 +220,57 @@ public class DataSeeder implements ApplicationRunner {
                 .hasBathtub(hasBathtub)
                 .hasBalcony(hasBalcony)
                 .hasMinibar(hasMinibar)
+                .build();
+    }
+
+    private void seedSpaServices() {
+        if (spaServiceRepository.count() > 0) {
+            log.info("Spa services already seeded");
+            return;
+        }
+
+        List<SpaService> services = List.of(
+                spaService("Swedish Relaxation Massage",
+                        "Gentle full-body massage using rhythmic soothing strokes and botanical oils to release muscle tension, stimulate circulation, and cultivate deep relaxation.",
+                        SpaCategory.MASSAGE, 60, new java.math.BigDecimal("95.00"), 2,
+                        "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80"),
+                spaService("Deep Tissue Therapy",
+                        "Intensive neuromuscular massage applying firm, focused pressure to release chronic tension patterns, alleviate trigger points, and restore mobility.",
+                        SpaCategory.MASSAGE, 75, new java.math.BigDecimal("130.00"), 2,
+                        "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80"),
+                spaService("Organic Botanical Aromatherapy",
+                        "Holistic sensory journey combining customized pure essential oil blends with Swedish massage techniques to calm the nervous system and revitalize spirit.",
+                        SpaCategory.WELLNESS, 60, new java.math.BigDecimal("110.00"), 2,
+                        "https://images.unsplash.com/photo-1600334129128-685c5582fd35?auto=format&fit=crop&w=800&q=80"),
+                spaService("Luxury Radiance Facial",
+                        "Rejuvenating bespoke facial featuring ultrasonic deep-cleansing, warm botanical steam, targeted enzymatic exfoliation, and ultra-hydrating antioxidant serum.",
+                        SpaCategory.FACIAL, 50, new java.math.BigDecimal("120.00"), 1,
+                        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80"),
+                spaService("Couples Wellness Sanctuary",
+                        "Side-by-side signature massages in our private VIP couple suite, accompanied by soothing hydrotherapy foot ritual and chilled champagne.",
+                        SpaCategory.COUPLES, 90, new java.math.BigDecimal("240.00"), 2,
+                        "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80"),
+                spaService("Himalayan Salt Scrub & Renewal",
+                        "Full-body mineral exfoliation with warm Himalayan pink salt crystals and aromatic sweet almond oil, followed by an ultra-nourishing hydration wrap.",
+                        SpaCategory.BODY_TREATMENT, 45, new java.math.BigDecimal("85.00"), 1,
+                        "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80")
+        );
+
+        spaServiceRepository.saveAll(services);
+        log.info("Seeded {} luxury spa services", services.size());
+    }
+
+    private SpaService spaService(String name, String description, SpaCategory category,
+                                  int durationMinutes, java.math.BigDecimal price, int capacity, String imageUrl) {
+        return SpaService.builder()
+                .name(name)
+                .description(description)
+                .category(category)
+                .durationMinutes(durationMinutes)
+                .price(price)
+                .capacity(capacity)
+                .active(true)
+                .imageUrl(imageUrl)
                 .build();
     }
 }

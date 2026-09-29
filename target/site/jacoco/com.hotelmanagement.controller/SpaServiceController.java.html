@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpaServiceController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.controller</a> &gt; <span class="el_source">SpaServiceController.java</span></div><h1>SpaServiceController.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.controller;
+
+import com.hotelmanagement.model.SpaCategory;
+import com.hotelmanagement.model.SpaService;
+import com.hotelmanagement.service.SpaServiceService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping({&quot;/api/spa-services&quot;, &quot;/spa-services&quot;, &quot;/api/spa/services&quot;, &quot;/spa/services&quot;})
+@RequiredArgsConstructor
+@CrossOrigin(origins = {&quot;http://localhost:3000&quot;, &quot;http://localhost:5173&quot;})
+public class SpaServiceController {
+
+    private final SpaServiceService spaServiceService;
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getAllServices(
+            @RequestParam(required = false) Boolean activeOnly) {
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if (Boolean.TRUE.equals(activeOnly)) {</span>
+<span class="nc" id="L25">            return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
+        }
+<span class="fc" id="L27">        return ResponseEntity.ok(spaServiceService.getAllServices());</span>
+    }
+
+    @GetMapping(&quot;/active&quot;)
+    public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getActiveServices() {
+<span class="fc" id="L32">        return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;SpaService&gt; getServiceById(@PathVariable Long id) {
+<span class="fc" id="L37">        return spaServiceService.getServiceById(id)</span>
+<span class="fc" id="L38">                .map(ResponseEntity::ok)</span>
+<span class="fc" id="L39">                .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+    }
+
+    @GetMapping(&quot;/category/{category}&quot;)
+    public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getServicesByCategory(@PathVariable SpaCategory category) {
+        try {
+<span class="nc" id="L45">            return ResponseEntity.ok(spaServiceService.getServicesByCategory(category));</span>
+<span class="nc" id="L46">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L47">            return ResponseEntity.badRequest().build();</span>
+        }
+    }
+
+    @PostMapping
+    public ResponseEntity&lt;?&gt; createService(@RequestBody SpaService service) {
+        try {
+<span class="fc" id="L54">            SpaService created = spaServiceService.createService(service);</span>
+<span class="fc" id="L55">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="fc" id="L56">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L57">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @PutMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;?&gt; updateService(@PathVariable Long id, @RequestBody SpaService service) {
+        try {
+<span class="fc" id="L64">            SpaService updated = spaServiceService.updateService(id, service);</span>
+<span class="fc" id="L65">            return ResponseEntity.ok(updated);</span>
+<span class="fc" id="L66">        } catch (IllegalArgumentException e) {</span>
+<span class="pc bpc" id="L67" title="2 of 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
+<span class="fc" id="L68">                return ResponseEntity.notFound().build();</span>
+            }
+<span class="nc" id="L70">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
+        }
+    }
+
+    @DeleteMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Void&gt; deleteService(@PathVariable Long id) {
+        try {
+<span class="fc" id="L77">            spaServiceService.deleteService(id);</span>
+<span class="fc" id="L78">            return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L79">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L80">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/deactivate&quot;)
+    public ResponseEntity&lt;?&gt; deactivateService(@PathVariable Long id) {
+        try {
+<span class="nc" id="L87">            SpaService updated = spaServiceService.deactivateService(id);</span>
+<span class="nc" id="L88">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L89">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L90">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @PostMapping(&quot;/{id}/activate&quot;)
+    public ResponseEntity&lt;?&gt; activateService(@PathVariable Long id) {
+        try {
+<span class="nc" id="L97">            SpaService updated = spaServiceService.activateService(id);</span>
+<span class="nc" id="L98">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L99">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L100">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

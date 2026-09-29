@@ -64,13 +64,9 @@ export const roomAPI = {
   markAvailable: (id) => apiClient.post(`/rooms/${id}/available`),
 };
 
-// Reservation API
 export const reservationAPI = {
   create: (reservationData) => apiClient.post("/reservations", reservationData),
   getAll: () => apiClient.get("/reservations"),
-  getById: (id) => apiClient.get(`/reservations/${id}`),
-  getByGuestId: (guestId) => apiClient.get(`/reservations/guest/${guestId}`),
-  getByRoomId: (roomId) => apiClient.get(`/reservations/room/${roomId}`),
   getById: (id) => apiClient.get(`/reservations/${id}`),
   getByGuestId: (guestId) => apiClient.get(`/reservations/guest/${guestId}`),
   getByRoomId: (roomId) => apiClient.get(`/reservations/room/${roomId}`),
@@ -119,6 +115,31 @@ export const tableReservationAPI = {
   cancel: (id) => apiClient.post(`/restaurant/reservations/${id}/cancel`),
   noShow: (id) => apiClient.post(`/restaurant/reservations/${id}/no-show`),
   delete: (id) => apiClient.delete(`/restaurant/reservations/${id}`),
+};
+
+// Spa Service API
+export const spaServiceAPI = {
+  getAll: (activeOnly) => apiClient.get("/spa-services", { params: { activeOnly } }),
+  getActive: () => apiClient.get("/spa-services/active"),
+  getById: (id) => apiClient.get(`/spa-services/${id}`),
+  getByCategory: (category) => apiClient.get(`/spa-services/category/${category}`),
+  create: (serviceData) => apiClient.post("/spa-services", serviceData),
+  update: (id, serviceData) => apiClient.put(`/spa-services/${id}`, serviceData),
+  delete: (id) => apiClient.delete(`/spa-services/${id}`),
+  activate: (id) => apiClient.post(`/spa-services/${id}/activate`),
+  deactivate: (id) => apiClient.post(`/spa-services/${id}/deactivate`),
+};
+
+// Spa Booking API
+export const spaBookingAPI = {
+  create: (bookingData) => apiClient.post("/spa-bookings", bookingData),
+  getAll: () => apiClient.get("/spa-bookings"),
+  getById: (id) => apiClient.get(`/spa-bookings/${id}`),
+  getByGuestId: (guestId) => apiClient.get(`/spa-bookings/guest/${guestId}`),
+  getByDate: (date) => apiClient.get(`/spa-bookings/date/${date}`),
+  confirm: (id) => apiClient.post(`/spa-bookings/${id}/confirm`),
+  complete: (id) => apiClient.post(`/spa-bookings/${id}/complete`),
+  cancel: (id) => apiClient.post(`/spa-bookings/${id}/cancel`),
 };
 
 export default apiClient;

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ClientNavbar from '../components/ClientNavbar';
 import ClientBookingModal from '../components/ClientBookingModal';
 import ClientProfile from '../components/ClientProfile';
+import ClientSpaView from '../components/ClientSpaView';
 import StatusBadge from '../components/StatusBadge';
 import RestaurantPage from './RestaurantPage';
 import { useAuth } from '../context/AuthContext';
@@ -1974,6 +1975,13 @@ const ClientDashboard = () => {
               setTimeout(() => setAlertNotice(null), 5000);
             }}
           />
+        </main>
+      )}
+
+      {/* Tab: Spa Sanctuary */}
+      {activeTab === 'spa' && (
+        <main className="client-main-content">
+          <ClientSpaView />
         </main>
       )}
 

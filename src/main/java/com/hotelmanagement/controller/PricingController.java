@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/pricing")
+@RequestMapping({"/api/pricing", "/pricing"})
 @RequiredArgsConstructor
 public class PricingController {
 

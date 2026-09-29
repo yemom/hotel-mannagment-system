@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(&quot;/api/restaurant/reservations&quot;)
+@RequestMapping({&quot;/api/restaurant/reservations&quot;, &quot;/restaurant/reservations&quot;})
 @RequiredArgsConstructor
 @CrossOrigin(origins = {&quot;http://localhost:3000&quot;, &quot;http://localhost:5173&quot;})
 public class TableReservationController {
@@ -22,7 +22,7 @@ public class TableReservationController {
     @PostMapping
     public ResponseEntity&lt;?&gt; create(@RequestBody TableReservation reservation) {
         try {
-<span class="nc" id="L25">            return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));</span>
+<span class="fc" id="L25">            return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));</span>
 <span class="nc" id="L26">        } catch (Exception e) {</span>
 <span class="nc bnc" id="L27" title="All 2 branches missed.">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Map.of(&quot;message&quot;, e.getMessage() != null ? e.getMessage() : &quot;Invalid reservation&quot;));</span>
         }
@@ -30,13 +30,13 @@ public class TableReservationController {
 
     @GetMapping
     public ResponseEntity&lt;List&lt;TableReservation&gt;&gt; getAll() {
-<span class="nc" id="L33">        return ResponseEntity.ok(service.getAll());</span>
+<span class="fc" id="L33">        return ResponseEntity.ok(service.getAll());</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;TableReservation&gt; getById(@PathVariable Long id) {
         try {
-<span class="nc" id="L39">            return ResponseEntity.ok(service.getById(id));</span>
+<span class="fc" id="L39">            return ResponseEntity.ok(service.getById(id));</span>
 <span class="nc" id="L40">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L41">            return ResponseEntity.notFound().build();</span>
         }
@@ -56,7 +56,7 @@ public class TableReservationController {
     @PostMapping(&quot;/{id}/confirm&quot;)
     public ResponseEntity&lt;TableReservation&gt; confirm(@PathVariable Long id) {
         try {
-<span class="nc" id="L59">            return ResponseEntity.ok(service.confirm(id));</span>
+<span class="fc" id="L59">            return ResponseEntity.ok(service.confirm(id));</span>
 <span class="nc" id="L60">        } catch (Exception e) {</span>
 <span class="nc" id="L61">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
@@ -83,7 +83,7 @@ public class TableReservationController {
     @PostMapping(&quot;/{id}/cancel&quot;)
     public ResponseEntity&lt;TableReservation&gt; cancel(@PathVariable Long id) {
         try {
-<span class="nc" id="L86">            return ResponseEntity.ok(service.cancel(id));</span>
+<span class="fc" id="L86">            return ResponseEntity.ok(service.cancel(id));</span>
 <span class="nc" id="L87">        } catch (Exception e) {</span>
 <span class="nc" id="L88">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }

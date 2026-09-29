@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
 
   const [email, setEmail] = useState('');
@@ -35,7 +36,11 @@ const Login = () => {
 
     try {
       const user = await login(email.trim(), password, rememberMe);
-      if (user?.role === 'receptionist') {
+      // Restore booking intent if user was redirected here from a public page
+      const redirectTo = location.state?.redirectTo;
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else if (user?.role === 'receptionist') {
         navigate('/staff');
       } else {
         navigate('/client');

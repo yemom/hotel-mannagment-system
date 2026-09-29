@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping(&quot;/api/rooms&quot;)
+@RequestMapping({&quot;/api/rooms&quot;, &quot;/rooms&quot;})
 @RequiredArgsConstructor
 public class RoomController {
 
@@ -23,8 +23,8 @@ public class RoomController {
     @PostMapping
     public ResponseEntity&lt;Room&gt; createRoom(@RequestBody Room room) {
         try {
-<span class="nc" id="L26">            Room created = roomService.createRoom(room);</span>
-<span class="nc" id="L27">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="fc" id="L26">            Room created = roomService.createRoom(room);</span>
+<span class="fc" id="L27">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
 <span class="nc" id="L28">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L29">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
@@ -32,19 +32,19 @@ public class RoomController {
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Room&gt; getRoom(@PathVariable Long id) {
-<span class="nc" id="L35">        return roomService.getRoom(id)</span>
-<span class="nc" id="L36">            .map(ResponseEntity::ok)</span>
-<span class="nc" id="L37">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+<span class="fc" id="L35">        return roomService.getRoom(id)</span>
+<span class="fc" id="L36">            .map(ResponseEntity::ok)</span>
+<span class="fc" id="L37">            .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
     }
 
     @GetMapping
     public ResponseEntity&lt;List&lt;Room&gt;&gt; getAllRooms() {
-<span class="nc" id="L42">        return ResponseEntity.ok(roomService.getAllRooms());</span>
+<span class="fc" id="L42">        return ResponseEntity.ok(roomService.getAllRooms());</span>
     }
 
     @GetMapping(&quot;/type/{type}&quot;)
     public ResponseEntity&lt;List&lt;Room&gt;&gt; getRoomsByType(@PathVariable RoomType type) {
-<span class="nc" id="L47">        return ResponseEntity.ok(roomService.getRoomsByType(type));</span>
+<span class="fc" id="L47">        return ResponseEntity.ok(roomService.getRoomsByType(type));</span>
     }
 
     @GetMapping(&quot;/type/{type}/available&quot;)
@@ -63,8 +63,8 @@ public class RoomController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
             @RequestParam Integer guests) {
         try {
-<span class="nc" id="L66">            List&lt;Room&gt; available = roomService.getAvailableRooms(checkIn, checkOut, guests);</span>
-<span class="nc" id="L67">            return ResponseEntity.ok(available);</span>
+<span class="fc" id="L66">            List&lt;Room&gt; available = roomService.getAvailableRooms(checkIn, checkOut, guests);</span>
+<span class="fc" id="L67">            return ResponseEntity.ok(available);</span>
 <span class="nc" id="L68">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L69">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
@@ -73,8 +73,8 @@ public class RoomController {
     @PutMapping(&quot;/{id}/status&quot;)
     public ResponseEntity&lt;Room&gt; updateRoomStatus(@PathVariable Long id, @RequestParam RoomStatus status) {
         try {
-<span class="nc" id="L76">            Room updated = roomService.updateRoomStatus(id, status);</span>
-<span class="nc" id="L77">            return ResponseEntity.ok(updated);</span>
+<span class="fc" id="L76">            Room updated = roomService.updateRoomStatus(id, status);</span>
+<span class="fc" id="L77">            return ResponseEntity.ok(updated);</span>
 <span class="nc" id="L78">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L79">            return ResponseEntity.notFound().build();</span>
         }
@@ -83,8 +83,8 @@ public class RoomController {
     @PostMapping(&quot;/{id}/maintenance&quot;)
     public ResponseEntity&lt;Room&gt; sendToMaintenance(@PathVariable Long id) {
         try {
-<span class="nc" id="L86">            Room room = roomService.sendToMaintenance(id);</span>
-<span class="nc" id="L87">            return ResponseEntity.ok(room);</span>
+<span class="fc" id="L86">            Room room = roomService.sendToMaintenance(id);</span>
+<span class="fc" id="L87">            return ResponseEntity.ok(room);</span>
 <span class="nc" id="L88">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L89">            return ResponseEntity.notFound().build();</span>
         }
@@ -93,8 +93,8 @@ public class RoomController {
     @PostMapping(&quot;/{id}/available&quot;)
     public ResponseEntity&lt;Room&gt; markAsAvailable(@PathVariable Long id) {
         try {
-<span class="nc" id="L96">            Room room = roomService.markAsAvailable(id);</span>
-<span class="nc" id="L97">            return ResponseEntity.ok(room);</span>
+<span class="fc" id="L96">            Room room = roomService.markAsAvailable(id);</span>
+<span class="fc" id="L97">            return ResponseEntity.ok(room);</span>
 <span class="nc" id="L98">        } catch (IllegalArgumentException e) {</span>
 <span class="nc" id="L99">            return ResponseEntity.notFound().build();</span>
         }

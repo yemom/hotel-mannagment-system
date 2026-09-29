@@ -5,6 +5,8 @@ D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\control
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\ReservationController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\RestaurantTableController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\RoomController.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\SpaBookingController.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\SpaServiceController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\TableReservationController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\HotelManagementApplication.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\DiningArea.java
@@ -16,6 +18,10 @@ D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\R
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\Room.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\RoomStatus.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\RoomType.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\SpaBooking.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\SpaBookingStatus.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\SpaCategory.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\SpaService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\TableReservation.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\TableReservationStatus.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\TableStatus.java
@@ -23,10 +29,14 @@ D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\reposit
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\ReservationRepository.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\RestaurantTableRepository.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\RoomRepository.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\SpaBookingRepository.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\SpaServiceRepository.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\repository\TableReservationRepository.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\GuestService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\PricingService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\ReservationService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\RestaurantTableService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\RoomService.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\SpaBookingService.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\SpaServiceService.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\service\TableReservationService.java

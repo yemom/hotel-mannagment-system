@@ -18,6 +18,9 @@ public class Guest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Builder.Default
+    private String role = &quot;CLIENT&quot;;
+
     @Column(nullable = false)
     private String firstName;
 
@@ -45,15 +48,15 @@ public class Guest {
     private String country;
 
     public String getFullName() {
-<span class="nc" id="L48">        return firstName + &quot; &quot; + lastName;</span>
+<span class="fc" id="L51">        return firstName + &quot; &quot; + lastName;</span>
     }
 
     public boolean isValidAge() {
-<span class="pc bpc" id="L52" title="1 of 6 branches missed.">        return age != null &amp;&amp; age &gt;= 18 &amp;&amp; age &lt;= 120;</span>
+<span class="fc bfc" id="L55" title="All 6 branches covered.">        return age != null &amp;&amp; age &gt;= 18 &amp;&amp; age &lt;= 120;</span>
     }
 
     public boolean canMakeReservation() {
-<span class="pc bpc" id="L56" title="3 of 4 branches missed.">        return GuestStatus.ACTIVE.equals(status) &amp;&amp; isValidAge();</span>
+<span class="pc bpc" id="L59" title="3 of 4 branches missed.">        return GuestStatus.ACTIVE.equals(status) &amp;&amp; isValidAge();</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SpaBooking.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.model</a> &gt; <span class="el_source">SpaBooking.java</span></div><h1>SpaBooking.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = &quot;spa_bookings&quot;)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class SpaBooking {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;guest_id&quot;, nullable = false)
+    private Guest guest;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = &quot;spa_service_id&quot;, nullable = false)
+    private SpaService spaService;
+
+    @Column(nullable = false)
+    private LocalDate bookingDate;
+
+    /**
+     * Start time in &quot;HH:mm&quot; 24-hour format, e.g. &quot;10:00&quot;, &quot;14:30&quot;
+     */
+    @Column(nullable = false)
+    private String startTime;
+
+    @Column(nullable = false)
+    private Integer duration;
+
+    @Column(nullable = false)
+    private Integer numberOfGuests;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private SpaBookingStatus status;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
+
+    @Column(length = 1000)
+    private String specialRequests;
+
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+<span class="pc bpc" id="L64" title="1 of 2 branches missed.">        if (createdAt == null) {</span>
+<span class="nc" id="L65">            createdAt = LocalDateTime.now();</span>
+        }
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (updatedAt == null) {</span>
+<span class="nc" id="L68">            updatedAt = LocalDateTime.now();</span>
+        }
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">        if (status == null) {</span>
+<span class="nc" id="L71">            status = SpaBookingStatus.PENDING;</span>
+        }
+<span class="fc" id="L73">    }</span>
+
+    @PreUpdate
+    protected void onUpdate() {
+<span class="fc" id="L77">        updatedAt = LocalDateTime.now();</span>
+<span class="fc" id="L78">    }</span>
+
+    // State transition methods
+    public boolean canConfirm() {
+<span class="fc" id="L82">        return SpaBookingStatus.PENDING.equals(status);</span>
+    }
+
+    public boolean canComplete() {
+<span class="fc" id="L86">        return SpaBookingStatus.CONFIRMED.equals(status);</span>
+    }
+
+    public boolean canCancel() {
+<span class="fc bfc" id="L90" title="All 4 branches covered.">        return SpaBookingStatus.PENDING.equals(status) || SpaBookingStatus.CONFIRMED.equals(status);</span>
+    }
+
+    public void confirm() {
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (!canConfirm()) {</span>
+<span class="fc" id="L95">            throw new IllegalStateException(&quot;Cannot confirm spa booking with status: &quot; + status);</span>
+        }
+<span class="fc" id="L97">        this.status = SpaBookingStatus.CONFIRMED;</span>
+<span class="fc" id="L98">    }</span>
+
+    public void complete() {
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        if (!canComplete()) {</span>
+<span class="fc" id="L102">            throw new IllegalStateException(&quot;Cannot complete spa booking with status: &quot; + status);</span>
+        }
+<span class="fc" id="L104">        this.status = SpaBookingStatus.COMPLETED;</span>
+<span class="fc" id="L105">    }</span>
+
+    public void cancel() {
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (!canCancel()) {</span>
+<span class="fc" id="L109">            throw new IllegalStateException(&quot;Cannot cancel spa booking with status: &quot; + status);</span>
+        }
+<span class="fc" id="L111">        this.status = SpaBookingStatus.CANCELLED;</span>
+<span class="fc" id="L112">    }</span>
+
+    // Validation methods
+    public boolean isValidBookingDate() {
+<span class="pc bpc" id="L116" title="2 of 4 branches missed.">        return bookingDate != null &amp;&amp; !bookingDate.isBefore(LocalDate.now());</span>
+    }
+
+    public boolean isValidGuestCount() {
+<span class="pc bpc" id="L120" title="3 of 6 branches missed.">        return numberOfGuests != null &amp;&amp; numberOfGuests &gt;= 1 &amp;&amp; numberOfGuests &lt;= 20;</span>
+    }
+
+    public boolean isValidStartTime() {
+<span class="pc bpc" id="L124" title="2 of 4 branches missed.">        return startTime != null &amp;&amp; startTime.matches(&quot;^([01][0-9]|2[0-3]):[0-5][0-9]$&quot;);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

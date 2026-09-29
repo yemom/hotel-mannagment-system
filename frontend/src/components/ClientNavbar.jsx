@@ -63,6 +63,15 @@ const ClientNavbar = ({ activeTab, onTabChange, reservationCount = 0 }) => {
 
           <button
             type="button"
+            className={`client-nav-link ${activeTab === "spa" ? "active" : ""}`}
+            onClick={() => onTabChange("spa")}
+          >
+            <span className="material-symbols-outlined">spa</span>
+            <span>Spa Sanctuary</span>
+          </button>
+
+          <button
+            type="button"
             className={`client-nav-link ${activeTab === "reservations" ? "active" : ""}`}
             onClick={() => onTabChange("reservations")}
           >

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { signup } = useAuth();
 
   const [fullName, setFullName] = useState('');
@@ -51,8 +52,14 @@ const SignUp = () => {
         phone,
         password,
       });
-      // Client is automatically logged in and redirected to Client Dashboard
-      navigate('/client');
+      // Restore booking intent if user came from a public page
+      const redirectTo = location.state?.redirectTo;
+      if (redirectTo) {
+        navigate(redirectTo, { replace: true });
+      } else {
+        // Client is automatically logged in and redirected to Client Dashboard
+        navigate('/client');
+      }
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Registration failed. Please try again.');
     } finally {

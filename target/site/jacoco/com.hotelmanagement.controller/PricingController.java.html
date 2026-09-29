@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping(&quot;/api/pricing&quot;)
+@RequestMapping({&quot;/api/pricing&quot;, &quot;/pricing&quot;})
 @RequiredArgsConstructor
 public class PricingController {
 
@@ -24,20 +24,20 @@ public class PricingController {
 
     @GetMapping(&quot;/base-rates&quot;)
     public ResponseEntity&lt;Map&lt;RoomType, BigDecimal&gt;&gt; getBaseRates() {
-<span class="nc" id="L27">        Map&lt;RoomType, BigDecimal&gt; rates = new LinkedHashMap&lt;&gt;();</span>
-<span class="nc" id="L28">        Arrays.stream(RoomType.values())</span>
-<span class="nc" id="L29">            .forEach(type -&gt; rates.put(type, pricingService.getBasePriceForRoomType(type)));</span>
-<span class="nc" id="L30">        return ResponseEntity.ok(rates);</span>
+<span class="fc" id="L27">        Map&lt;RoomType, BigDecimal&gt; rates = new LinkedHashMap&lt;&gt;();</span>
+<span class="fc" id="L28">        Arrays.stream(RoomType.values())</span>
+<span class="fc" id="L29">            .forEach(type -&gt; rates.put(type, pricingService.getBasePriceForRoomType(type)));</span>
+<span class="fc" id="L30">        return ResponseEntity.ok(rates);</span>
     }
 
     @GetMapping(&quot;/base-price/{roomType}&quot;)
     public ResponseEntity&lt;BigDecimal&gt; getBasePrice(@PathVariable RoomType roomType) {
-<span class="nc" id="L35">        return ResponseEntity.ok(pricingService.getBasePriceForRoomType(roomType));</span>
+<span class="fc" id="L35">        return ResponseEntity.ok(pricingService.getBasePriceForRoomType(roomType));</span>
     }
 
     @GetMapping(&quot;/category&quot;)
     public ResponseEntity&lt;String&gt; getPriceCategory(@RequestParam BigDecimal price) {
-<span class="nc" id="L40">        return ResponseEntity.ok(pricingService.getPriceCategory(price));</span>
+<span class="fc" id="L40">        return ResponseEntity.ok(pricingService.getPriceCategory(price));</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

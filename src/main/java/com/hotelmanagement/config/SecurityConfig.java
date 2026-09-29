@@ -43,24 +43,20 @@ public class SecurityConfig {
                 return http.build();
         }
 
-        @Bean
-        public CorsConfigurationSource corsConfigurationSource() {
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origin-patterns:http://localhost:*,http://127.0.0.1:*,http://192.168.*.*:*,http://10.*.*.*:*}")
+    private String allowedOriginPatterns;
 
-                CorsConfiguration configuration = new CorsConfiguration();
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
 
-                /*
-                 * setAllowedOriginPatterns() supports wildcards, so this
-                 * covers localhost, 127.0.0.1, and common private LAN
-                 * ranges (e.g. http://192.168.137.1:5173) without having
-                 * to hardcode every possible machine IP.
-                 */
+        CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOriginPatterns(
-                                List.of(
-                                                "http://localhost:*",
-                                                "http://127.0.0.1:*",
-                                                "http://192.168.*.*:*",
-                                                "http://10.*.*.*:*"));
+        List<String> origins = java.util.Arrays.stream(allowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
+
+        configuration.setAllowedOriginPatterns(origins);
 
                 configuration.setAllowedMethods(
                                 List.of(
