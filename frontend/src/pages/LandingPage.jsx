@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
 import { roomAPI, spaServiceAPI } from '../services/api';
+import { getRoomImage, getSpaImage } from '../utils/propertyImages';
+import { goToReserve } from '../utils/reserve';
+import { useAuth } from '../context/AuthContext';
 
 const HERO_BG =
   'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=2000&q=85';
@@ -11,68 +14,9 @@ const RESTAURANT_BG =
 const SPA_BG =
   'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80';
 
-const FALLBACK_ROOMS = [
-  {
-    id: 401,
-    roomNumber: '401',
-    roomType: 'PENTHOUSE',
-    basePrice: 480,
-    capacity: 4,
-    description: 'Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service.',
-    image: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 301,
-    roomNumber: '301',
-    roomType: 'DELUXE',
-    basePrice: 290,
-    capacity: 4,
-    description: 'Ultra-luxurious corner suite with panoramic skyline views, walk-in dressing room, and deep soaking tub.',
-    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 201,
-    roomNumber: '201',
-    roomType: 'SUITE',
-    basePrice: 220,
-    capacity: 3,
-    description: 'Executive boutique suite with partitioned salon lounge, Italian marble bath, and private terrace.',
-    image: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?auto=format&fit=crop&w=800&q=80',
-  },
-];
-
-const FALLBACK_SPA = [
-  {
-    id: 1,
-    name: 'Swedish Relaxation Massage',
-    category: 'MASSAGE',
-    durationMinutes: 60,
-    price: 95,
-    description: 'Gentle full-body massage using rhythmic strokes and botanical oils to release muscle tension and cultivate deep calm.',
-    imageUrl: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 2,
-    name: 'Luxury Radiance Facial',
-    category: 'FACIAL',
-    durationMinutes: 50,
-    price: 120,
-    description: 'Rejuvenating bespoke facial featuring ultrasonic deep-cleansing, warm botanical steam, and antioxidant serum.',
-    imageUrl: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80',
-  },
-  {
-    id: 3,
-    name: 'Couples Wellness Sanctuary',
-    category: 'COUPLES',
-    durationMinutes: 90,
-    price: 240,
-    description: 'Side-by-side signature massages in our private VIP couple suite, with hydrotherapy foot ritual and champagne.',
-    imageUrl: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80',
-  },
-];
-
 const LandingPage = () => {
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   // Search parameters for availability
   const [checkIn, setCheckIn] = useState(() => {
@@ -87,44 +31,71 @@ const LandingPage = () => {
   const [guests, setGuests] = useState('2');
   const [roomType, setRoomType] = useState('ALL');
 
-  // Real backend data states
-  const [featuredRooms, setFeaturedRooms] = useState(FALLBACK_ROOMS);
-  const [featuredSpa, setFeaturedSpa] = useState(FALLBACK_SPA);
+  // Live inventory — every value below is read from the backend, never invented.
+  const [featuredRooms, setFeaturedRooms] = useState([]);
+  const [featuredSpa, setFeaturedSpa] = useState([]);
+  const [previewLoading, setPreviewLoading] = useState(true);
+  const [previewError, setPreviewError] = useState('');
+  const [inventory, setInventory] = useState({ roomCount: null, spaCount: null });
+
+  const loadPreview = async () => {
+    setPreviewLoading(true);
+    setPreviewError('');
+    const [roomsResult, spaResult] = await Promise.allSettled([
+      roomAPI.getAll(),
+      spaServiceAPI.getActive(),
+    ]);
+
+    if (roomsResult.status === 'fulfilled') {
+      const list = Array.isArray(roomsResult.value.data) ? roomsResult.value.data : [];
+      setFeaturedRooms(list.slice(0, 3).map((r) => ({ ...r, image: getRoomImage(r) })));
+      setInventory((prev) => ({ ...prev, roomCount: list.length }));
+    } else {
+      setFeaturedRooms([]);
+      setInventory((prev) => ({ ...prev, roomCount: null }));
+      setPreviewError('We could not reach the hotel reservation service.');
+    }
+
+    if (spaResult.status === 'fulfilled') {
+      const list = Array.isArray(spaResult.value.data) ? spaResult.value.data : [];
+      setFeaturedSpa(
+        list.slice(0, 3).map((s) => ({ ...s, image: getSpaImage(s) }))
+      );
+      setInventory((prev) => ({ ...prev, spaCount: list.length }));
+    } else {
+      setFeaturedSpa([]);
+      setInventory((prev) => ({ ...prev, spaCount: null }));
+    }
+
+    setPreviewLoading(false);
+  };
 
   useEffect(() => {
-    // Load real rooms
-    roomAPI
-      .getAll()
-      .then((res) => {
-        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          const formatted = res.data.slice(0, 3).map((r, i) => ({
-            ...r,
-            image: FALLBACK_ROOMS[i % FALLBACK_ROOMS.length].image,
-          }));
-          setFeaturedRooms(formatted);
-        }
-      })
-      .catch((err) => {
-        console.warn('Using fallback room inventory for landing showcase:', err);
-      });
-
-    // Load real spa services
-    spaServiceAPI
-      .getActive()
-      .then((res) => {
-        if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-          setFeaturedSpa(res.data.slice(0, 3));
-        }
-      })
-      .catch((err) => {
-        console.warn('Using fallback spa services for landing showcase:', err);
-      });
+    loadPreview();
   }, []);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     navigate(`/rooms?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}&type=${roomType}`);
   };
+
+  /** Reservation CTAs: authenticated clients go to the client area, visitors sign in. */
+  const handleReserveRoom = (room) =>
+    goToReserve(navigate, {
+      user: currentUser,
+      target: '/client?tab=book',
+      intent: room ? { type: 'ROOM', roomId: room.id, roomNumber: room.roomNumber } : null,
+    });
+
+  const handleReserveSpa = (service) =>
+    goToReserve(navigate, {
+      user: currentUser,
+      target: '/client?tab=spa',
+      intent: service ? { type: 'SPA', spaServiceId: service.id } : null,
+    });
+
+  const handleReserveTable = () =>
+    goToReserve(navigate, { user: currentUser, target: '/client?tab=restaurant' });
 
   return (
     <div className="landing-page-root">
@@ -135,27 +106,36 @@ const LandingPage = () => {
       <header
         className="landing-hero"
         style={{
-          background: `linear-gradient(rgba(15, 23, 42, 0.74), rgba(15, 23, 42, 0.88)), url("${HERO_BG}") center/cover no-repeat`,
+          background: `linear-gradient(rgba(26, 26, 26, 0.4), rgba(26, 26, 26, 0.7)), url("${HERO_BG}") center/cover no-repeat`,
         }}
       >
         <div className="landing-hero-content">
           <div className="hero-kicker">
             <span className="hero-kicker-dot" />
-            <span>THE SANCTUARY COLLECTION &bull; ADDIS ABABA &bull; EST. 2026</span>
+            <span>AURELIA GRAND &bull; ADDIS ABABA &bull; EST. 2026</span>
           </div>
 
           <h1 className="hero-headline">
-            A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
+            Aurelia Grand — A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
           </h1>
 
           <p className="hero-subheadline">
             Experience quintessential elegance where quiet architecture meets intuitive
-            white-glove service. Indulge in bespoke suites, Michelin-inspired dining, and
+            white-glove service. Indulge in bespoke suites, chef-led dining, and
             restorative holistic wellness rituals.
           </p>
 
           <div className="hero-cta-group">
-            <Link to="/rooms" className="public-cta-btn">
+            {/* Explore Rooms drops the guest straight into the room reservation page.
+                Anonymous visitors are sent to /login first and return here afterwards. */}
+            <Link
+              to="/client?tab=book"
+              className="public-cta-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                handleReserveRoom(null);
+              }}
+            >
               <span>Explore Rooms</span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
@@ -228,26 +208,60 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Metrics Ribbon */}
-      <section className="landing-metrics-ribbon">
+      {/* Live Inventory Ribbon — values sourced from the backend */}
+      <section className="landing-metrics-ribbon" aria-label="Live property information">
         <div className="metric-item">
-          <strong>14</strong>
-          <span>Curated Suites</span>
+          <strong>{inventory.roomCount !== null ? inventory.roomCount : '—'}</strong>
+          <span>Rooms &amp; Suites</span>
         </div>
         <div className="metric-divider" />
         <div className="metric-item">
-          <strong>18</strong>
-          <span>Fine Dining Tables</span>
+          <strong>{inventory.spaCount !== null ? inventory.spaCount : '—'}</strong>
+          <span>Spa Rituals</span>
         </div>
         <div className="metric-divider" />
         <div className="metric-item">
-          <strong>6</strong>
-          <span>Holistic Spa Rituals</span>
+          <strong>24/7</strong>
+          <span>Concierge Desk</span>
         </div>
         <div className="metric-divider" />
         <div className="metric-item">
-          <strong>4.95 / 5</strong>
-          <span>Forbes Travel Accolade</span>
+          <strong>Addis Ababa</strong>
+          <span>Bole, Ethiopia</span>
+        </div>
+      </section>
+
+      {/* Section 0: Welcome / Editorial Introduction */}
+      <section className="landing-section welcome-section">
+        <div className="section-container">
+          <div className="welcome-split">
+            <div className="welcome-media">
+              <img
+                src={HERO_BG}
+                alt="The architecture and atrium of Aurelia Grand"
+                loading="lazy"
+              />
+            </div>
+            <div className="welcome-copy">
+              <span className="section-eyebrow">WELCOME</span>
+              <h2>Arrive as a guest. Leave as part of the house.</h2>
+              <p>
+                Aurelia Grand is an intimate luxury retreat in Bole, Addis Ababa — built around
+                quiet architecture, warm materials, and hospitality that anticipates rather than
+                reacts. Every suite, treatment, and table is designed to slow the pace of your day.
+              </p>
+              <p>
+                From the moment you are welcomed at the atrium to your final morning on the
+                terrace, our team curates each detail of your stay around you.
+              </p>
+              <div className="welcome-actions">
+                <Link to="/about" className="public-outline-btn">
+                  <span>Our Story</span>
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -263,12 +277,41 @@ const LandingPage = () => {
             </p>
           </div>
 
+          {previewLoading && (
+            <div className="catalog-loading">
+              <span className="spinner" />
+              <p>Loading current availability...</p>
+            </div>
+          )}
+
+          {!previewLoading && previewError && (
+            <div className="api-error-state" role="alert">
+              <span className="material-symbols-outlined">cloud_off</span>
+              <h3>Accommodations are temporarily unavailable</h3>
+              <p>{previewError}</p>
+              <button type="button" className="public-cta-btn" onClick={loadPreview}>
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {!previewLoading && !previewError && featuredRooms.length === 0 && (
+            <div className="empty-card">
+              <span className="material-symbols-outlined">hotel</span>
+              <h3>No suites are currently listed</h3>
+              <p>
+                Our reservations team is updating availability. Please contact the concierge
+                desk for immediate assistance.
+              </p>
+            </div>
+          )}
+
           <div className="landing-rooms-grid">
             {featuredRooms.map((room) => (
               <div key={room.id} className="catalog-room-card">
                 <div className="card-media">
                   <img
-                    src={room.image || FALLBACK_ROOMS[0].image}
+                    src={room.image}
                     alt={`Room ${room.roomNumber} - ${room.roomType}`}
                     loading="lazy"
                   />
@@ -304,12 +347,13 @@ const LandingPage = () => {
                     )}
                   </div>
                   <div className="card-actions">
-                    <Link
-                      to={`/rooms?select=${room.roomNumber}`}
+                    <button
+                      type="button"
                       className="public-cta-btn"
+                      onClick={() => handleReserveRoom(room)}
                     >
-                      Book Now
-                    </Link>
+                      {currentUser ? 'Book Now' : 'Reserve'}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -318,7 +362,11 @@ const LandingPage = () => {
 
           <div className="section-footer-cta">
             <Link to="/rooms" className="public-outline-btn">
-              <span>View All 14 Suites</span>
+              <span>
+                {inventory.roomCount
+                  ? `View All ${inventory.roomCount} Accommodations`
+                  : 'View All Accommodations'}
+              </span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
           </div>
@@ -329,28 +377,40 @@ const LandingPage = () => {
       <section
         className="landing-section spa-showcase-section"
         style={{
-          background: `linear-gradient(rgba(15, 23, 42, 0.88), rgba(15, 23, 42, 0.94)), url("${SPA_BG}") center/cover no-repeat`,
+          background: `linear-gradient(rgba(26, 26, 26, 0.8), rgba(26, 26, 26, 0.95)), url("${SPA_BG}") center/cover no-repeat`,
           color: '#ffffff',
         }}
       >
         <div className="section-container">
           <div className="landing-section-header" style={{ color: '#ffffff' }}>
-            <span className="section-eyebrow" style={{ color: '#34d399' }}>
+            <span className="section-eyebrow" style={{ color: 'var(--accent-light)' }}>
               WELLNESS &amp; SERENITY
             </span>
             <h2 style={{ color: '#ffffff' }}>The Spa Sanctuary</h2>
-            <p style={{ color: '#cbd5e1' }}>
+            <p style={{ color: 'var(--accent-light)' }}>
               Surrender to restorative stillness. Our certified therapists blend ancient herbal
               rituals with modern botanical therapies to soothe body and mind.
             </p>
           </div>
+
+          {!previewLoading && featuredSpa.length === 0 && (
+            <div className="empty-card" style={{ background: 'rgba(250, 247, 242, 0.06)', color: '#ffffff', borderColor: 'rgba(223, 195, 138, 0.35)' }}>
+              <span className="material-symbols-outlined" style={{ color: 'var(--accent-light)' }}>
+                spa
+              </span>
+              <h3>No spa rituals are currently listed</h3>
+              <p style={{ color: 'rgba(255,255,255,0.7)' }}>
+                No spa services are currently available. Please check back shortly.
+              </p>
+            </div>
+          )}
 
           <div className="landing-spa-grid">
             {featuredSpa.map((treatment) => (
               <div key={treatment.id} className="spa-treatment-card">
                 <div className="treatment-media">
                   <img
-                    src={treatment.imageUrl || FALLBACK_SPA[0].imageUrl}
+                    src={treatment.image}
                     alt={treatment.name}
                     loading="lazy"
                   />
@@ -365,9 +425,13 @@ const LandingPage = () => {
                   <p>{treatment.description}</p>
                   <div className="treatment-footer">
                     <span className="treatment-price">${treatment.price}</span>
-                    <Link to="/spa" className="public-cta-btn">
+                    <button
+                      type="button"
+                      className="public-cta-btn"
+                      onClick={() => handleReserveSpa(treatment)}
+                    >
                       Book This Ritual
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -375,7 +439,17 @@ const LandingPage = () => {
           </div>
 
           <div className="section-footer-cta">
-            <Link to="/spa" className="public-outline-btn" style={{ borderColor: '#34d399', color: '#34d399' }}>
+            {/* Explore All Spa Rituals opens the spa sanctuary page — a grid of real
+                spa imagery with reservation actions (login required). */}
+            <Link
+              to="/client?tab=spa"
+              className="public-outline-btn"
+              style={{ borderColor: 'var(--accent)', color: 'var(--accent)' }}
+              onClick={(e) => {
+                e.preventDefault();
+                handleReserveSpa(null);
+              }}
+            >
               <span>Explore All Spa Rituals</span>
               <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
@@ -390,7 +464,7 @@ const LandingPage = () => {
             <div className="dining-image-column">
               <img
                 src={RESTAURANT_BG}
-                alt="Fine Dining at Ye-mom Hotel"
+                alt="Fine Dining at Aurelia Grand"
                 loading="lazy"
               />
             </div>
@@ -406,7 +480,7 @@ const LandingPage = () => {
                 <li>
                   <span className="material-symbols-outlined">restaurant</span>
                   <div>
-                    <strong>Michelin-Inspired Tasting Menus</strong>
+                    <strong>Chef-Curated Tasting Menus</strong>
                     <span>Crafted daily with hand-picked regional harvest</span>
                   </div>
                 </li>
@@ -426,9 +500,13 @@ const LandingPage = () => {
                 </li>
               </ul>
               <div className="dining-cta-group">
-                <Link to="/restaurant" className="public-cta-btn">
+                <button
+                  type="button"
+                  className="public-cta-btn"
+                  onClick={handleReserveTable}
+                >
                   Reserve a Table
-                </Link>
+                </button>
                 <Link to="/restaurant" className="public-outline-btn">
                   View Dining Menu
                 </Link>
@@ -493,11 +571,40 @@ const LandingPage = () => {
               and flexible arrival schedules.
             </p>
             <div className="invitation-actions">
-              <Link to="/rooms" className="public-cta-btn">
+              <button
+                type="button"
+                className="public-cta-btn"
+                onClick={() => handleReserveRoom(null)}
+              >
                 Reserve Your Stay Now
-              </Link>
+              </button>
               <Link to="/login" className="public-outline-btn">
                 Member Sign In
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Section 6: Final Reservation CTA */}
+      <section className="landing-section final-cta-section">
+        <div className="section-container">
+          <div className="final-cta-card">
+            <span className="section-eyebrow" style={{ color: 'var(--accent)' }}>
+              YOUR NEXT STAY
+            </span>
+            <h2 style={{ color: '#ffffff' }}>Begins Here</h2>
+            <p style={{ color: 'rgba(255,255,255,0.78)' }}>
+              Reserve directly with Aurelia Grand for preferred suite allocation, complimentary
+              artisan breakfast, and flexible arrival scheduling.
+            </p>
+            <div className="final-cta-actions">
+              <Link to="/login" state={{ redirectTo: '/client' }} className="public-cta-btn">
+                <span>Reserve Your Stay</span>
+                <span className="material-symbols-outlined">arrow_forward</span>
+              </Link>
+              <Link to="/rooms" className="public-outline-btn" style={{ borderColor: '#ffffff', color: '#ffffff' }}>
+                <span>Browse Accommodations</span>
               </Link>
             </div>
           </div>

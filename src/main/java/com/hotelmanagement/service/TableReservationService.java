@@ -49,10 +49,133 @@ public class TableReservationService {
             reservation.setRestaurantTable(table);
         }
 
+        // Reject a table that cannot seat the party, or is already booked for that slot.
+        if (reservation.getRestaurantTable() != null) {
+            RestaurantTable assigned = reservation.getRestaurantTable();
+            if (assigned.getCapacity() != null && reservation.getPartySize() > assigned.getCapacity()) {
+                throw new IllegalArgumentException("Table " + assigned.getTableNumber()
+                    + " seats at most " + assigned.getCapacity() + " guests");
+            }
+            assertNoTableConflict(assigned.getId(), reservation.getReservationDate(),
+                reservation.getTimeSlot(), null);
+        }
+
         reservation.setStatus(TableReservationStatus.PENDING);
         reservation.setCreatedAt(LocalDateTime.now());
         return repository.save(reservation);
     }
+
+    /**
+     * Re-schedules an existing table reservation owned by the acting guest.
+     *
+     * Server-side validation:
+     *  - ownership (mismatch -> AccessDeniedException / 403)
+     *  - only PENDING or CONFIRMED may change
+     *  - date must not be in the past, time slot must be a valid HH:mm
+     *  - party size must be 1..20 and fit the table capacity
+     *  - the table must not already be booked for that date + time slot
+     *  - status returns to PENDING so staff re-approve the change
+     */
+    public TableReservation reschedule(Long id, LocalDate newDate, String newTimeSlot,
+                                       Integer newPartySize, Long actingGuestId) {
+        TableReservation res = getById(id);
+
+        requireOwnership(res.getGuest() != null ? res.getGuest().getId() : null, actingGuestId);
+
+        if (!TableReservationStatus.PENDING.equals(res.getStatus())
+            && !TableReservationStatus.CONFIRMED.equals(res.getStatus())) {
+            throw new IllegalStateException(
+                "Cannot modify a reservation with status: " + res.getStatus());
+        }
+
+        if (newDate == null) {
+            throw new IllegalArgumentException("Reservation date is required");
+        }
+        if (newDate.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Reservation date cannot be in the past");
+        }
+        if (newTimeSlot == null || !newTimeSlot.trim().matches("^([01][0-9]|2[0-3]):[0-5][0-9]$")) {
+            throw new IllegalArgumentException("Time slot must be in HH:mm format (e.g. 18:00)");
+        }
+
+        int partySize = newPartySize != null ? newPartySize : res.getPartySize();
+        if (partySize < 1 || partySize > 20) {
+            throw new IllegalArgumentException("Party size must be between 1 and 20");
+        }
+
+        RestaurantTable table = res.getRestaurantTable();
+        if (table != null && table.getCapacity() != null && partySize > table.getCapacity()) {
+            throw new IllegalArgumentException("Table " + table.getTableNumber()
+                + " seats at most " + table.getCapacity() + " guests");
+        }
+
+        if (table != null && table.getId() != null) {
+            List<TableReservation> conflicts =
+                repository.findByRestaurantTableIdAndReservationDateAndTimeSlotAndStatusNotAndIdNot(
+                    table.getId(), newDate, newTimeSlot, TableReservationStatus.CANCELLED, res.getId());
+            if (!conflicts.isEmpty()) {
+                throw new IllegalStateException("Table " + table.getTableNumber()
+                    + " is already reserved for " + newTimeSlot + " on " + newDate);
+            }
+        }
+
+        res.setReservationDate(newDate);
+        res.setTimeSlot(newTimeSlot);
+        res.setPartySize(partySize);
+        res.setStatus(TableReservationStatus.PENDING);
+        return repository.save(res);
+    }
+
+    /**
+     * Cancels a reservation on behalf of a specific guest, enforcing ownership.
+     */
+    public TableReservation cancelAs(Long id, Long actingGuestId) {
+        TableReservation res = getById(id);
+        requireOwnership(res.getGuest() != null ? res.getGuest().getId() : null, actingGuestId);
+        return cancel(id);
+    }
+
+    /**
+     * Admin queue: table reservations still awaiting approval.
+     */
+    public List<TableReservation> getPending() {
+        return repository.findByStatus(TableReservationStatus.PENDING);
+    }
+
+    private void requireOwnership(Long ownerGuestId, Long actingGuestId) {
+        if (actingGuestId == null) {
+            throw new IllegalArgumentException("actingGuestId is required");
+        }
+        if (ownerGuestId == null || !ownerGuestId.equals(actingGuestId)) {
+            throw new com.hotelmanagement.exception.AccessDeniedException(
+                "You may only modify your own reservations");
+        }
+    }
+
+    /**
+     * Rejects a create/reschedule that would double-book the same table, date and slot.
+     */
+    private void assertNoTableConflict(Long tableId, LocalDate date, String timeSlot, Long excludeId) {
+        if (tableId == null || date == null || timeSlot == null) {
+            return;
+        }
+        List<TableReservation> conflicts;
+        if (excludeId == null) {
+            conflicts = repository.findByRestaurantTableIdAndReservationDateAndTimeSlot(
+                tableId, date, timeSlot);
+            conflicts = conflicts.stream()
+                .filter(r -> !TableReservationStatus.CANCELLED.equals(r.getStatus()))
+                .collect(java.util.stream.Collectors.toList());
+        } else {
+            conflicts = repository.findByRestaurantTableIdAndReservationDateAndTimeSlotAndStatusNotAndIdNot(
+                tableId, date, timeSlot, TableReservationStatus.CANCELLED, excludeId);
+        }
+        if (!conflicts.isEmpty()) {
+            throw new IllegalStateException("That table is already reserved for "
+                + timeSlot + " on " + date);
+        }
+    }
+
 
     public List<TableReservation> getAll() {
         return repository.findAll();

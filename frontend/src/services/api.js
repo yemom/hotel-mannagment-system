@@ -70,10 +70,22 @@ export const reservationAPI = {
   getById: (id) => apiClient.get(`/reservations/${id}`),
   getByGuestId: (guestId) => apiClient.get(`/reservations/guest/${guestId}`),
   getByRoomId: (roomId) => apiClient.get(`/reservations/room/${roomId}`),
-  confirm: (id) => apiClient.post(`/reservations/${id}/confirm`),
+  /** Admin queue: reservations awaiting approval */
+  getPending: () => apiClient.get("/reservations/pending"),
+  confirm: (id, actingGuestId) =>
+    apiClient.post(`/reservations/${id}/confirm`, null, {
+      params: actingGuestId ? { actingGuestId } : {},
+    }),
   checkIn: (id) => apiClient.post(`/reservations/${id}/check-in`),
   checkOut: (id) => apiClient.post(`/reservations/${id}/check-out`),
-  cancel: (id) => apiClient.post(`/reservations/${id}/cancel`),
+  cancel: (id, actingGuestId) =>
+    apiClient.post(`/reservations/${id}/cancel`, null, {
+      params: actingGuestId ? { actingGuestId } : {},
+    }),
+  /** Client reschedules their own stay dates. Resets status to PENDING for re-approval. */
+  reschedule: (id, data) => apiClient.put(`/reservations/${id}/reschedule`, data),
+  /** Booking desk cleanup: permanently removes a reservation row. */
+  delete: (id) => apiClient.delete(`/reservations/${id}`),
 };
 
 // Pricing API
@@ -109,12 +121,20 @@ export const tableReservationAPI = {
   getByGuestId: (guestId) =>
     apiClient.get(`/restaurant/reservations/guest/${guestId}`),
   getByDate: (date) => apiClient.get(`/restaurant/reservations/date/${date}`),
+  /** Admin queue: table reservations awaiting approval */
+  getPending: () => apiClient.get("/restaurant/reservations/pending"),
   confirm: (id) => apiClient.post(`/restaurant/reservations/${id}/confirm`),
   seat: (id) => apiClient.post(`/restaurant/reservations/${id}/seat`),
   complete: (id) => apiClient.post(`/restaurant/reservations/${id}/complete`),
-  cancel: (id) => apiClient.post(`/restaurant/reservations/${id}/cancel`),
+  cancel: (id, actingGuestId) =>
+    apiClient.post(`/restaurant/reservations/${id}/cancel`, null, {
+      params: actingGuestId ? { actingGuestId } : {},
+    }),
   noShow: (id) => apiClient.post(`/restaurant/reservations/${id}/no-show`),
   delete: (id) => apiClient.delete(`/restaurant/reservations/${id}`),
+  /** Client reschedules their own table booking. Resets status to PENDING for re-approval. */
+  reschedule: (id, data) =>
+    apiClient.put(`/restaurant/reservations/${id}/reschedule`, data),
 };
 
 // Spa Service API
@@ -137,9 +157,18 @@ export const spaBookingAPI = {
   getById: (id) => apiClient.get(`/spa-bookings/${id}`),
   getByGuestId: (guestId) => apiClient.get(`/spa-bookings/guest/${guestId}`),
   getByDate: (date) => apiClient.get(`/spa-bookings/date/${date}`),
+  /** Admin queue: spa bookings awaiting approval */
+  getPending: () => apiClient.get("/spa-bookings/pending"),
   confirm: (id) => apiClient.post(`/spa-bookings/${id}/confirm`),
   complete: (id) => apiClient.post(`/spa-bookings/${id}/complete`),
-  cancel: (id) => apiClient.post(`/spa-bookings/${id}/cancel`),
+  cancel: (id, actingGuestId) =>
+    apiClient.post(`/spa-bookings/${id}/cancel`, null, {
+      params: actingGuestId ? { actingGuestId } : {},
+    }),
+  /** Wellness desk cleanup: permanently removes an appointment row. */
+  delete: (id) => apiClient.delete(`/spa-bookings/${id}`),
+  /** Client reschedules their own spa appointment. Resets status to PENDING for re-approval. */
+  reschedule: (id, data) => apiClient.put(`/spa-bookings/${id}/reschedule`, data),
 };
 
 export default apiClient;

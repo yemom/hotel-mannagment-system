@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -6,6 +6,21 @@ const ClientNavbar = ({ activeTab, onTabChange, reservationCount = 0 }) => {
   const navigate = useNavigate();
   const { currentUser, logout, switchRole } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") setDropdownOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const initials = currentUser
     ? `${currentUser.firstName?.[0] || ""}${currentUser.lastName?.[0] || ""}`.toUpperCase() ||
@@ -23,20 +38,24 @@ const ClientNavbar = ({ activeTab, onTabChange, reservationCount = 0 }) => {
   };
 
   return (
-    <header className="client-navbar">
-      <div className="client-navbar-container">
+    <header className={`client-navbar public-navbar ${scrolled ? "scrolled" : ""}`}>
+      <div className="client-navbar-container public-nav-container">
         {/* Brand Logo */}
         <div
-          className="client-brand"
-          onClick={() => onTabChange("book")}
+          className="client-brand public-nav-brand"
+          onClick={() => navigate("/")}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") navigate("/");
+          }}
           role="button"
           tabIndex={0}
+          title="Back to Aurelia Grand home"
         >
-          <div className="client-brand-mark">የ</div>
-          <div>
-            <span className="client-brand-name">የ-mom Hotel</span>
-            <span className="client-brand-tagline">
-              Boutique Luxury Stays & Dining
+          <div className="client-brand-mark public-brand-mark">A</div>
+          <div className="public-brand-text">
+            <span className="client-brand-name public-brand-title">Aurelia Grand</span>
+            <span className="client-brand-tagline public-brand-subtitle">
+              Boutique Luxury Stays &amp; Dining
             </span>
           </div>
         </div>

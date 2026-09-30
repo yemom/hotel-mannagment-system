@@ -91,12 +91,12 @@ const Pricing = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '22px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
-            <span style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em' }}>
+            <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', border: '1px solid var(--surface-line)', padding: '3px 10px', borderRadius: '14px', fontSize: '11px', fontWeight: 800, letterSpacing: '0.04em' }}>
               &bull; AUTUMN HIGH-SEASON ACTIVE &bull; OCT 1 &ndash; NOV 30
             </span>
           </div>
-          <h1 style={{ fontSize: '26px', margin: '4px 0 0', color: '#0f172a' }}>Dynamic Rate &amp; Pricing Management</h1>
-          <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+          <h1 style={{ fontSize: '26px', margin: '4px 0 0', color: 'var(--text)' }}>Dynamic Rate &amp; Pricing Management</h1>
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--muted)' }}>
             Configure real-time yields, seasonal surcharges, and inventory-linked algorithm rules.
           </p>
         </div>
@@ -117,7 +117,7 @@ const Pricing = () => {
               showToast('Exporting current rate sheet to CSV/PDF...');
               window.print();
             }}
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 16px', background: '#065f46' }}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', padding: '8px 16px', background: 'var(--jade)' }}
           >
             <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>download</span>
             <span>Export Rate Sheet</span>
@@ -127,55 +127,55 @@ const Pricing = () => {
 
       {/* 4 Top KPI Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px' }}>
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>AVERAGE DAILY RATE (ADR)</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#065f46' }}>attach_money</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>AVERAGE DAILY RATE (ADR)</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--jade)' }}>attach_money</span>
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             $338.00
-            <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700, background: '#dcfce7', padding: '2px 6px', borderRadius: '4px' }}>+5.8%</span>
+            <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 700, background: 'var(--surface-line)', padding: '2px 6px', borderRadius: '4px' }}>+5.8%</span>
           </div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
             Target: $320.00 &bull; RevPAR: $287.20
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>BASE RATE INDEX</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>stacked_line_chart</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>BASE RATE INDEX</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>stacked_line_chart</span>
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a' }}>100.0%</div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)' }}>100.0%</div>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
             Portfolio Parity: Optimal Range
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>WEEKEND SURGE</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#d97706' }}>trending_up</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>WEEKEND SURGE</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--amber)' }}>trending_up</span>
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             +25%
-            <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 700, background: '#fef3c7', padding: '2px 6px', borderRadius: '4px' }}>Fri &ndash; Sun</span>
+            <span style={{ fontSize: '11px', color: 'var(--amber)', fontWeight: 700, background: 'var(--surface-line)', padding: '2px 6px', borderRadius: '4px' }}>Fri &ndash; Sun</span>
           </div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
             Applied automatically &bull; Max: $1,562
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>HOLIDAY MULTIPLIER</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#7c3aed' }}>celebration</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>HOLIDAY MULTIPLIER</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>celebration</span>
           </div>
-          <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+          <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
             +40%
-            <span style={{ fontSize: '11px', color: '#6b21a8', fontWeight: 700, background: '#f3e8ff', padding: '2px 6px', borderRadius: '4px' }}>Nov 28 Active</span>
+            <span style={{ fontSize: '11px', color: 'var(--accent)', fontWeight: 700, background: 'var(--surface-line)', padding: '2px 6px', borderRadius: '4px' }}>Nov 28 Active</span>
           </div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '6px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>
             Thanksgiving Gala Week &bull; 3-Night Min
           </div>
         </div>
@@ -187,8 +187,8 @@ const Pricing = () => {
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <div>
-              <h2 style={{ fontSize: '18px', margin: 0, color: '#0f172a' }}>Room Type Rate Matrix</h2>
-              <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Direct base allocations, guest multipliers, and seasonal yields per category.</p>
+              <h2 style={{ fontSize: '18px', margin: 0, color: 'var(--text)' }}>Room Type Rate Matrix</h2>
+              <p style={{ margin: 0, fontSize: '12px', color: 'var(--muted)' }}>Direct base allocations, guest multipliers, and seasonal yields per category.</p>
             </div>
             <button
               type="button"
@@ -196,7 +196,7 @@ const Pricing = () => {
                 setRates(INITIAL_ROOM_RATES);
                 showToast('Reset all rates to baseline defaults');
               }}
-              style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>restart_alt</span>
               Reset All Defaults
@@ -210,7 +210,7 @@ const Pricing = () => {
                 style={{
                   background: '#ffffff',
                   borderRadius: '12px',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--surface-line)',
                   padding: '18px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.03)',
                 }}
@@ -218,58 +218,58 @@ const Pricing = () => {
                 {/* Card Header */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
                   <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '24px', color: '#065f46' }}>bed</span>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '8px', background: 'var(--surface-soft)', border: '1px solid var(--surface-line)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '24px', color: 'var(--jade)' }}>bed</span>
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>{item.name}</h3>
-                        <span style={{ fontSize: '11px', color: '#64748b', background: '#f1f5f9', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>
+                        <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text)' }}>{item.name}</h3>
+                        <span style={{ fontSize: '11px', color: 'var(--muted)', background: 'var(--surface-soft)', padding: '2px 8px', borderRadius: '10px', fontWeight: 600 }}>
                           {item.inventory} Rooms Active
                         </span>
                         {item.badge && (
-                          <span style={{ fontSize: '10px', color: '#92400e', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', fontWeight: 800 }}>
+                          <span style={{ fontSize: '10px', color: 'var(--amber)', background: 'var(--surface-line)', padding: '2px 6px', borderRadius: '4px', fontWeight: 800 }}>
                             {item.badge}
                           </span>
                         )}
                       </div>
-                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>
+                      <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--muted)' }}>
                         {item.size} &bull; {item.view}
                       </p>
                     </div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '11px', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700 }}>CURRENT BASE</span>
-                    <div style={{ fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>${item.base} <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>/ night</span></div>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', textTransform: 'uppercase', fontWeight: 700 }}>CURRENT BASE</span>
+                    <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text)' }}>${item.base} <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>/ night</span></div>
                   </div>
                 </div>
 
                 {/* Card Inputs Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', background: 'var(--surface-soft)', padding: '12px', borderRadius: '8px', border: '1px solid var(--surface-soft)' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>BASE NIGHTLY ($)</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--muted)', marginBottom: '4px' }}>BASE NIGHTLY ($)</label>
                     <input
                       type="number"
                       value={item.base}
                       onChange={(e) => handleRateChange(key, 'base', Number(e.target.value))}
-                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--surface-line)', fontSize: '13px', fontWeight: 700 }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>WEEKEND RATE</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--muted)', marginBottom: '4px' }}>WEEKEND RATE</label>
                     <input
                       type="number"
                       value={item.weekend}
                       onChange={(e) => handleRateChange(key, 'weekend', Number(e.target.value))}
-                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }}
+                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--surface-line)', fontSize: '13px', fontWeight: 700 }}
                     />
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>MIN STAY REQ.</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--muted)', marginBottom: '4px' }}>MIN STAY REQ.</label>
                     <select
                       value={item.minStay}
                       onChange={(e) => handleRateChange(key, 'minStay', e.target.value)}
-                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '12px' }}
+                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--surface-line)', fontSize: '12px' }}
                     >
                       <option value="1 Night Min">1 Night Min</option>
                       <option value="2 Nights Min">2 Nights Min</option>
@@ -278,27 +278,27 @@ const Pricing = () => {
                     </select>
                   </div>
                   <div>
-                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#475569', marginBottom: '4px' }}>EXTRA GUEST / OCC.</label>
+                    <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--muted)', marginBottom: '4px' }}>EXTRA GUEST / OCC.</label>
                     <input
                       type="number"
                       value={item.extraGuest}
                       onChange={(e) => handleRateChange(key, 'extraGuest', Number(e.target.value))}
-                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '13px' }}
+                      style={{ width: '100%', padding: '6px 8px', borderRadius: '6px', border: '1px solid var(--surface-line)', fontSize: '13px' }}
                     />
                   </div>
                 </div>
 
                 {/* Card Footer: Trigger note & Apply Button */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-                  <span style={{ fontSize: '11px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }} />
+                  <span style={{ fontSize: '11px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
                     Occupancy Trigger: {item.trigger}
                   </span>
                   <button
                     type="button"
                     className="primary-button"
                     onClick={() => handleApplyRate(key)}
-                    style={{ padding: '6px 14px', fontSize: '12px', background: '#065f46', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    style={{ padding: '6px 14px', fontSize: '12px', background: 'var(--jade)', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>price_change</span>
                     <span>Apply Rate Update</span>
@@ -312,12 +312,12 @@ const Pricing = () => {
         {/* Right Column: Algorithmic Rules Engine & Revenue Forecast */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Algorithmic Rules Engine */}
-          <div style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid var(--surface-line)', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
-              <span className="material-symbols-outlined" style={{ color: '#065f46', fontSize: '20px' }}>tune</span>
-              <h3 style={{ margin: 0, fontSize: '15px', color: '#0f172a' }}>Algorithmic Rules Engine</h3>
+              <span className="material-symbols-outlined" style={{ color: 'var(--jade)', fontSize: '20px' }}>tune</span>
+              <h3 style={{ margin: 0, fontSize: '15px', color: 'var(--text)' }}>Algorithmic Rules Engine</h3>
             </div>
-            <p style={{ margin: '0 0 16px', fontSize: '12px', color: '#64748b' }}>
+            <p style={{ margin: '0 0 16px', fontSize: '12px', color: 'var(--muted)' }}>
               Control real-time distribution policies across direct booking engines and global distribution systems (GDS).
             </p>
 
@@ -328,16 +328,16 @@ const Pricing = () => {
                 { title: 'Corporate Preferred Rate', desc: 'Applies negotiated -15% tariff for vetted corporate luxury consortium accounts.', state: corporateRate, set: setCorporateRate },
                 { title: 'Channel Manager Rate Parity Lock', desc: 'Forces OTA rate blocking.', state: parityLock, set: setParityLock },
               ].map((rule) => (
-                <div key={rule.title} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                <div key={rule.title} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', paddingBottom: '12px', borderBottom: '1px solid var(--surface-soft)' }}>
                   <div>
-                    <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>{rule.title}</strong>
-                    <span style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>{rule.desc}</span>
+                    <strong style={{ fontSize: '13px', color: 'var(--text)', display: 'block' }}>{rule.title}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>{rule.desc}</span>
                   </div>
                   <input
                     type="checkbox"
                     checked={rule.state}
                     onChange={(e) => rule.set(e.target.checked)}
-                    style={{ accentColor: '#065f46', width: '18px', height: '18px', marginTop: '2px', cursor: 'pointer' }}
+                    style={{ accentColor: 'var(--jade)', width: '18px', height: '18px', marginTop: '2px', cursor: 'pointer' }}
                   />
                 </div>
               ))}
@@ -355,22 +355,22 @@ const Pricing = () => {
           </div>
 
           {/* Revenue Forecast Box */}
-          <div style={{ background: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0', padding: '18px' }}>
+          <div style={{ background: 'var(--surface-line)', borderRadius: '12px', border: '1px solid var(--surface-line)', padding: '18px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-              <span className="material-symbols-outlined" style={{ color: '#065f46' }}>analytics</span>
-              <strong style={{ color: '#065f46', fontSize: '14px' }}>Revenue Manager Forecast</strong>
+              <span className="material-symbols-outlined" style={{ color: 'var(--jade)' }}>analytics</span>
+              <strong style={{ color: 'var(--jade)', fontSize: '14px' }}>Revenue Manager Forecast</strong>
             </div>
-            <p style={{ margin: 0, fontSize: '12px', color: '#166534', lineHeight: 1.4 }}>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--text)', lineHeight: 1.4 }}>
               Occupancy for late October is pacing <strong>14.2% higher</strong> than same-time last year. Recommending shifting Deluxe Ocean King minimum stay requirement to 2 nights starting next Monday.
             </p>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid #bbf7d0' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--surface-line)' }}>
               <div>
-                <span style={{ fontSize: '11px', color: '#166534' }}>Target RevPAR</span>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#065f46' }}>$310</div>
+                <span style={{ fontSize: '11px', color: 'var(--text)' }}>Target RevPAR</span>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--jade)' }}>$310</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '11px', color: '#166534' }}>Projected Rev</span>
-                <div style={{ fontSize: '16px', fontWeight: 800, color: '#065f46' }}>+$92,850</div>
+                <span style={{ fontSize: '11px', color: 'var(--text)' }}>Projected Rev</span>
+                <div style={{ fontSize: '16px', fontWeight: 800, color: 'var(--jade)' }}>+$92,850</div>
               </div>
             </div>
           </div>
@@ -378,11 +378,11 @@ const Pricing = () => {
       </div>
 
       {/* Pricing History & Audit Log */}
-      <div className="panel" style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <div className="panel-header" style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="panel" style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid var(--surface-line)', overflow: 'hidden' }}>
+        <div className="panel-header" style={{ padding: '16px 20px', borderBottom: '1px solid var(--surface-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 style={{ fontSize: '16px', margin: 0, color: '#0f172a' }}>Pricing History &amp; Audit Log</h2>
-            <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Immutable change record of nightly tariffs, yield triggers, and manual staff overrides.</p>
+            <h2 style={{ fontSize: '16px', margin: 0, color: 'var(--text)' }}>Pricing History &amp; Audit Log</h2>
+            <p style={{ margin: 0, fontSize: '12px', color: 'var(--muted)' }}>Immutable change record of nightly tariffs, yield triggers, and manual staff overrides.</p>
           </div>
           <button
             type="button"
@@ -410,14 +410,14 @@ const Pricing = () => {
           <tbody>
             {auditLog.map((log, idx) => (
               <tr key={idx}>
-                <td style={{ fontSize: '12px', color: '#334155' }}>{log.time}</td>
-                <td><strong style={{ fontSize: '13px', color: '#0f172a' }}>{log.type}</strong></td>
-                <td style={{ fontSize: '13px', color: '#64748b' }}>{log.oldRate}</td>
-                <td><strong style={{ fontSize: '13px', color: '#059669' }}>{log.newRate}</strong></td>
-                <td style={{ fontSize: '12px', color: '#334155' }}>{log.trigger}</td>
-                <td style={{ fontSize: '12px', color: '#64748b' }}>{log.user}</td>
+                <td style={{ fontSize: '12px', color: 'var(--text-soft)' }}>{log.time}</td>
+                <td><strong style={{ fontSize: '13px', color: 'var(--text)' }}>{log.type}</strong></td>
+                <td style={{ fontSize: '13px', color: 'var(--muted)' }}>{log.oldRate}</td>
+                <td><strong style={{ fontSize: '13px', color: 'var(--accent)' }}>{log.newRate}</strong></td>
+                <td style={{ fontSize: '12px', color: 'var(--text-soft)' }}>{log.trigger}</td>
+                <td style={{ fontSize: '12px', color: 'var(--muted)' }}>{log.user}</td>
                 <td style={{ textAlign: 'right' }}>
-                  <span style={{ background: log.status === 'Applied' ? '#ecfdf5' : '#f1f5f9', color: log.status === 'Applied' ? '#065f46' : '#64748b', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+                  <span style={{ background: log.status === 'Applied' ? 'var(--surface-line)' : 'var(--surface-soft)', color: log.status === 'Applied' ? 'var(--jade)' : 'var(--muted)', padding: '3px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
                     &bull; {log.status}
                   </span>
                 </td>

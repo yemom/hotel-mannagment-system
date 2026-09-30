@@ -15,9 +15,9 @@ const Sidebar = () => {
     <aside className="sidebar">
       <div>
         <div className="brand">
-          <div className="brand-mark">የ</div>
+          <div className="brand-mark">A</div>
           <div>
-            <strong>የ-mom Hotel</strong>
+            <strong>Aurelia Grand</strong>
             <span>Boutique Hotel PMS</span>
           </div>
         </div>

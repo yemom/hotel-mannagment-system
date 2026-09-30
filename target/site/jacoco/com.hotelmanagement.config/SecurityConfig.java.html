@@ -60,12 +60,12 @@ import java.util.List;
 
 <span class="fc" id="L61">                configuration.setAllowedMethods(</span>
 <span class="fc" id="L62">                                List.of(</span>
-<span class="fc" id="L63">                                                &quot;GET&quot;,</span>
-<span class="fc" id="L64">                                                &quot;POST&quot;,</span>
-<span class="fc" id="L65">                                                &quot;PUT&quot;,</span>
-<span class="fc" id="L66">                                                &quot;DELETE&quot;,</span>
-<span class="fc" id="L67">                                                &quot;PATCH&quot;,</span>
-<span class="fc" id="L68">                                                &quot;OPTIONS&quot;));</span>
+                                                &quot;GET&quot;,
+                                                &quot;POST&quot;,
+                                                &quot;PUT&quot;,
+                                                &quot;DELETE&quot;,
+                                                &quot;PATCH&quot;,
+                                                &quot;OPTIONS&quot;));
 
 <span class="fc" id="L70">                configuration.setAllowedHeaders(</span>
 <span class="fc" id="L71">                                List.of(&quot;*&quot;));</span>
@@ -78,8 +78,8 @@ import java.util.List;
 <span class="fc" id="L78">                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();</span>
 
 <span class="fc" id="L80">                source.registerCorsConfiguration(</span>
-<span class="fc" id="L81">                                &quot;/**&quot;,</span>
-<span class="fc" id="L82">                                configuration);</span>
+                                &quot;/**&quot;,
+                                configuration);
 
 <span class="fc" id="L84">                return source;</span>
         }

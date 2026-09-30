@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReservationService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Hotel Management System</a> &gt; <a href="index.source.html" class="el_package">com.hotelmanagement.service</a> &gt; <span class="el_source">ReservationService.java</span></div><h1>ReservationService.java</h1><pre class="source lang-java linenums">package com.hotelmanagement.service;
 
 import com.hotelmanagement.model.Reservation;
+import com.hotelmanagement.model.ReservationStatus;
 import com.hotelmanagement.model.Room;
 import com.hotelmanagement.repository.ReservationRepository;
 import com.hotelmanagement.repository.RoomRepository;
@@ -26,78 +27,195 @@ public class ReservationService {
      */
     public Reservation createReservation(Reservation reservation) {
         // Validate
-<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (!reservation.isValidDateRange()) {</span>
-<span class="fc" id="L30">            throw new IllegalArgumentException(&quot;Invalid date range&quot;);</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">        if (!reservation.isValidDateRange()) {</span>
+<span class="fc" id="L31">            throw new IllegalArgumentException(&quot;Invalid date range&quot;);</span>
         }
-<span class="fc bfc" id="L32" title="All 2 branches covered.">        if (!reservation.isValidNumberOfGuests()) {</span>
-<span class="fc" id="L33">            throw new IllegalArgumentException(&quot;Invalid number of guests&quot;);</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        if (!reservation.isValidNumberOfGuests()) {</span>
+<span class="fc" id="L34">            throw new IllegalArgumentException(&quot;Invalid number of guests&quot;);</span>
         }
-<span class="fc bfc" id="L35" title="All 2 branches covered.">        if (!reservation.getRoom().canAccommodate(reservation.getNumberOfGuests())) {</span>
-<span class="fc" id="L36">            throw new IllegalArgumentException(&quot;Room cannot accommodate the number of guests&quot;);</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">        if (!reservation.getRoom().canAccommodate(reservation.getNumberOfGuests())) {</span>
+<span class="fc" id="L37">            throw new IllegalArgumentException(&quot;Room cannot accommodate the number of guests&quot;);</span>
         }
 
         // Check room availability
-<span class="fc" id="L40">        if (!isRoomAvailable(reservation.getRoom(), reservation.getCheckInDate(), </span>
-<span class="pc bpc" id="L41" title="1 of 2 branches missed.">            reservation.getCheckOutDate())) {</span>
-<span class="nc" id="L42">            throw new IllegalArgumentException(&quot;Room is not available for the requested dates&quot;);</span>
+<span class="fc" id="L41">        if (!isRoomAvailable(reservation.getRoom(), reservation.getCheckInDate(), </span>
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">            reservation.getCheckOutDate())) {</span>
+<span class="nc" id="L43">            throw new IllegalArgumentException(&quot;Room is not available for the requested dates&quot;);</span>
         }
 
         // Calculate price and discount
-<span class="fc" id="L46">        BigDecimal baseTotal = calculateBaseTotal(reservation);</span>
-<span class="fc" id="L47">        BigDecimal discount = calculateDiscount(reservation);</span>
-<span class="fc" id="L48">        BigDecimal finalPrice = baseTotal.subtract(discount);</span>
+<span class="fc" id="L47">        BigDecimal baseTotal = calculateBaseTotal(reservation);</span>
+<span class="fc" id="L48">        BigDecimal discount = calculateDiscount(reservation);</span>
+<span class="fc" id="L49">        BigDecimal finalPrice = baseTotal.subtract(discount);</span>
 
-<span class="fc" id="L50">        reservation.setTotalPrice(finalPrice);</span>
-<span class="fc" id="L51">        reservation.setDiscountAmount(discount);</span>
-<span class="fc" id="L52">        reservation.setStatus(com.hotelmanagement.model.ReservationStatus.PENDING);</span>
-<span class="fc" id="L53">        reservation.setCreatedDate(LocalDate.now());</span>
+<span class="fc" id="L51">        reservation.setTotalPrice(finalPrice);</span>
+<span class="fc" id="L52">        reservation.setDiscountAmount(discount);</span>
+<span class="fc" id="L53">        reservation.setStatus(com.hotelmanagement.model.ReservationStatus.PENDING);</span>
+<span class="fc" id="L54">        reservation.setCreatedDate(LocalDate.now());</span>
 
-<span class="fc" id="L55">        return reservationRepository.save(reservation);</span>
+<span class="fc" id="L56">        return reservationRepository.save(reservation);</span>
     }
 
     /**
      * Confirms a pending reservation.
      */
     public Reservation confirmReservation(Long id) {
-<span class="fc" id="L62">        Reservation reservation = reservationRepository.findById(id)</span>
-<span class="pc" id="L63">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
-<span class="fc" id="L64">        reservation.confirm();</span>
-<span class="fc" id="L65">        return reservationRepository.save(reservation);</span>
+<span class="fc" id="L63">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="pc" id="L64">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+<span class="fc" id="L65">        reservation.confirm();</span>
+<span class="fc" id="L66">        return reservationRepository.save(reservation);</span>
     }
+
+    /**
+     * Re-schedules an existing room reservation.
+     *
+     * Security: the caller must present the id of the guest who owns the reservation.
+     * A mismatch raises AccessDeniedException -&gt; HTTP 403.
+     *
+     * Business rules enforced server-side:
+     *  - only PENDING or CONFIRMED reservations may be changed
+     *  - dates must be valid, in the future, and check-out must be after check-in
+     *  - guest count must be within 1..20 and within the room capacity
+     *  - the room must not be double-booked for the new dates
+     *  - the reservation returns to PENDING so staff re-approve the change
+     */
+    public Reservation rescheduleReservation(Long id, LocalDate newCheckIn, LocalDate newCheckOut,
+                                             Integer newGuests, Long actingGuestId) {
+<span class="nc" id="L84">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="nc" id="L85">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        requireOwnership(reservation.getGuest() != null ? reservation.getGuest().getId() : null,</span>
+<span class="nc" id="L88">            actingGuestId);</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (!ReservationStatus.PENDING.equals(reservation.getStatus())</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            &amp;&amp; !ReservationStatus.CONFIRMED.equals(reservation.getStatus())) {</span>
+<span class="nc" id="L92">            throw new IllegalStateException(</span>
+<span class="nc" id="L93">                &quot;Cannot modify a reservation with status: &quot; + reservation.getStatus());</span>
+        }
+
+<span class="nc bnc" id="L96" title="All 4 branches missed.">        if (newCheckIn == null || newCheckOut == null) {</span>
+<span class="nc" id="L97">            throw new IllegalArgumentException(&quot;Both check-in and check-out dates are required&quot;);</span>
+        }
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (!newCheckOut.isAfter(newCheckIn)) {</span>
+<span class="nc" id="L100">            throw new IllegalArgumentException(&quot;Check-out date must be after the check-in date&quot;);</span>
+        }
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (newCheckIn.isBefore(LocalDate.now())) {</span>
+<span class="nc" id="L103">            throw new IllegalArgumentException(&quot;Check-in date cannot be in the past&quot;);</span>
+        }
+
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        Integer guests = newGuests != null ? newGuests : reservation.getNumberOfGuests();</span>
+<span class="nc bnc" id="L107" title="All 6 branches missed.">        if (guests == null || guests &lt; 1 || guests &gt; 20) {</span>
+<span class="nc" id="L108">            throw new IllegalArgumentException(&quot;Number of guests must be between 1 and 20&quot;);</span>
+        }
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (!reservation.getRoom().canAccommodate(guests)) {</span>
+<span class="nc" id="L111">            throw new IllegalArgumentException(&quot;Room cannot accommodate &quot; + guests + &quot; guests&quot;);</span>
+        }
+
+<span class="nc" id="L114">        Room room = reservation.getRoom();</span>
+<span class="nc" id="L115">        List&lt;Reservation&gt; conflicts = reservationRepository.findConflictingReservationsExcluding(</span>
+<span class="nc" id="L116">            room, ReservationStatus.CANCELLED, newCheckIn, newCheckOut, reservation.getId());</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (!conflicts.isEmpty()) {</span>
+<span class="nc" id="L118">            throw new IllegalStateException(</span>
+<span class="nc" id="L119">                &quot;Room &quot; + room.getRoomNumber() + &quot; is not available for the requested dates&quot;);</span>
+        }
+
+<span class="nc" id="L122">        reservation.setCheckInDate(newCheckIn);</span>
+<span class="nc" id="L123">        reservation.setCheckOutDate(newCheckOut);</span>
+<span class="nc" id="L124">        reservation.setNumberOfGuests(guests);</span>
+
+<span class="nc" id="L126">        BigDecimal baseTotal = calculateBaseTotal(reservation);</span>
+<span class="nc" id="L127">        BigDecimal discount = calculateDiscount(reservation);</span>
+<span class="nc" id="L128">        reservation.setTotalPrice(baseTotal.subtract(discount));</span>
+<span class="nc" id="L129">        reservation.setDiscountAmount(discount);</span>
+
+        // A changed reservation must be re-approved by staff.
+<span class="nc" id="L132">        reservation.setStatus(ReservationStatus.PENDING);</span>
+<span class="nc" id="L133">        reservation.setModifiedDate(LocalDate.now());</span>
+
+<span class="nc" id="L135">        return reservationRepository.save(reservation);</span>
+    }
+
+    /**
+     * Verifies that the acting guest owns the given resource.
+     */
+    private void requireOwnership(Long ownerGuestId, Long actingGuestId) {
+<span class="nc bnc" id="L142" title="All 2 branches missed.">        if (actingGuestId == null) {</span>
+<span class="nc" id="L143">            throw new IllegalArgumentException(&quot;actingGuestId is required&quot;);</span>
+        }
+<span class="nc bnc" id="L145" title="All 4 branches missed.">        if (ownerGuestId == null || !ownerGuestId.equals(actingGuestId)) {</span>
+<span class="nc" id="L146">            throw new com.hotelmanagement.exception.AccessDeniedException(</span>
+<span class="nc" id="L147">                &quot;You may only modify your own reservations&quot;);</span>
+        }
+<span class="nc" id="L149">    }</span>
 
     /**
      * Checks in a confirmed reservation.
      */
     public Reservation checkIn(Long id) {
-<span class="fc" id="L72">        Reservation reservation = reservationRepository.findById(id)</span>
-<span class="pc" id="L73">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
-<span class="fc" id="L74">        reservation.checkIn();</span>
-<span class="fc" id="L75">        reservation.getRoom().setStatus(com.hotelmanagement.model.RoomStatus.OCCUPIED);</span>
-<span class="fc" id="L76">        roomRepository.save(reservation.getRoom());</span>
-<span class="fc" id="L77">        return reservationRepository.save(reservation);</span>
+<span class="fc" id="L155">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="pc" id="L156">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+<span class="fc" id="L157">        reservation.checkIn();</span>
+<span class="fc" id="L158">        reservation.getRoom().setStatus(com.hotelmanagement.model.RoomStatus.OCCUPIED);</span>
+<span class="fc" id="L159">        roomRepository.save(reservation.getRoom());</span>
+<span class="fc" id="L160">        return reservationRepository.save(reservation);</span>
     }
 
     /**
      * Checks out a reservation.
      */
     public Reservation checkOut(Long id) {
-<span class="fc" id="L84">        Reservation reservation = reservationRepository.findById(id)</span>
-<span class="pc" id="L85">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
-<span class="fc" id="L86">        reservation.checkOut();</span>
-<span class="fc" id="L87">        reservation.getRoom().setStatus(com.hotelmanagement.model.RoomStatus.AVAILABLE);</span>
-<span class="fc" id="L88">        roomRepository.save(reservation.getRoom());</span>
-<span class="fc" id="L89">        return reservationRepository.save(reservation);</span>
+<span class="fc" id="L167">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="pc" id="L168">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+<span class="fc" id="L169">        reservation.checkOut();</span>
+<span class="fc" id="L170">        reservation.getRoom().setStatus(com.hotelmanagement.model.RoomStatus.AVAILABLE);</span>
+<span class="fc" id="L171">        roomRepository.save(reservation.getRoom());</span>
+<span class="fc" id="L172">        return reservationRepository.save(reservation);</span>
     }
 
     /**
      * Cancels a reservation.
      */
     public Reservation cancelReservation(Long id) {
-<span class="fc" id="L96">        Reservation reservation = reservationRepository.findById(id)</span>
-<span class="pc" id="L97">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
-<span class="fc" id="L98">        reservation.cancel();</span>
-<span class="fc" id="L99">        return reservationRepository.save(reservation);</span>
+<span class="fc" id="L179">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="pc" id="L180">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+<span class="fc" id="L181">        reservation.cancel();</span>
+<span class="fc" id="L182">        return reservationRepository.save(reservation);</span>
     }
+
+    /**
+     * Cancels a reservation on behalf of a specific guest, enforcing ownership.
+     * Raises AccessDeniedException -&gt; HTTP 403 when the caller is not the owner.
+     */
+    public Reservation cancelReservationAs(Long id, Long actingGuestId) {
+<span class="nc" id="L190">        Reservation reservation = reservationRepository.findById(id)</span>
+<span class="nc" id="L191">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Reservation not found&quot;));</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        requireOwnership(reservation.getGuest() != null ? reservation.getGuest().getId() : null,</span>
+<span class="nc" id="L194">            actingGuestId);</span>
+
+<span class="nc" id="L196">        reservation.cancel();</span>
+<span class="nc" id="L197">        return reservationRepository.save(reservation);</span>
+    }
+
+    /**
+     * Admin queue: reservations still awaiting approval.
+     */
+    public List&lt;Reservation&gt; getPendingReservations() {
+<span class="nc" id="L204">        return reservationRepository.findByStatus(ReservationStatus.PENDING);</span>
+    }
+
+    /**
+     * Returns true when the given guest is the owner of the reservation.
+     */
+    public boolean isOwner(Long reservationId, Long guestId) {
+<span class="nc bnc" id="L211" title="All 4 branches missed.">        if (reservationId == null || guestId == null) {</span>
+<span class="nc" id="L212">            return false;</span>
+        }
+<span class="nc" id="L214">        return reservationRepository.findById(reservationId)</span>
+<span class="nc bnc" id="L215" title="All 4 branches missed.">            .map(r -&gt; r.getGuest() != null &amp;&amp; guestId.equals(r.getGuest().getId()))</span>
+<span class="nc" id="L216">            .orElse(false);</span>
+    }
+
 
     /**
      * Decision Table Logic: Calculate discount based on multiple conditions
@@ -108,91 +226,110 @@ public class ReservationService {
      * 4. Season (Peak, Off-peak)
      */
     public BigDecimal calculateDiscount(Reservation reservation) {
-<span class="fc" id="L111">        BigDecimal baseTotal = calculateBaseTotal(reservation);</span>
-<span class="fc" id="L112">        BigDecimal discount = BigDecimal.ZERO;</span>
+<span class="fc" id="L229">        BigDecimal baseTotal = calculateBaseTotal(reservation);</span>
+<span class="fc" id="L230">        BigDecimal discount = BigDecimal.ZERO;</span>
 
         // Condition 1: Length of stay
-<span class="fc" id="L115">        long nights = reservation.getNumberOfNights();</span>
-<span class="fc bfc" id="L116" title="All 2 branches covered.">        boolean isLongStay = nights &gt;= 3;</span>
+<span class="fc" id="L233">        long nights = reservation.getNumberOfNights();</span>
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        boolean isLongStay = nights &gt;= 3;</span>
 
         // Condition 2: Guest age
-<span class="fc" id="L119">        Integer guestAge = reservation.getGuest().getAge();</span>
-<span class="pc bpc" id="L120" title="1 of 4 branches missed.">        boolean isSenior = guestAge != null &amp;&amp; guestAge &gt;= 60;</span>
+<span class="fc" id="L237">        Integer guestAge = reservation.getGuest().getAge();</span>
+<span class="pc bpc" id="L238" title="1 of 4 branches missed.">        boolean isSenior = guestAge != null &amp;&amp; guestAge &gt;= 60;</span>
 
         // Condition 3: Is VIP (simplified - based on email domain for testing)
-<span class="fc" id="L123">        boolean isVip = reservation.getGuest().getEmail().endsWith(&quot;@vip.com&quot;);</span>
+<span class="fc" id="L241">        boolean isVip = reservation.getGuest().getEmail().endsWith(&quot;@vip.com&quot;);</span>
 
         // Condition 4: Season (simplified - using month)
-<span class="fc" id="L126">        boolean isPeakSeason = isPeakSeason(reservation.getCheckInDate());</span>
+<span class="fc" id="L244">        boolean isPeakSeason = isPeakSeason(reservation.getCheckInDate());</span>
 
         // Decision Table Rules:
-<span class="pc bpc" id="L129" title="1 of 8 branches missed.">        if (isLongStay &amp;&amp; isSenior &amp;&amp; isVip &amp;&amp; !isPeakSeason) {</span>
+<span class="pc bpc" id="L247" title="1 of 8 branches missed.">        if (isLongStay &amp;&amp; isSenior &amp;&amp; isVip &amp;&amp; !isPeakSeason) {</span>
             // Rule 1: All conditions met - Maximum discount
-<span class="fc" id="L131">            discount = baseTotal.multiply(new BigDecimal(&quot;0.25&quot;)); // 25% discount</span>
-<span class="pc bpc" id="L132" title="1 of 6 branches missed.">        } else if (isLongStay &amp;&amp; isSenior &amp;&amp; !isPeakSeason) {</span>
+<span class="fc" id="L249">            discount = baseTotal.multiply(new BigDecimal(&quot;0.25&quot;)); // 25% discount</span>
+<span class="pc bpc" id="L250" title="1 of 6 branches missed.">        } else if (isLongStay &amp;&amp; isSenior &amp;&amp; !isPeakSeason) {</span>
             // Rule 2: Long stay + Senior + Off-peak
-<span class="fc" id="L134">            discount = baseTotal.multiply(new BigDecimal(&quot;0.15&quot;)); // 15% discount</span>
-<span class="fc bfc" id="L135" title="All 4 branches covered.">        } else if (isLongStay &amp;&amp; isVip) {</span>
+<span class="fc" id="L252">            discount = baseTotal.multiply(new BigDecimal(&quot;0.15&quot;)); // 15% discount</span>
+<span class="fc bfc" id="L253" title="All 4 branches covered.">        } else if (isLongStay &amp;&amp; isVip) {</span>
             // Rule 3: Long stay + VIP
-<span class="fc" id="L137">            discount = baseTotal.multiply(new BigDecimal(&quot;0.15&quot;)); // 15% discount</span>
-<span class="pc bpc" id="L138" title="1 of 4 branches missed.">        } else if (isSenior &amp;&amp; !isPeakSeason) {</span>
+<span class="fc" id="L255">            discount = baseTotal.multiply(new BigDecimal(&quot;0.15&quot;)); // 15% discount</span>
+<span class="pc bpc" id="L256" title="1 of 4 branches missed.">        } else if (isSenior &amp;&amp; !isPeakSeason) {</span>
             // Rule 4: Senior + Off-peak
-<span class="fc" id="L140">            discount = baseTotal.multiply(new BigDecimal(&quot;0.10&quot;)); // 10% discount</span>
-<span class="fc bfc" id="L141" title="All 4 branches covered.">        } else if (isLongStay &amp;&amp; nights &gt;= 7) {</span>
+<span class="fc" id="L258">            discount = baseTotal.multiply(new BigDecimal(&quot;0.10&quot;)); // 10% discount</span>
+<span class="fc bfc" id="L259" title="All 4 branches covered.">        } else if (isLongStay &amp;&amp; nights &gt;= 7) {</span>
             // Rule 5: Very long stay (7+ nights)
-<span class="fc" id="L143">            discount = baseTotal.multiply(new BigDecimal(&quot;0.12&quot;)); // 12% discount</span>
-<span class="fc bfc" id="L144" title="All 2 branches covered.">        } else if (isLongStay) {</span>
+<span class="fc" id="L261">            discount = baseTotal.multiply(new BigDecimal(&quot;0.12&quot;)); // 12% discount</span>
+<span class="fc bfc" id="L262" title="All 2 branches covered.">        } else if (isLongStay) {</span>
             // Rule 6: Standard long stay discount
-<span class="fc" id="L146">            discount = baseTotal.multiply(new BigDecimal(&quot;0.05&quot;)); // 5% discount</span>
+<span class="fc" id="L264">            discount = baseTotal.multiply(new BigDecimal(&quot;0.05&quot;)); // 5% discount</span>
         }
 
         // Cap discount at base total
-<span class="pc bpc" id="L150" title="1 of 2 branches missed.">        if (discount.compareTo(baseTotal) &gt; 0) {</span>
-<span class="nc" id="L151">            discount = baseTotal;</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        if (discount.compareTo(baseTotal) &gt; 0) {</span>
+<span class="nc" id="L269">            discount = baseTotal;</span>
         }
 
-<span class="fc" id="L154">        return discount;</span>
+<span class="fc" id="L272">        return discount;</span>
     }
 
     private BigDecimal calculateBaseTotal(Reservation reservation) {
-<span class="fc" id="L158">        long nights = reservation.getNumberOfNights();</span>
-<span class="pc bpc" id="L159" title="1 of 2 branches missed.">        if (nights &lt;= 0) {</span>
-<span class="nc" id="L160">            return BigDecimal.ZERO;</span>
+<span class="fc" id="L276">        long nights = reservation.getNumberOfNights();</span>
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">        if (nights &lt;= 0) {</span>
+<span class="nc" id="L278">            return BigDecimal.ZERO;</span>
         }
-<span class="fc" id="L162">        return reservation.getRoom().getBasePrice().multiply(new BigDecimal(nights));</span>
+<span class="fc" id="L280">        return reservation.getRoom().getBasePrice().multiply(new BigDecimal(nights));</span>
     }
 
     private boolean isPeakSeason(LocalDate date) {
-<span class="fc" id="L166">        int month = date.getMonthValue();</span>
+<span class="fc" id="L284">        int month = date.getMonthValue();</span>
         // Peak season: June, July, August, December, January
-<span class="pc bpc" id="L168" title="3 of 10 branches missed.">        return month == 6 || month == 7 || month == 8 || month == 12 || month == 1;</span>
+<span class="pc bpc" id="L286" title="3 of 10 branches missed.">        return month == 6 || month == 7 || month == 8 || month == 12 || month == 1;</span>
     }
 
     private boolean isRoomAvailable(Room room, LocalDate checkIn, LocalDate checkOut) {
-<span class="fc" id="L172">        List&lt;Reservation&gt; conflictingReservations = reservationRepository</span>
-<span class="fc" id="L173">            .findByRoomAndStatusNotAndCheckOutDateGreaterThanAndCheckInDateLessThan(</span>
-<span class="fc" id="L174">                room,</span>
-<span class="fc" id="L175">                com.hotelmanagement.model.ReservationStatus.CANCELLED,</span>
-<span class="fc" id="L176">                checkIn,</span>
-<span class="fc" id="L177">                checkOut</span>
+<span class="fc" id="L290">        List&lt;Reservation&gt; conflictingReservations = reservationRepository</span>
+<span class="fc" id="L291">            .findByRoomAndStatusNotAndCheckOutDateGreaterThanAndCheckInDateLessThan(</span>
+<span class="fc" id="L292">                room,</span>
+<span class="fc" id="L293">                com.hotelmanagement.model.ReservationStatus.CANCELLED,</span>
+<span class="fc" id="L294">                checkIn,</span>
+<span class="fc" id="L295">                checkOut</span>
             );
-<span class="fc" id="L179">        return conflictingReservations.isEmpty();</span>
+<span class="fc" id="L297">        return conflictingReservations.isEmpty();</span>
     }
 
     public Optional&lt;Reservation&gt; getReservation(Long id) {
-<span class="nc" id="L183">        return reservationRepository.findById(id);</span>
+<span class="nc" id="L301">        return reservationRepository.findById(id);</span>
     }
 
     public List&lt;Reservation&gt; getAllReservations() {
-<span class="nc" id="L187">        return reservationRepository.findAll();</span>
+<span class="nc" id="L305">        return reservationRepository.findAll();</span>
     }
 
     public List&lt;Reservation&gt; getReservationsByGuest(Long guestId) {
-<span class="fc" id="L191">        return reservationRepository.findByGuestId(guestId);</span>
+<span class="fc" id="L309">        return reservationRepository.findByGuestId(guestId);</span>
     }
 
     public List&lt;Reservation&gt; getReservationsByRoom(Long roomId) {
-<span class="nc" id="L195">        return reservationRepository.findByRoomId(roomId);</span>
+<span class="nc" id="L313">        return reservationRepository.findByRoomId(roomId);</span>
     }
+
+    /**
+     * Permanently removes a reservation record.
+     *
+     * Used by the booking desk when clearing cancelled or test bookings; the row
+     * is removed from the database so the reservation list only ever shows real,
+     * currently-tracked stays.
+     *
+     * @throws IllegalArgumentException when no reservation exists for the id
+     */
+    public void deleteReservation(Long id) {
+<span class="nc bnc" id="L326" title="All 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L327">            throw new IllegalArgumentException(&quot;Reservation id is required&quot;);</span>
+        }
+<span class="nc bnc" id="L329" title="All 2 branches missed.">        if (!reservationRepository.existsById(id)) {</span>
+<span class="nc" id="L330">            throw new IllegalArgumentException(&quot;Reservation not found with ID: &quot; + id);</span>
+        }
+<span class="nc" id="L332">        reservationRepository.deleteById(id);</span>
+<span class="nc" id="L333">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

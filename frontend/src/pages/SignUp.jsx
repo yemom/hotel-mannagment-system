@@ -76,9 +76,9 @@ const SignUp = () => {
         <div className="auth-card">
           {/* Hotel Brand Header */}
           <div className="auth-brand">
-            <div className="auth-brand-mark">የ</div>
+            <div className="auth-brand-mark">A</div>
             <div>
-              <h2 className="auth-brand-title">የ-mom Hotel</h2>
+              <h2 className="auth-brand-title">Aurelia Grand</h2>
               <span className="auth-brand-subtitle">Guest Membership & Booking Portal</span>
             </div>
           </div>
@@ -165,7 +165,6 @@ const SignUp = () => {
                     className="password-toggle-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     title={showPassword ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
                     style={{
                       position: 'absolute',
                       right: '12px',
@@ -174,7 +173,7 @@ const SignUp = () => {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      color: '#64748b',
+                      color: 'var(--muted)',
                       padding: 0,
                       display: 'flex',
                       alignItems: 'center',
@@ -205,7 +204,6 @@ const SignUp = () => {
                     className="password-toggle-btn"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     title={showConfirmPassword ? 'Hide password' : 'Show password'}
-                    tabIndex={-1}
                     style={{
                       position: 'absolute',
                       right: '12px',
@@ -214,7 +212,7 @@ const SignUp = () => {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      color: '#64748b',
+                      color: 'var(--muted)',
                       padding: 0,
                       display: 'flex',
                       alignItems: 'center',
@@ -236,8 +234,8 @@ const SignUp = () => {
                 checked={termsAgreed}
                 onChange={(e) => setTermsAgreed(e.target.checked)}
               />
-              <label htmlFor="signup-terms" style={{ fontSize: '13px', color: '#475569' }}>
-                I agree to the <a href="#terms" onClick={(e) => e.preventDefault()} style={{ color: '#064e3b', fontWeight: 600 }}>Terms of Service</a> and <a href="#privacy" onClick={(e) => e.preventDefault()} style={{ color: '#064e3b', fontWeight: 600 }}>Privacy Policy</a>.
+              <label htmlFor="signup-terms" style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                I agree to the <a href="#terms" onClick={(e) => e.preventDefault()} style={{ color: 'var(--text)', fontWeight: 600 }}>Terms of Service</a> and <a href="#privacy" onClick={(e) => e.preventDefault()} style={{ color: 'var(--text)', fontWeight: 600 }}>Privacy Policy</a>.
               </label>
             </div>
 

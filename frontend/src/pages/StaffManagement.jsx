@@ -219,9 +219,9 @@ const StaffManagement = () => {
       {/* ─── Page Header ─── */}
       <div className="page-header" style={{ marginBottom: '24px' }}>
         <div>
-          <span className="eyebrow" style={{ color: '#065f46' }}>Staff Administration</span>
+          <span className="eyebrow" style={{ color: 'var(--jade)' }}>Staff Administration</span>
           <h1>Staff Team &amp; Account Provisioning</h1>
-          <p style={{ color: '#64748b', marginTop: '4px' }}>
+          <p style={{ color: 'var(--muted)', marginTop: '4px' }}>
             Create and manage hotel staff accounts, shifts, roles, and front-desk access credentials.
           </p>
         </div>
@@ -258,8 +258,8 @@ const StaffManagement = () => {
               background: '#ffffff',
               borderRadius: '12px',
               padding: '18px 20px',
-              border: '1px solid #e2e8f0',
-              borderLeft: '4px solid #065f46',
+              border: '1px solid var(--surface-line)',
+              borderLeft: '4px solid var(--jade)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               display: 'flex',
               alignItems: 'center',
@@ -271,8 +271,8 @@ const StaffManagement = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#ecfdf5',
-                color: '#065f46',
+                background: 'var(--surface-soft)',
+                color: 'var(--jade)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -281,13 +281,13 @@ const StaffManagement = () => {
               <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>badge</span>
             </div>
             <div>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Total Staff
               </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#0f172a', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', lineHeight: 1.2 }}>
                 {staffList.length}
               </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Provisioned Accounts</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Provisioned Accounts</span>
             </div>
           </div>
 
@@ -296,8 +296,8 @@ const StaffManagement = () => {
               background: '#ffffff',
               borderRadius: '12px',
               padding: '18px 20px',
-              border: '1px solid #e2e8f0',
-              borderLeft: '4px solid #10b981',
+              border: '1px solid var(--surface-line)',
+              borderLeft: '4px solid var(--accent)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               display: 'flex',
               alignItems: 'center',
@@ -309,8 +309,8 @@ const StaffManagement = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#dcfce7',
-                color: '#15803d',
+                background: 'var(--surface-soft)',
+                color: 'var(--text)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -319,13 +319,13 @@ const StaffManagement = () => {
               <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>verified_user</span>
             </div>
             <div>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Active on Duty
               </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#15803d', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--text)', lineHeight: 1.2 }}>
                 {staffList.filter((s) => s.status === 'ACTIVE').length}
               </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Authorized &amp; Active</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Authorized &amp; Active</span>
             </div>
           </div>
 
@@ -334,8 +334,8 @@ const StaffManagement = () => {
               background: '#ffffff',
               borderRadius: '12px',
               padding: '18px 20px',
-              border: '1px solid #e2e8f0',
-              borderLeft: '4px solid #d97706',
+              border: '1px solid var(--surface-line)',
+              borderLeft: '4px solid var(--amber)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               display: 'flex',
               alignItems: 'center',
@@ -347,8 +347,8 @@ const StaffManagement = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#fef3c7',
-                color: '#b45309',
+                background: 'var(--surface-soft)',
+                color: 'var(--amber)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -357,13 +357,13 @@ const StaffManagement = () => {
               <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>admin_panel_settings</span>
             </div>
             <div>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Administrators
               </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#b45309', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--amber)', lineHeight: 1.2 }}>
                 {staffList.filter((s) => s.accessLevel?.includes('Admin')).length}
               </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Super Admin &amp; Managers</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Super Admin &amp; Managers</span>
             </div>
           </div>
 
@@ -372,8 +372,8 @@ const StaffManagement = () => {
               background: '#ffffff',
               borderRadius: '12px',
               padding: '18px 20px',
-              border: '1px solid #e2e8f0',
-              borderLeft: '4px solid #7c3aed',
+              border: '1px solid var(--surface-line)',
+              borderLeft: '4px solid var(--accent)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               display: 'flex',
               alignItems: 'center',
@@ -385,8 +385,8 @@ const StaffManagement = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#f3e8ff',
-                color: '#7c3aed',
+                background: 'var(--surface-soft)',
+                color: 'var(--accent)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -395,13 +395,13 @@ const StaffManagement = () => {
               <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>schedule</span>
             </div>
             <div>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Morning Shift
               </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#7c3aed', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent)', lineHeight: 1.2 }}>
                 {staffList.filter((s) => s.shift?.includes('Morning')).length}
               </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>07:00 – 15:00 Shift</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>07:00 – 15:00 Shift</span>
             </div>
           </div>
 
@@ -410,8 +410,8 @@ const StaffManagement = () => {
               background: '#ffffff',
               borderRadius: '12px',
               padding: '18px 20px',
-              border: '1px solid #e2e8f0',
-              borderLeft: '4px solid #0284c7',
+              border: '1px solid var(--surface-line)',
+              borderLeft: '4px solid var(--accent)',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
               display: 'flex',
               alignItems: 'center',
@@ -423,8 +423,8 @@ const StaffManagement = () => {
                 width: '44px',
                 height: '44px',
                 borderRadius: '10px',
-                background: '#e0f2fe',
-                color: '#0284c7',
+                background: 'var(--surface-soft)',
+                color: 'var(--accent)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -433,13 +433,13 @@ const StaffManagement = () => {
               <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>dark_mode</span>
             </div>
             <div>
-              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                 Evening / Night
               </span>
-              <div style={{ fontSize: '24px', fontWeight: 800, color: '#0284c7', lineHeight: 1.2 }}>
+              <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--accent)', lineHeight: 1.2 }}>
                 {staffList.filter((s) => s.shift?.includes('Evening') || s.shift?.includes('Night')).length}
               </div>
-              <span style={{ fontSize: '11px', color: '#94a3b8' }}>Later Rotations</span>
+              <span style={{ fontSize: '11px', color: 'var(--muted)' }}>Later Rotations</span>
             </div>
           </div>
         </div>
@@ -447,7 +447,7 @@ const StaffManagement = () => {
         {/* Right Area: Search, Filters, and Staff Table */}
         <div>
           {/* ─── Search and Filters Bar ─── */}
-          <div className="table-controls-card" style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div className="table-controls-card" style={{ background: '#ffffff', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-line)', marginBottom: '20px', display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
             <div className="input-with-icon" style={{ flex: 1, minWidth: '240px' }}>
               <span className="material-symbols-outlined">search</span>
               <input
@@ -459,7 +459,7 @@ const StaffManagement = () => {
             </div>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <label style={{ fontSize: '13px', fontWeight: 600, color: '#475569' }}>Department:</label>
+              <label style={{ fontSize: '13px', fontWeight: 600, color: 'var(--muted)' }}>Department:</label>
               <select
                 className="field"
                 style={{ padding: '8px 12px', minWidth: '180px' }}
@@ -475,7 +475,7 @@ const StaffManagement = () => {
           </div>
 
           {/* ─── Staff Roster Table ─── */}
-          <div className="table-wrap" style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <div className="table-wrap" style={{ background: '#ffffff', borderRadius: '12px', border: '1px solid var(--surface-line)', overflow: 'hidden' }}>
             <table className="table">
           <thead>
             <tr>
@@ -491,7 +491,7 @@ const StaffManagement = () => {
           <tbody>
             {filteredStaff.length === 0 ? (
               <tr>
-                <td colSpan="7" style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
+                <td colSpan="7" style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--muted)' }}>
                   No staff members match the selected filter.
                 </td>
               </tr>
@@ -505,7 +505,7 @@ const StaffManagement = () => {
                           width: '38px',
                           height: '38px',
                           borderRadius: '50%',
-                          background: staff.accessLevel.includes('Admin') ? '#065f46' : '#1e293b',
+                          background: staff.accessLevel.includes('Admin') ? 'var(--jade)' : 'var(--text-soft)',
                           color: '#ffffff',
                           display: 'flex',
                           alignItems: 'center',
@@ -517,19 +517,19 @@ const StaffManagement = () => {
                         {staff.name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()}
                       </div>
                       <div>
-                        <strong style={{ display: 'block', color: '#0f172a' }}>{staff.name}</strong>
-                        <span style={{ fontSize: '12px', color: '#64748b' }}>{staff.email}</span>
+                        <strong style={{ display: 'block', color: 'var(--text)' }}>{staff.name}</strong>
+                        <span style={{ fontSize: '12px', color: 'var(--muted)' }}>{staff.email}</span>
                       </div>
                     </div>
                   </td>
                   <td>
                     <div>
-                      <strong style={{ display: 'block', color: '#334155' }}>{staff.role}</strong>
+                      <strong style={{ display: 'block', color: 'var(--text-soft)' }}>{staff.role}</strong>
                       <span className="tag-badge" style={{ marginTop: '3px' }}>{staff.department}</span>
                     </div>
                   </td>
                   <td>
-                    <span style={{ fontSize: '13px', color: '#334155', fontWeight: 500 }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-soft)', fontWeight: 500 }}>
                       {staff.shift}
                     </span>
                   </td>
@@ -540,8 +540,8 @@ const StaffManagement = () => {
                         borderRadius: '6px',
                         fontSize: '12px',
                         fontWeight: 600,
-                        background: staff.accessLevel.includes('Admin') ? '#ecfdf5' : '#f1f5f9',
-                        color: staff.accessLevel.includes('Admin') ? '#065f46' : '#475569',
+                        background: staff.accessLevel.includes('Admin') ? 'var(--surface-soft)' : 'var(--surface-soft)',
+                        color: staff.accessLevel.includes('Admin') ? 'var(--jade)' : 'var(--muted)',
                       }}
                     >
                       {staff.accessLevel}
@@ -557,7 +557,7 @@ const StaffManagement = () => {
                     </span>
                   </td>
                   <td>
-                    <span style={{ fontSize: '13px', color: '#64748b' }}>{staff.createdAt}</span>
+                    <span style={{ fontSize: '13px', color: 'var(--muted)' }}>{staff.createdAt}</span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
@@ -596,7 +596,7 @@ const StaffManagement = () => {
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '620px' }}>
             <div className="modal-header">
               <div>
-                <span className="eyebrow" style={{ color: '#065f46' }}>Internal Provisioning</span>
+                <span className="eyebrow" style={{ color: 'var(--jade)' }}>Internal Provisioning</span>
                 <h3>Create New Staff Member</h3>
                 <p className="modal-subtitle">Provision front-desk, management, or dining staff accounts</p>
               </div>
@@ -749,7 +749,7 @@ const StaffManagement = () => {
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      color: '#64748b',
+                      color: 'var(--muted)',
                     }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>

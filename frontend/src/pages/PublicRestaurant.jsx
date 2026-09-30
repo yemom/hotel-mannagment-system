@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
-import { restaurantTableAPI, tableReservationAPI } from '../services/api';
+import { restaurantTableAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { goToReserve } from '../utils/reserve';
 
 const RESTAURANT_BANNER_BG =
   'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1920&q=85';
@@ -58,118 +59,56 @@ const TASTING_MENU = [
   },
 ];
 
-const TIME_SLOTS = [
-  '12:30', '13:00', '13:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00'
-];
+// Photography keyed by the DiningArea enum value persisted on each table.
+const TABLE_IMAGES = {
+  MAIN_HALL:
+    'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+  TERRACE:
+    'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=800&q=80',
+  PRIVATE_ROOM:
+    'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=800&q=80',
+};
 
 const PublicRestaurant = () => {
   const navigate = useNavigate();
   const { currentUser } = useAuth();
 
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().slice(0, 10);
-  });
-  const [timeSlot, setTimeSlot] = useState('19:30');
-  const [partySize, setPartySize] = useState('2');
-  const [area, setArea] = useState('TERRACE');
-  const [specialRequests, setSpecialRequests] = useState('');
+  // Every table rendered on this page comes straight from the database.
+  // The public site only previews availability — reservations are created in the
+  // authenticated client area so no fabricated status can ever be stored.
   const [tables, setTables] = useState([]);
-  const [submitting, setSubmitting] = useState(false);
-  const [successNotice, setSuccessNotice] = useState(null);
+  const [tablesLoading, setTablesLoading] = useState(true);
+  const [tablesError, setTablesError] = useState('');
 
-  useEffect(() => {
-    restaurantTableAPI.getAll().then((res) => {
-      if (res.data && Array.isArray(res.data)) {
-        setTables(res.data);
-      }
-    }).catch(() => {});
-  }, []);
-
-  const handleTableReservationSubmit = async (e) => {
-    e.preventDefault();
-    if (!currentUser) {
-      const intent = {
-        type: 'TABLE',
-        date,
-        timeSlot,
-        partySize,
-        area,
-        specialRequests,
-      };
-      sessionStorage.setItem('pending_booking', JSON.stringify(intent));
-      navigate('/login', {
-        state: {
-          redirectTo: '/restaurant',
-          bookingIntent: intent,
-        },
-      });
-      return;
-    }
-
-    setSubmitting(true);
+  const loadTables = async () => {
+    setTablesLoading(true);
+    setTablesError('');
     try {
-      // Find a matching table in the requested area with enough capacity
-      const matchingTable = tables.find(
-        (t) => t.area === area && t.capacity >= Number(partySize)
-      ) || tables[0];
-
-      const payload = {
-        guestId: currentUser.id || 1,
-        tableId: matchingTable ? matchingTable.id : 1,
-        reservationDate: date,
-        timeSlot,
-        partySize: Number(partySize),
-        specialRequests: specialRequests || 'Sunset window view requested',
-      };
-
-      let created = null;
-      try {
-        const res = await tableReservationAPI.create(payload);
-        if (res && res.data) {
-          created = res.data;
-        }
-      } catch (err) {
-        console.warn('Backend table reservation offline, caching locally:', err);
-      }
-
-      if (!created) {
-        created = {
-          id: Date.now(),
-          guest: currentUser,
-          restaurantTable: matchingTable,
-          reservationDate: date,
-          timeSlot,
-          partySize: Number(partySize),
-          status: 'CONFIRMED',
-          specialRequests,
-        };
-      }
-
-      // Sync to client local storage
-      try {
-        const key = `client_table_res_${currentUser.email}`;
-        const existing = JSON.parse(localStorage.getItem(key) || '[]');
-        localStorage.setItem(key, JSON.stringify([created, ...existing]));
-      } catch (_) {}
-
-      // Clear pending intent
-      sessionStorage.removeItem('pending_booking');
-
-      setSuccessNotice({
-        tableNumber: matchingTable?.tableNumber || 'TR-01',
-        area: area.replace('_', ' '),
-        date,
-        time: timeSlot,
-        partySize,
-      });
+      const res = await restaurantTableAPI.getAll();
+      setTables(res.data && Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      alert(err.message || 'Unable to confirm table reservation.');
+      setTables([]);
+      setTablesError(
+        err?.response?.data?.message ||
+          'We could not reach the restaurant reservation service. Please retry.'
+      );
     } finally {
-      setSubmitting(false);
+      setTablesLoading(false);
     }
   };
+
+  useEffect(() => {
+    loadTables();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** Reservation CTA — visitors are sent to /login and returned here afterwards. */
+  const handleReserveTable = () =>
+    goToReserve(navigate, {
+      user: currentUser,
+      target: '/client?tab=restaurant',
+      intent: { type: 'TABLE' },
+    });
 
   return (
     <div className="public-restaurant-page">
@@ -179,7 +118,7 @@ const PublicRestaurant = () => {
       <header
         className="restaurant-header-banner"
         style={{
-          background: `linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.90)), url("${RESTAURANT_BANNER_BG}") center/cover no-repeat`,
+          background: `linear-gradient(rgba(26, 26, 26, 0.75), rgba(26, 26, 26, 0.90)), url("${RESTAURANT_BANNER_BG}") center/cover no-repeat`,
         }}
       >
         <div className="section-container banner-content">
@@ -192,122 +131,106 @@ const PublicRestaurant = () => {
         </div>
       </header>
 
-      {/* Success Notification */}
-      {successNotice && (
-        <div className="section-container" style={{ marginTop: '24px' }}>
-          <div className="booking-confirmation-banner">
-            <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#059669' }}>
-              restaurant
-            </span>
-            <div>
-              <h3>Table Reserved — Table {successNotice.tableNumber} ({successNotice.area})</h3>
-              <p>
-                {successNotice.date} at {successNotice.time} &bull; {successNotice.partySize} Guests.
-                Our sommelier will have your table prepared upon arrival.
-              </p>
-            </div>
-            <Link to="/client" className="public-cta-btn" style={{ marginLeft: 'auto' }}>
-              View in My Portal
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* Main Reservation Section */}
-      <section className="section-container" style={{ padding: '40px 24px 60px' }}>
+      {/* Reservation CTA — the table booking form itself lives in the authenticated
+          client area (Guest portal → Reserve a Table). */}
+      <section className="section-container" style={{ padding: '40px 24px 16px' }}>
         <div className="restaurant-booking-card">
           <div className="booking-card-header">
             <span className="section-eyebrow">TABLE RESERVATION</span>
             <h2>Secure Your Dining Experience</h2>
-            <p>Direct bookings receive complimentary chef amuse-bouche and reserved sommelier pairing.</p>
+            <p>
+              Direct bookings receive a complimentary chef amuse-bouche and reserved sommelier pairing.
+              Sign in to select your table, party size and seating time.
+            </p>
           </div>
 
-          <form className="restaurant-booking-form" onSubmit={handleTableReservationSubmit}>
-            <div className="form-group">
-              <label htmlFor="dining-date">Date</label>
-              <input
-                id="dining-date"
-                type="date"
-                required
-                className="field"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-              />
+          <div className="restaurant-reserve-cta">
+            <div className="reserve-cta-copy">
+              <span className="material-symbols-outlined">event_available</span>
+              <div>
+                <strong>
+                  {currentUser ? 'Continue to table reservation' : 'Sign in to reserve your table'}
+                </strong>
+                <span>
+                  {currentUser
+                    ? 'Choose a table, guest count and seating time from your guest dashboard.'
+                    : 'Guests reserve tables, rooms and spa rituals from the secure guest portal.'}
+                </span>
+              </div>
             </div>
-
-            <div className="form-group">
-              <label htmlFor="dining-time">Service Seating</label>
-              <select
-                id="dining-time"
-                className="field"
-                value={timeSlot}
-                onChange={(e) => setTimeSlot(e.target.value)}
-              >
-                {TIME_SLOTS.map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dining-guests">Party Size</label>
-              <select
-                id="dining-guests"
-                className="field"
-                value={partySize}
-                onChange={(e) => setPartySize(e.target.value)}
-              >
-                <option value="1">1 Diner</option>
-                <option value="2">2 Diners</option>
-                <option value="3">3 Diners</option>
-                <option value="4">4 Diners</option>
-                <option value="6">6 Diners</option>
-                <option value="8">8+ Large Party</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="dining-area">Preferred Ambiance</label>
-              <select
-                id="dining-area"
-                className="field"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-              >
-                <option value="TERRACE">Balcony Terrace (Sunset View)</option>
-                <option value="MAIN_HALL">Main Dining Hall (Chandelier Salon)</option>
-                <option value="PRIVATE_ROOM">Private Dining Suite (Executive)</option>
-              </select>
-            </div>
-
-            <div className="form-group full-width">
-              <label htmlFor="dining-notes">Special Occasions &amp; Dietary Notes</label>
-              <input
-                id="dining-notes"
-                type="text"
-                className="field"
-                placeholder="e.g. Anniversary celebration, wine pairing, gluten-free..."
-                value={specialRequests}
-                onChange={(e) => setSpecialRequests(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group full-width" style={{ marginTop: '12px' }}>
-              <button
-                type="submit"
-                className="public-cta-btn"
-                style={{ width: '100%', padding: '14px 24px', fontSize: '15px' }}
-                disabled={submitting}
-              >
-                {submitting ? 'Confirming Table...' : (currentUser ? 'Confirm Table Reservation' : 'Sign In to Reserve Table')}
-              </button>
-            </div>
-          </form>
+            <button type="button" className="public-cta-btn" onClick={handleReserveTable}>
+              <span>Reserve a Table</span>
+              <span className="material-symbols-outlined">arrow_forward</span>
+            </button>
+          </div>
         </div>
       </section>
 
+      {/* Live table availability — real rows from the restaurant_tables table */}
+      <section className="section-container" style={{ padding: '16px 24px 60px' }}>
+        <div className="landing-section-header">
+          <span className="section-eyebrow">LIVE AVAILABILITY</span>
+          <h2>Our Dining Tables</h2>
+          <p>
+            {tablesLoading
+              ? 'Checking live table availability...'
+              : `${tables.length} tables across the Main Hall, Balcony Terrace and Private Dining Suites.`}
+          </p>
+        </div>
+
+        {tablesError && (
+          <div className="api-error-state" role="alert">
+            <span className="material-symbols-outlined">cloud_off</span>
+            <h3>Table availability is temporarily unavailable</h3>
+            <p>{tablesError}</p>
+            <button type="button" className="public-cta-btn" onClick={loadTables}>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {tablesLoading && !tablesError && (
+          <div className="catalog-loading">
+            <span className="spinner" />
+            <p>Loading tables...</p>
+          </div>
+        )}
+
+        {!tablesLoading && !tablesError && tables.length === 0 && (
+          <div className="empty-card">
+            <span className="material-symbols-outlined">restaurant</span>
+            <h3>No tables are currently listed</h3>
+            <p>Please contact our concierge desk and we will arrange your seating personally.</p>
+          </div>
+        )}
+
+        {!tablesLoading && !tablesError && tables.length > 0 && (
+          <div className="dining-areas-grid">
+            {tables.map((table) => (
+              <div key={table.id} className="dining-area-card">
+                <img
+                  src={TABLE_IMAGES[table.area] || TABLE_IMAGES.MAIN_HALL}
+                  alt={`Table ${table.tableNumber}`}
+                  loading="lazy"
+                />
+                <div className="area-content">
+                  <span className="area-capacity">
+                    Table {table.tableNumber} &bull; {String(table.area || 'MAIN_HALL').replace('_', ' ')}
+                  </span>
+                  <h3>Seats {table.capacity} Guests</h3>
+                  <p>{table.description}</p>
+                  <span className={`table-status-chip ${String(table.status || '').toLowerCase()}`}>
+                    {String(table.status || 'AVAILABLE').replace('_', ' ')}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
       {/* Dining Areas Showcase */}
-      <section className="landing-section" style={{ background: '#f8fafc', padding: '60px 0' }}>
+      <section className="landing-section" style={{ background: 'var(--surface-soft)', padding: '60px 0' }}>
         <div className="section-container">
           <div className="landing-section-header">
             <span className="section-eyebrow">SPACES &amp; ATMOSPHERES</span>

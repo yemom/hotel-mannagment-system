@@ -1,0 +1,113 @@
+          {/* --- Live dining tables & spa rituals straight from the database --- */}
+          <section className="itinerary-list-section">
+            <div className="itinerary-list-head">
+              <div>
+                <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+                  LIVE AVAILABILITY
+                </span>
+                <h2>Dining Tables &amp; Spa Rituals</h2>
+                <p>
+                  Real inventory from the restaurant and wellness departments. Select any item to
+                  continue into the reservation flow.
+                </p>
+              </div>
+            </div>
+
+            {mixError && (
+              <div className="api-error-panel" role="alert">
+                <span className="material-symbols-outlined">error</span>
+                <div>
+                  <strong>We couldn&apos;t load live availability.</strong>
+                  <p>{mixError}</p>
+                </div>
+                <button type="button" className="outline-button" onClick={loadBookableOptions}>
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            <div className="live-availability-grid">
+              <div className="itinerary-list-panel">
+                <div className="live-availability-head">
+                  <span className="material-symbols-outlined">restaurant</span>
+                  <div>
+                    <strong>Restaurant Tables ({tableOptions.length})</strong>
+                    <small>Main hall, terrace and private dining rooms</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="outline-button"
+                    onClick={() => setActiveTab('restaurant')}
+                  >
+                    Reserve
+                  </button>
+                </div>
+                {mixLoading ? (
+                  <div className="catalog-loading">
+                    <span className="spinner" />
+                    <p>Loading tables...</p>
+                  </div>
+                ) : tableOptions.length === 0 ? (
+                  <p className="live-availability-empty">No dining tables are currently listed.</p>
+                ) : (
+                  <ul className="live-availability-list">
+                    {tableOptions.map((table) => (
+                      <li key={table.id}>
+                        <div>
+                          <strong>Table {table.tableNumber}</strong>
+                          <small>
+                            {String(table.area || 'MAIN_HALL').replace(/_/g, ' ')} &bull; seats{' '}
+                            {table.capacity}
+                          </small>
+                        </div>
+                        <span className={`table-status-chip ${String(table.status || '').toLowerCase()}`}>
+                          {String(table.status || 'AVAILABLE').replace(/_/g, ' ')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="itinerary-list-panel">
+                <div className="live-availability-head">
+                  <span className="material-symbols-outlined">spa</span>
+                  <div>
+                    <strong>Spa Rituals ({bookableSpaServices.length})</strong>
+                    <small>Treatments currently open for reservation</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="outline-button"
+                    onClick={() => setActiveTab('spa')}
+                  >
+                    Reserve
+                  </button>
+                </div>
+                {mixLoading ? (
+                  <div className="catalog-loading">
+                    <span className="spinner" />
+                    <p>Loading rituals...</p>
+                  </div>
+                ) : bookableSpaServices.length === 0 ? (
+                  <p className="live-availability-empty">No spa rituals are currently listed.</p>
+                ) : (
+                  <ul className="live-availability-list">
+                    {bookableSpaServices.map((service) => (
+                      <li key={service.id}>
+                        <div>
+                          <strong>{service.name}</strong>
+                          <small>
+                            {String(service.category || '').replace(/_/g, ' ')} &bull;{' '}
+                            {service.durationMinutes} min
+                          </small>
+                        </div>
+                        <span className="live-availability-price">${service.price}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </section>
+

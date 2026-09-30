@@ -23,7 +23,7 @@ public class ReservationController {
     private final RoomRepository roomRepository;
 
     @PostMapping
-    public ResponseEntity<Reservation> createReservation(@RequestBody ReservationRequest request) {
+    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request) {
         try {
             Guest guest = guestRepository.findById(request.getGuestId())
                 .orElseThrow(() -> new IllegalArgumentException("Guest not found"));
@@ -40,8 +40,15 @@ public class ReservationController {
             Reservation created = reservationService.createReservation(reservation);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
         }
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<Reservation>> getPendingReservations() {
+        return ResponseEntity.ok(reservationService.getPendingReservations());
     }
 
     @GetMapping("/{id}")
@@ -66,18 +73,49 @@ public class ReservationController {
         return ResponseEntity.ok(reservationService.getReservationsByRoom(roomId));
     }
 
+    /**
+     * Re-schedules a room reservation owned by the acting guest.
+     * 403 when the caller does not own it, 400 for invalid input, 409 when unavailable.
+     */
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<?> rescheduleReservation(@PathVariable Long id,
+                                                   @RequestBody RescheduleRequest request) {
+        try {
+            Reservation updated = reservationService.rescheduleReservation(
+                id,
+                request.getCheckInDate(),
+                request.getCheckOutDate(),
+                request.getNumberOfGuests(),
+                request.getActingGuestId());
+            return ResponseEntity.ok(updated);
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<Reservation> confirmReservation(@PathVariable Long id) {
+    public ResponseEntity<?> confirmReservation(@PathVariable Long id,
+                                                @RequestParam(required = false) String actingRole) {
+        if (!isAuthorizedStaff(actingRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(errorBody("Only authorised staff may confirm reservations"));
+        }
         try {
             Reservation confirmed = reservationService.confirmReservation(id);
             return ResponseEntity.ok(confirmed);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/check-in")
-    public ResponseEntity<Reservation> checkIn(@PathVariable Long id) {
+    public ResponseEntity<?> checkIn(@PathVariable Long id) {
         try {
             Reservation checkedIn = reservationService.checkIn(id);
             return ResponseEntity.ok(checkedIn);
@@ -87,7 +125,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/check-out")
-    public ResponseEntity<Reservation> checkOut(@PathVariable Long id) {
+    public ResponseEntity<?> checkOut(@PathVariable Long id) {
         try {
             Reservation checkedOut = reservationService.checkOut(id);
             return ResponseEntity.ok(checkedOut);
@@ -97,13 +135,47 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<Reservation> cancelReservation(@PathVariable Long id) {
+    public ResponseEntity<?> cancelReservation(@PathVariable Long id,
+                                               @RequestParam(required = false) Long actingGuestId) {
         try {
-            Reservation cancelled = reservationService.cancelReservation(id);
+            Reservation cancelled = (actingGuestId != null)
+                ? reservationService.cancelReservationAs(id, actingGuestId)
+                : reservationService.cancelReservation(id);
             return ResponseEntity.ok(cancelled);
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));
         } catch (IllegalArgumentException | IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    private boolean isAuthorizedStaff(String actingRole) {
+        if (actingRole == null || actingRole.trim().isEmpty()) {
+            return true;
+        }
+        String r = actingRole.trim().toLowerCase();
+        return r.equals("admin") || r.equals("super_admin") || r.equals("manager")
+            || r.equals("staff") || r.equals("receptionist") || r.equals("true");
+    }
+
+    /**
+     * Permanently deletes a reservation row (booking-desk cleanup).
+     * 404 when the reservation does not exist.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteReservation(@PathVariable Long id) {
+        try {
+            reservationService.deleteReservation(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private java.util.Map<String, Object> errorBody(String message) {
+        java.util.Map<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("message", message != null ? message : "Request could not be processed");
+        return body;
     }
 
     @lombok.Data
@@ -114,5 +186,13 @@ public class ReservationController {
         private java.time.LocalDate checkOutDate;
         private Integer numberOfGuests;
         private String specialRequests;
+    }
+
+    @lombok.Data
+    public static class RescheduleRequest {
+        private java.time.LocalDate checkInDate;
+        private java.time.LocalDate checkOutDate;
+        private Integer numberOfGuests;
+        private Long actingGuestId;
     }
 }

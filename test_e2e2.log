@@ -1,0 +1,85 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------< com.hotelmanagement:hotel-management-system >-------------
+[INFO] Building Hotel Management System 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- jacoco:0.8.11:prepare-agent (prepare-agent) @ hotel-management-system ---
+[INFO] argLine set to "-javaagent:C:\\Users\\12yem\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.11\\org.jacoco.agent-0.8.11-runtime.jar=destfile=D:\\AAiT PROJECTS\\QA TEST\\final project\\target\\jacoco.exec"
+[INFO] 
+[INFO] --- resources:3.2.0:resources (default-resources) @ hotel-management-system ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 2 resources
+[INFO] Copying 0 resource
+[INFO] 
+[INFO] --- compiler:3.14.0:compile (default-compile) @ hotel-management-system ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.2.0:testResources (default-testResources) @ hotel-management-system ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Using 'UTF-8' encoding to copy filtered properties files.
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- compiler:3.14.0:testCompile (default-testCompile) @ hotel-management-system ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.2.5:test (default-test) @ hotel-management-system ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.hotelmanagement.system.HotelManagementSystemTest
+20:12:49.444 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Using WebDriverManager 6.3.4
+20:12:49.832 [main] DEBUG org.apache.hc.client5.http.socket.UnixDomainSocketFactory - Using JDK Unix Domain Socket implementation
+20:12:50.575 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome=154 in cache (valid until 21:08:53 30/09/2026 EAT)
+20:12:50.577 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome154=154.0.8037.92 in cache (valid until 19:04:33 01/10/2026 EAT)
+20:12:50.578 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 154.0.8037.92 (resolved driver for Chrome 154)
+20:12:50.615 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Driver chromedriver 154.0.8037.92 found in cache
+20:12:50.616 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\12yem\.cache\selenium\chromedriver\win64\154.0.8037.92\chromedriver.exe
+Sep 30, 2026 8:12:52 PM org.openqa.selenium.devtools.CdpVersionFinder findNearestMatch
+WARNING: Unable to find CDP implementation matching 154
+Sep 30, 2026 8:12:52 PM org.openqa.selenium.chromium.ChromiumDriver lambda$new$4
+WARNING: Unable to find version of CDP to use for 154.0.8037.58. You may need to include a dependency on a specific version of the CDP using something similar to `org.seleniumhq.selenium:selenium-devtools-v86:4.35.0` where the version ("v86") matches the version of the chromium-based browser you're using and the version number of the artifact is the same as Selenium's.
+20:12:55.553 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Using WebDriverManager 6.3.4
+20:12:55.553 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome=154 in cache (valid until 21:08:53 30/09/2026 EAT)
+20:12:55.553 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome154=154.0.8037.92 in cache (valid until 19:04:33 01/10/2026 EAT)
+20:12:55.553 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 154.0.8037.92 (resolved driver for Chrome 154)
+20:12:55.570 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Driver chromedriver 154.0.8037.92 found in cache
+20:12:55.570 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\12yem\.cache\selenium\chromedriver\win64\154.0.8037.92\chromedriver.exe
+Sep 30, 2026 8:12:56 PM org.openqa.selenium.devtools.CdpVersionFinder findNearestMatch
+WARNING: Unable to find CDP implementation matching 154
+Sep 30, 2026 8:12:56 PM org.openqa.selenium.chromium.ChromiumDriver lambda$new$4
+WARNING: Unable to find version of CDP to use for 154.0.8037.58. You may need to include a dependency on a specific version of the CDP using something similar to `org.seleniumhq.selenium:selenium-devtools-v86:4.35.0` where the version ("v86") matches the version of the chromium-based browser you're using and the version number of the artifact is the same as Selenium's.
+20:12:59.631 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Using WebDriverManager 6.3.4
+20:12:59.637 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome=154 in cache (valid until 21:08:53 30/09/2026 EAT)
+20:12:59.638 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome154=154.0.8037.92 in cache (valid until 19:04:33 01/10/2026 EAT)
+20:12:59.638 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 154.0.8037.92 (resolved driver for Chrome 154)
+20:12:59.641 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Driver chromedriver 154.0.8037.92 found in cache
+20:12:59.642 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\12yem\.cache\selenium\chromedriver\win64\154.0.8037.92\chromedriver.exe
+Sep 30, 2026 8:13:00 PM org.openqa.selenium.devtools.CdpVersionFinder findNearestMatch
+WARNING: Unable to find CDP implementation matching 154
+Sep 30, 2026 8:13:00 PM org.openqa.selenium.chromium.ChromiumDriver lambda$new$4
+WARNING: Unable to find version of CDP to use for 154.0.8037.58. You may need to include a dependency on a specific version of the CDP using something similar to `org.seleniumhq.selenium:selenium-devtools-v86:4.35.0` where the version ("v86") matches the version of the chromium-based browser you're using and the version number of the artifact is the same as Selenium's.
+20:13:03.066 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Using WebDriverManager 6.3.4
+20:13:03.072 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome=154 in cache (valid until 21:08:53 30/09/2026 EAT)
+20:13:03.073 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome154=154.0.8037.92 in cache (valid until 19:04:33 01/10/2026 EAT)
+20:13:03.073 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 154.0.8037.92 (resolved driver for Chrome 154)
+20:13:03.080 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Driver chromedriver 154.0.8037.92 found in cache
+20:13:03.081 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\12yem\.cache\selenium\chromedriver\win64\154.0.8037.92\chromedriver.exe
+Sep 30, 2026 8:13:03 PM org.openqa.selenium.devtools.CdpVersionFinder findNearestMatch
+WARNING: Unable to find CDP implementation matching 154
+Sep 30, 2026 8:13:03 PM org.openqa.selenium.chromium.ChromiumDriver lambda$new$4
+WARNING: Unable to find version of CDP to use for 154.0.8037.58. You may need to include a dependency on a specific version of the CDP using something similar to `org.seleniumhq.selenium:selenium-devtools-v86:4.35.0` where the version ("v86") matches the version of the chromium-based browser you're using and the version number of the artifact is the same as Selenium's.
+20:13:06.603 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Using WebDriverManager 6.3.4
+20:13:06.610 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome=154 in cache (valid until 21:08:53 30/09/2026 EAT)
+20:13:06.610 [main] DEBUG io.github.bonigarcia.wdm.cache.ResolutionCache - Resolution chrome154=154.0.8037.92 in cache (valid until 19:04:33 01/10/2026 EAT)
+20:13:06.610 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Using chromedriver 154.0.8037.92 (resolved driver for Chrome 154)
+20:13:06.614 [main] DEBUG io.github.bonigarcia.wdm.WebDriverManager - Driver chromedriver 154.0.8037.92 found in cache
+20:13:06.614 [main] INFO io.github.bonigarcia.wdm.WebDriverManager - Exporting webdriver.chrome.driver as C:\Users\12yem\.cache\selenium\chromedriver\win64\154.0.8037.92\chromedriver.exe
+Sep 30, 2026 8:13:07 PM org.openqa.selenium.devtools.CdpVersionFinder findNearestMatch
+WARNING: Unable to find CDP implementation matching 154
+Sep 30, 2026 8:13:07 PM org.openqa.selenium.chromium.ChromiumDriver lambda$new$4
+WARNING: Unable to find version of CDP to use for 154.0.8037.58. You may need to include a dependency on a specific version of the CDP using something similar to `org.seleniumhq.selenium:selenium-devtools-v86:4.35.0` where the version ("v86") matches the version of the chromium-based browser you're using and the version number of the artifact is the same as Selenium's.

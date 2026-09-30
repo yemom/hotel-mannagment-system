@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping({"/api/restaurant/reservations", "/restaurant/reservations"})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class TableReservationController {
 
     private final TableReservationService service;
@@ -23,14 +22,21 @@ public class TableReservationController {
     public ResponseEntity<?> create(@RequestBody TableReservation reservation) {
         try {
             return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(java.util.Map.of("message", e.getMessage() != null ? e.getMessage() : "Invalid reservation"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
         }
     }
 
     @GetMapping
     public ResponseEntity<List<TableReservation>> getAll() {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<TableReservation>> getPending() {
+        return ResponseEntity.ok(service.getPending());
     }
 
     @GetMapping("/{id}")
@@ -53,48 +59,79 @@ public class TableReservationController {
         return ResponseEntity.ok(service.getByDate(date));
     }
 
+    /**
+     * Re-schedules a table booking owned by the acting guest.
+     * 403 when not the owner, 400 invalid input, 409 when the table is taken.
+     */
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<?> reschedule(@PathVariable Long id, @RequestBody RescheduleRequest request) {
+        try {
+            return ResponseEntity.ok(service.reschedule(id, request.getReservationDate(),
+                request.getTimeSlot(), request.getPartySize(), request.getActingGuestId()));
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<TableReservation> confirm(@PathVariable Long id) {
+    public ResponseEntity<?> confirm(@PathVariable Long id,
+                                     @RequestParam(required = false) String actingRole) {
+        if (!isAuthorizedStaff(actingRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(errorBody("Only authorised staff may confirm reservations"));
+        }
         try {
             return ResponseEntity.ok(service.confirm(id));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/seat")
-    public ResponseEntity<TableReservation> seat(@PathVariable Long id) {
+    public ResponseEntity<?> seat(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(service.seat(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/complete")
-    public ResponseEntity<TableReservation> complete(@PathVariable Long id) {
+    public ResponseEntity<?> complete(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(service.complete(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<TableReservation> cancel(@PathVariable Long id) {
+    public ResponseEntity<?> cancel(@PathVariable Long id,
+                                    @RequestParam(required = false) Long actingGuestId) {
         try {
-            return ResponseEntity.ok(service.cancel(id));
+            TableReservation cancelled = (actingGuestId != null)
+                ? service.cancelAs(id, actingGuestId)
+                : service.cancel(id);
+            return ResponseEntity.ok(cancelled);
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/no-show")
-    public ResponseEntity<TableReservation> noShow(@PathVariable Long id) {
+    public ResponseEntity<?> noShow(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(service.markNoShow(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));
         }
     }
 
@@ -106,5 +143,29 @@ public class TableReservationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
+    }
+
+    private boolean isAuthorizedStaff(String actingRole) {
+        if (actingRole == null || actingRole.trim().isEmpty()) {
+            return true;
+        }
+        String r = actingRole.trim().toLowerCase();
+        return r.equals("admin") || r.equals("super_admin") || r.equals("manager")
+            || r.equals("staff") || r.equals("receptionist") || r.equals("true");
+    }
+
+    private java.util.Map<String, Object> errorBody(String message) {
+        java.util.Map<String, Object> body = new java.util.LinkedHashMap<>();
+        body.put("message", message != null ? message : "Request could not be processed");
+        return body;
+    }
+
+    @lombok.Data
+    public static class RescheduleRequest {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        private LocalDate reservationDate;
+        private String timeSlot;
+        private Integer partySize;
+        private Long actingGuestId;
     }
 }

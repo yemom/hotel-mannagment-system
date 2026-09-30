@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { roomAPI } from '../services/api';
 
 const STATUS_CONFIG = {
-  AVAILABLE:   { label: 'Available',   color: '#16a34a', bg: '#dcfce7', icon: 'check_circle' },
-  OCCUPIED:    { label: 'Occupied',    color: '#dc2626', bg: '#fee2e2', icon: 'person' },
-  RESERVED:    { label: 'Reserved',    color: '#b45309', bg: '#fef3c7', icon: 'event_available' },
-  MAINTENANCE: { label: 'Maintenance', color: '#d97706', bg: '#fef9c3', icon: 'build' },
+  AVAILABLE:   { label: 'Available',   color: 'var(--jade)', bg: 'var(--surface-soft)', icon: 'check_circle' },
+  OCCUPIED:    { label: 'Occupied',    color: 'var(--rose)', bg: '#fee2e2', icon: 'person' },
+  RESERVED:    { label: 'Reserved',    color: 'var(--amber)', bg: 'var(--surface-soft)', icon: 'event_available' },
+  MAINTENANCE: { label: 'Maintenance', color: 'var(--amber)', bg: 'var(--surface-soft)', icon: 'build' },
 };
 
 const TYPE_CONFIG = {
@@ -257,15 +257,15 @@ const Rooms = () => {
         <div
           className="status-stat-card"
           style={{
-            borderColor: '#6366f1',
+            borderColor: 'var(--accent)',
             cursor: 'pointer',
-            outline: filterStatus === 'ALL' ? '2px solid #6366f1' : 'none',
+            outline: filterStatus === 'ALL' ? '2px solid var(--accent)' : 'none',
           }}
           onClick={() => setFilterStatus('ALL')}
         >
-          <span className="material-symbols-outlined" style={{ color: '#6366f1' }}>apartment</span>
+          <span className="material-symbols-outlined" style={{ color: 'var(--accent)' }}>apartment</span>
           <div>
-            <strong style={{ color: '#6366f1' }}>{counts.total}</strong>
+            <strong style={{ color: 'var(--accent)' }}>{counts.total}</strong>
             <span>All Rooms</span>
           </div>
         </div>
@@ -351,7 +351,7 @@ const Rooms = () => {
                       <div className="floor-table-capacity">
                         <span className="material-symbols-outlined">group</span>
                         Sleeps {room.capacity}&nbsp;&middot;&nbsp;
-                        <span style={{ color: '#059669', fontWeight: 700 }}>
+                        <span style={{ color: 'var(--accent)', fontWeight: 700 }}>
                           ${Number(room.basePrice || 0).toFixed(0)}/night
                         </span>
                       </div>
@@ -407,17 +407,17 @@ const Rooms = () => {
 
       {/* Add Room Modal matching Stitch Design */}
       {showAddModal && (
-        <div className="modal-backdrop" onClick={() => setShowAddModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px' }}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', padding: '28px' }}>
+        <div className="modal-backdrop" onClick={() => setShowAddModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(26, 26, 26,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px' }}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '640px', width: '100%', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid var(--surface-line)', padding: '28px' }}>
             {/* Modal Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
               <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: '#065f46', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '10px', background: 'var(--jade)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '26px' }}>domain_add</span>
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0f172a' }}>Add New Room to Inventory</h2>
-                  <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: 'var(--text)' }}>Add New Room to Inventory</h2>
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                     PROPERTY : ATELIER GRAND HOTEL &bull; CORE PMS REGISTRY
                   </span>
                 </div>
@@ -425,7 +425,7 @@ const Rooms = () => {
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', padding: '4px' }}
                 aria-label="Close"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -436,8 +436,8 @@ const Rooms = () => {
               {/* Row 1: Room Number, Floor Level, Room Category */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr 1.2fr', gap: '14px', marginBottom: '16px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Room Number <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Room Number <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -445,17 +445,17 @@ const Rooms = () => {
                     placeholder="e.g. 412"
                     value={formData.roomNumber}
                     onChange={(e) => setFormData({ ...formData, roomNumber: e.target.value })}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '14px', color: '#0f172a', fontWeight: 600 }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '14px', color: 'var(--text)', fontWeight: 600 }}
                   />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Floor Level <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Floor Level <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <select
                     value={formData.floorLevel || '4th Floor (Ocean Panorama)'}
                     onChange={(e) => setFormData({ ...formData, floorLevel: e.target.value })}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', color: '#0f172a', background: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', color: 'var(--text)', background: '#fff' }}
                   >
                     <option value="4th Floor (Ocean Panorama)">4th Floor (Ocean Panorama)</option>
                     <option value="3rd Floor (Skyline)">3rd Floor (Skyline)</option>
@@ -465,13 +465,13 @@ const Rooms = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Room Category <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Room Category <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <select
                     value={formData.roomType}
                     onChange={(e) => setFormData({ ...formData, roomType: e.target.value })}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', color: '#0f172a', background: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', color: 'var(--text)', background: '#fff' }}
                   >
                     <option value="DELUXE">Deluxe Ocean View</option>
                     <option value="SUITE">Executive Suite</option>
@@ -485,13 +485,13 @@ const Rooms = () => {
               {/* Row 2: Bed Configuration, Nightly Base Rate, Max Occupancy */}
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1.2fr', gap: '14px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Bed Configuration <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Bed Configuration <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <select
                     value={formData.bedConfig || '1 King Bed (European Plush)'}
                     onChange={(e) => setFormData({ ...formData, bedConfig: e.target.value })}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', color: '#0f172a', background: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', color: 'var(--text)', background: '#fff' }}
                   >
                     <option value="1 King Bed (European Plush)">1 King Bed (European Plush)</option>
                     <option value="2 Queen Beds (Plush)">2 Queen Beds (Plush)</option>
@@ -500,11 +500,11 @@ const Rooms = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Nightly Base Rate ($) <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Nightly Base Rate ($) <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <div style={{ position: 'relative' }}>
-                    <span style={{ position: 'absolute', left: '10px', top: '9px', color: '#64748b', fontWeight: 700 }}>$</span>
+                    <span style={{ position: 'absolute', left: '10px', top: '9px', color: 'var(--muted)', fontWeight: 700 }}>$</span>
                     <input
                       type="number"
                       step="0.01"
@@ -512,18 +512,18 @@ const Rooms = () => {
                       placeholder="380.00"
                       value={formData.basePrice}
                       onChange={(e) => setFormData({ ...formData, basePrice: e.target.value })}
-                      style={{ width: '100%', padding: '9px 12px 9px 24px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '14px', fontWeight: 700, color: '#0f172a' }}
+                      style={{ width: '100%', padding: '9px 12px 9px 24px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '14px', fontWeight: 700, color: 'var(--text)' }}
                     />
                   </div>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    Max Occupancy <span style={{ color: '#ef4444' }}>*</span>
+                  <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
+                    Max Occupancy <span style={{ color: 'var(--rose)' }}>*</span>
                   </label>
                   <select
                     value={formData.capacity}
                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', color: '#0f172a', background: '#fff' }}
+                    style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', color: 'var(--text)', background: '#fff' }}
                   >
                     <option value="1">1 Adult</option>
                     <option value="2">2 Adults</option>
@@ -536,7 +536,7 @@ const Rooms = () => {
 
               {/* Room Amenities & Features */}
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '10px' }}>
                   Room Amenities &amp; Features
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -556,12 +556,12 @@ const Rooms = () => {
                         gap: '8px',
                         padding: '10px 12px',
                         borderRadius: '8px',
-                        border: '1px solid #e2e8f0',
-                        background: formData[key] ? '#f0fdf4' : '#ffffff',
+                        border: '1px solid var(--surface-line)',
+                        background: formData[key] ? 'var(--surface-soft)' : '#ffffff',
                         cursor: 'pointer',
                         fontSize: '13px',
                         fontWeight: 600,
-                        color: formData[key] ? '#065f46' : '#334155',
+                        color: formData[key] ? 'var(--jade)' : 'var(--text-soft)',
                         transition: 'all 0.15s ease',
                       }}
                     >
@@ -569,7 +569,7 @@ const Rooms = () => {
                         type="checkbox"
                         checked={Boolean(formData[key])}
                         onChange={(e) => setFormData({ ...formData, [key]: e.target.checked })}
-                        style={{ accentColor: '#065f46', width: '16px', height: '16px' }}
+                        style={{ accentColor: 'var(--jade)', width: '16px', height: '16px' }}
                       />
                       <span>{label}</span>
                     </label>
@@ -579,14 +579,14 @@ const Rooms = () => {
 
               {/* Initial Operational Status */}
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '10px' }}>
                   Initial Operational Status
                 </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <label
                     style={{
-                      border: (formData.status || 'AVAILABLE') === 'AVAILABLE' ? '2px solid #10b981' : '1px solid #cbd5e1',
-                      background: (formData.status || 'AVAILABLE') === 'AVAILABLE' ? '#f0fdf4' : '#ffffff',
+                      border: (formData.status || 'AVAILABLE') === 'AVAILABLE' ? '2px solid var(--jade)' : '1px solid var(--surface-line)',
+                      background: (formData.status || 'AVAILABLE') === 'AVAILABLE' ? 'var(--surface-soft)' : '#ffffff',
                       borderRadius: '10px',
                       padding: '14px',
                       cursor: 'pointer',
@@ -600,11 +600,11 @@ const Rooms = () => {
                       value="AVAILABLE"
                       checked={(formData.status || 'AVAILABLE') === 'AVAILABLE'}
                       onChange={() => setFormData({ ...formData, status: 'AVAILABLE' })}
-                      style={{ accentColor: '#10b981', marginTop: '3px' }}
+                      style={{ accentColor: 'var(--jade)', marginTop: '3px' }}
                     />
                     <div>
-                      <strong style={{ display: 'block', color: '#065f46', fontSize: '13px' }}>&bull; Available for Booking</strong>
-                      <span style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>
+                      <strong style={{ display: 'block', color: 'var(--jade)', fontSize: '13px' }}>&bull; Available for Booking</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>
                         Instantly released to booking engines, front desk, and GDS channels.
                       </span>
                     </div>
@@ -612,8 +612,8 @@ const Rooms = () => {
 
                   <label
                     style={{
-                      border: formData.status === 'MAINTENANCE' ? '2px solid #f59e0b' : '1px solid #cbd5e1',
-                      background: formData.status === 'MAINTENANCE' ? '#fffbeb' : '#ffffff',
+                      border: formData.status === 'MAINTENANCE' ? '2px solid var(--amber)' : '1px solid var(--surface-line)',
+                      background: formData.status === 'MAINTENANCE' ? 'var(--surface-soft)' : '#ffffff',
                       borderRadius: '10px',
                       padding: '14px',
                       cursor: 'pointer',
@@ -627,11 +627,11 @@ const Rooms = () => {
                       value="MAINTENANCE"
                       checked={formData.status === 'MAINTENANCE'}
                       onChange={() => setFormData({ ...formData, status: 'MAINTENANCE' })}
-                      style={{ accentColor: '#f59e0b', marginTop: '3px' }}
+                      style={{ accentColor: 'var(--amber)', marginTop: '3px' }}
                     />
                     <div>
-                      <strong style={{ display: 'block', color: '#b45309', fontSize: '13px' }}>&bull; Under Maintenance / Staging</strong>
-                      <span style={{ fontSize: '11px', color: '#64748b', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>
+                      <strong style={{ display: 'block', color: 'var(--amber)', fontSize: '13px' }}>&bull; Under Maintenance / Staging</strong>
+                      <span style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.3, display: 'block', marginTop: '2px' }}>
                         Hold key until final housekeeping walkthrough inspection is signed off.
                       </span>
                     </div>
@@ -641,7 +641,7 @@ const Rooms = () => {
 
               {/* Housekeeping & Maintenance Notes */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>
                   Housekeeping &amp; Maintenance Notes
                 </label>
                 <textarea
@@ -649,20 +649,20 @@ const Rooms = () => {
                   placeholder="e.g. Newly refreshed parquet floor finish. Extra feather-free pillow set stored in high shelf cabinet."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', resize: 'vertical' }}
                 />
               </div>
 
               {/* Modal Footer Actions */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid #e2e8f0' }}>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '16px', borderTop: '1px solid var(--surface-line)' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                   DRAFT AUTO-SAVED TO REGISTRY
                 </span>
                 <div style={{ display: 'flex', gap: '10px' }}>
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    style={{ padding: '9px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#475569', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
+                    style={{ padding: '9px 18px', borderRadius: '8px', border: '1px solid var(--surface-line)', background: 'var(--surface-soft)', color: 'var(--muted)', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
                   >
                     Cancel
                   </button>
@@ -673,7 +673,7 @@ const Rooms = () => {
                       padding: '9px 20px',
                       borderRadius: '8px',
                       border: 'none',
-                      background: '#065f46',
+                      background: 'var(--jade)',
                       color: '#ffffff',
                       cursor: 'pointer',
                       fontWeight: 700,
@@ -681,7 +681,7 @@ const Rooms = () => {
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '8px',
-                      boxShadow: '0 2px 4px rgba(6, 95, 70, 0.2)',
+                      boxShadow: '0 2px 4px rgba(26, 26, 26, 0.2)',
                     }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>

@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping({"/api/spa-services", "/spa-services", "/api/spa/services", "/spa/services"})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class SpaServiceController {
 
     private final SpaServiceService spaServiceService;

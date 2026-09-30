@@ -53,8 +53,8 @@ const AppRoutes = () => {
         element={
           <div style={{ textAlign: "center", padding: "80px 24px" }}>
             <h1>403 — Access Denied</h1>
-            <p style={{ color: "#64748b" }}>You don't have permission to view this page.</p>
-            <a href="/" style={{ color: "#064e3b", fontWeight: 600 }}>Return to Home</a>
+            <p style={{ color: "var(--muted)" }}>You don't have permission to view this page.</p>
+            <a href="/" style={{ color: "var(--accent)", fontWeight: 600 }}>Return to Home</a>
           </div>
         }
       />

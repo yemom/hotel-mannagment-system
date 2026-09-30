@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { guestAPI, reservationAPI, roomAPI, restaurantTableAPI, tableReservationAPI } from "../services/api";
+import { guestAPI, reservationAPI, roomAPI, restaurantTableAPI, tableReservationAPI, spaBookingAPI } from "../services/api";
 import StatusBadge from "../components/StatusBadge";
 
 const money = (v) => `$${Number(v || 0).toFixed(2)}`;
@@ -21,7 +21,7 @@ const VStatCard = ({ label, value, icon, accent, lightBg, sub }) => (
       background: "#ffffff",
       borderRadius: "12px",
       padding: "16px 18px",
-      border: "1px solid #e2e8f0",
+      border: "1px solid var(--surface-line)",
       borderLeft: `4px solid ${accent}`,
       boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
       display: "flex",
@@ -45,11 +45,11 @@ const VStatCard = ({ label, value, icon, accent, lightBg, sub }) => (
       <span className="material-symbols-outlined" style={{ fontSize: "22px" }}>{icon}</span>
     </div>
     <div>
-      <span style={{ fontSize: "11px", color: "#64748b", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+      <span style={{ fontSize: "11px", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
         {label}
       </span>
-      <div style={{ fontSize: "22px", fontWeight: 800, color: "#0f172a", lineHeight: 1.2 }}>{value}</div>
-      {sub && <span style={{ fontSize: "11px", color: "#94a3b8" }}>{sub}</span>}
+      <div style={{ fontSize: "22px", fontWeight: 800, color: "var(--text)", lineHeight: 1.2 }}>{value}</div>
+      {sub && <span style={{ fontSize: "11px", color: "var(--muted)" }}>{sub}</span>}
     </div>
   </div>
 );
@@ -140,6 +140,13 @@ const Dashboard = () => {
   const [guests, setGuests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+
+  // Pending approval queue
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [pendingLoading, setPendingLoading] = useState(true);
+  const [pendingError, setPendingError] = useState("");
+  const [pendingTypeFilter, setPendingTypeFilter] = useState("ALL");
+  const [pendingActionId, setPendingActionId] = useState(null);
 
   // Filter state for arrival manifest
   const [manifestFilter, setManifestFilter] = useState('ALL');
@@ -287,6 +294,153 @@ const Dashboard = () => {
     return () => clearInterval(t);
   }, []);
 
+  // ─── Pending approvals queue (real data, all three reservation types) ───
+  const fetchPendingApprovals = useCallback(async () => {
+    setPendingLoading(true);
+    setPendingError("");
+
+    const loadType = async (preferred, fallback, statusOf) => {
+      try {
+        const res = await preferred();
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (_) {
+        // Older backend without /pending: fall back to the full list and filter.
+        try {
+          const res = await fallback();
+          const list = Array.isArray(res.data) ? res.data : [];
+          return list.filter((r) => statusOf(r) === "PENDING");
+        } catch (err) {
+          throw err;
+        }
+      }
+    };
+
+    try {
+      const [roomPending, tablePending, spaPending] = await Promise.all([
+        loadType(
+          () => reservationAPI.getPending(),
+          () => reservationAPI.getAll(),
+          (r) => r.status
+        ),
+        loadType(
+          () => tableReservationAPI.getPending(),
+          () => tableReservationAPI.getAll(),
+          (r) => r.status
+        ),
+        loadType(
+          () => spaBookingAPI.getPending(),
+          () => spaBookingAPI.getAll(),
+          (r) => r.status
+        ),
+      ]);
+
+      setPendingApprovals([
+        ...roomPending.map((r) => ({ ...r, __type: "ROOM" })),
+        ...tablePending.map((r) => ({ ...r, __type: "TABLE" })),
+        ...spaPending.map((r) => ({ ...r, __type: "SPA" })),
+      ]);
+    } catch (err) {
+      setPendingApprovals([]);
+      setPendingError(
+        err?.response?.data?.message ||
+          "Could not load pending reservations from the server."
+      );
+    } finally {
+      setPendingLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPendingApprovals();
+  }, [fetchPendingApprovals]);
+
+  const filteredPending = useMemo(() => {
+    if (pendingTypeFilter === "ALL") return pendingApprovals;
+    return pendingApprovals.filter((r) => r.__type === pendingTypeFilter);
+  }, [pendingApprovals, pendingTypeFilter]);
+
+  /** Describes the requested date/time for any reservation type. */
+  const pendingSchedule = (r) => {
+    if (r.__type === "ROOM") {
+      return `${r.checkInDate} → ${r.checkOutDate} · 15:00 / 11:00`;
+    }
+    if (r.__type === "TABLE") {
+      return `${r.reservationDate} at ${r.timeSlot}`;
+    }
+    return `${r.bookingDate} at ${r.startTime}`;
+  };
+
+  const pendingReference = (r) => {
+    if (r.__type === "ROOM") {
+      return r.room ? `Room ${r.room.roomNumber}` : `Reservation #${r.id}`;
+    }
+    if (r.__type === "TABLE") {
+      return r.restaurantTable
+        ? `Table ${r.restaurantTable.tableNumber}`
+        : `Table reservation #${r.id}`;
+    }
+    return r.spaService ? r.spaService.name : `Spa booking #${r.id}`;
+  };
+
+  const pendingGuestName = (r) => {
+    const g = r.guest;
+    if (!g) return `Guest #${r.guestId || "—"}`;
+    return `${g.firstName || ""} ${g.lastName || ""}`.trim() || g.email || `Guest #${g.id}`;
+  };
+
+  /** Confirms a reservation through the real API, then refetches from the server. */
+  const handleConfirmApproval = async (r) => {
+    setPendingActionId(r.__type + "-" + r.id);
+    try {
+      if (r.__type === "ROOM") {
+        await reservationAPI.confirm(r.id, "admin");
+      } else if (r.__type === "TABLE") {
+        await tableReservationAPI.confirm(r.id, "admin");
+      } else {
+        await spaBookingAPI.confirm(r.id, "admin");
+      }
+      await fetchPendingApprovals();
+      fetchData();
+      setToast({ type: "success", message: `${pendingReference(r)} confirmed.` });
+    } catch (err) {
+      setToast({
+        type: "error",
+        message:
+          err?.response?.data?.message || "Could not confirm this reservation.",
+      });
+    } finally {
+      setPendingActionId(null);
+      setTimeout(() => setToast(null), 6000);
+    }
+  };
+
+  /** Rejects (cancels) a pending reservation through the real API. */
+  const handleRejectApproval = async (r) => {
+    if (!window.confirm(`Reject the reservation for ${pendingReference(r)}?`)) return;
+    setPendingActionId(r.__type + "-" + r.id);
+    try {
+      if (r.__type === "ROOM") {
+        await reservationAPI.cancel(r.id);
+      } else if (r.__type === "TABLE") {
+        await tableReservationAPI.cancel(r.id);
+      } else {
+        await spaBookingAPI.cancel(r.id);
+      }
+      await fetchPendingApprovals();
+      fetchData();
+      setToast({ type: "success", message: `${pendingReference(r)} rejected.` });
+    } catch (err) {
+      setToast({
+        type: "error",
+        message:
+          err?.response?.data?.message || "Could not reject this reservation.",
+      });
+    } finally {
+      setPendingActionId(null);
+      setTimeout(() => setToast(null), 6000);
+    }
+  };
+
   const stats = useMemo(() => {
     const totalRooms = rooms.length || 14;
     const occupiedRooms = rooms.filter((r) => r.status === "OCCUPIED").length;
@@ -375,7 +529,7 @@ const Dashboard = () => {
       schedule: `${r.checkInDate || 'TBD'} to ${r.checkOutDate || 'TBD'}`,
       size: `${r.numberOfGuests || 1} guest${Number(r.numberOfGuests || 1) === 1 ? '' : 's'}`,
       status: r.status || 'CONFIRMED',
-      accent: '#065f46',
+      accent: 'var(--jade)',
       actionPath: '/staff/reservations',
     }));
 
@@ -389,7 +543,7 @@ const Dashboard = () => {
       schedule: `${r.reservationDate || 'TBD'} at ${formatTime(r.timeSlot)}`,
       size: `${r.partySize || 1} guest${Number(r.partySize || 1) === 1 ? '' : 's'}`,
       status: r.status || 'CONFIRMED',
-      accent: '#b45309',
+      accent: 'var(--amber)',
       actionPath: '/staff/table-reservations',
     }));
 
@@ -404,17 +558,188 @@ const Dashboard = () => {
     <section className="page-section" style={{ maxWidth: '1440px', margin: '0 auto' }}>
       {toast && (
         <div className="client-toast-container">
-          <div className="client-toast client-toast-success">
-            <span className="material-symbols-outlined">check_circle</span>
-            <span>{toast}</span>
+          <div
+            className={`client-toast ${
+              typeof toast === "object" && toast.type === "error"
+                ? "client-toast-error"
+                : "client-toast-success"
+            }`}
+          >
+            <span className="material-symbols-outlined">
+              {typeof toast === "object" && toast.type === "error"
+                ? "error"
+                : "check_circle"}
+            </span>
+            <span>{typeof toast === "object" ? toast.message : toast}</span>
           </div>
         </div>
       )}
 
-      {/* ─── Top Operational Brief Header matching Image 1 ─── */}
+      {/* Pending Reservation Approvals (real data, all types) */}
+      <section
+        style={{
+          background: 'var(--surface-card)',
+          border: '1px solid var(--surface-line)',
+          borderLeft: '4px solid var(--amber)',
+          borderRadius: '14px',
+          padding: '20px 22px',
+          marginBottom: '24px',
+          boxShadow: 'var(--shadow-sm)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap',
+            gap: '14px',
+            marginBottom: '16px',
+          }}
+        >
+          <div>
+            <span
+              style={{
+                fontSize: '10px',
+                fontWeight: 800,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'var(--amber)',
+              }}
+            >
+              AWAITING APPROVAL
+            </span>
+            <h2 style={{ margin: '2px 0 0', fontSize: '20px', fontWeight: 800 }}>
+              Pending Approvals ({pendingApprovals.length})
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {['ALL', 'ROOM', 'TABLE', 'SPA'].map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setPendingTypeFilter(t)}
+                style={{
+                  padding: '6px 12px',
+                  borderRadius: '999px',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  border: '1px solid var(--surface-line)',
+                  background: pendingTypeFilter === t ? 'var(--accent)' : 'var(--surface-card)',
+                  color: pendingTypeFilter === t ? '#ffffff' : 'var(--muted)',
+                }}
+              >
+                {t === 'ALL' ? 'All Types' : t}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="outline-button"
+              onClick={fetchPendingApprovals}
+              disabled={pendingLoading}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>refresh</span>
+              {pendingLoading ? 'Loading...' : 'Refresh'}
+            </button>
+          </div>
+        </div>
+
+        {pendingError && (
+          <div className="api-error-panel" role="alert">
+            <span className="material-symbols-outlined">error</span>
+            <div>
+              <strong>Could not load the approval queue</strong>
+              <p>{pendingError}</p>
+            </div>
+            <button type="button" className="outline-button" onClick={fetchPendingApprovals}>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {pendingLoading && !pendingError ? (
+          <div className="catalog-loading">
+            <span className="spinner" />
+            <p>Loading pending reservations...</p>
+          </div>
+        ) : filteredPending.length === 0 ? (
+          <div className="empty-card">
+            <span className="material-symbols-outlined">task_alt</span>
+            <h3>No reservations awaiting approval</h3>
+            <p>Every client request has been reviewed.</p>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '820px' }}>
+              <thead>
+                <tr style={{ textAlign: 'left', color: 'var(--muted)' }}>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>TYPE</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>CLIENT</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>DETAIL</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>REQUESTED</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>GUESTS</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>AMOUNT</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>STATUS</th>
+                  <th style={{ padding: '8px 10px', fontWeight: 700 }}>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPending.map((r) => {
+                  const busy = pendingActionId === r.__type + '-' + r.id;
+                  const amount = Number(r.totalPrice);
+                  return (
+                    <tr key={r.__type + '-' + r.id} style={{ borderTop: '1px solid var(--surface-line)' }}>
+                      <td style={{ padding: '10px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 800, padding: '3px 8px', borderRadius: '4px', background: 'var(--surface-soft)', color: 'var(--text)' }}>
+                          {r.__type}
+                        </span>
+                      </td>
+                      <td style={{ padding: '10px' }}>
+                        <div style={{ fontWeight: 600 }}>{pendingGuestName(r)}</div>
+                        {r.guest?.email && (
+                          <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{r.guest.email}</div>
+                        )}
+                      </td>
+                      <td style={{ padding: '10px' }}>{pendingReference(r)}</td>
+                      <td style={{ padding: '10px' }}>{pendingSchedule(r)}</td>
+                      <td style={{ padding: '10px' }}>{r.numberOfGuests || r.partySize || '-'}</td>
+                      <td style={{ padding: '10px' }}>{Number.isFinite(amount) ? amount.toFixed(2) : '-'}</td>
+                      <td style={{ padding: '10px' }}><StatusBadge status={r.status} /></td>
+                      <td style={{ padding: '10px' }}>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button
+                            type="button"
+                            onClick={() => handleConfirmApproval(r)}
+                            disabled={busy}
+                            style={{ padding: '6px 12px', borderRadius: '6px', border: 'none', background: 'var(--jade)', color: '#ffffff', fontSize: '12px', fontWeight: 700, cursor: busy ? 'wait' : 'pointer' }}
+                          >
+                            {busy ? 'Working...' : 'Confirm'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRejectApproval(r)}
+                            disabled={busy}
+                            style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid var(--rose)', background: 'transparent', color: 'var(--rose)', fontSize: '12px', fontWeight: 700, cursor: busy ? 'wait' : 'pointer' }}
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      {/* Top Operational Brief Header */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #064e3b 0%, #065f46 60%, #047857 100%)',
+          background: 'linear-gradient(135deg, var(--text) 0%, var(--text-soft) 55%, var(--accent) 100%)',
           borderRadius: '16px',
           padding: '24px 28px',
           color: '#ffffff',
@@ -422,20 +747,20 @@ const Dashboard = () => {
           justifyContent: 'space-between',
           alignItems: 'center',
           marginBottom: '24px',
-          boxShadow: '0 10px 25px -5px rgba(6, 95, 70, 0.3)',
+          boxShadow: '0 10px 25px -5px rgba(26, 26, 26, 0.3)',
           flexWrap: 'wrap',
           gap: '20px',
         }}
       >
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.15)', padding: '4px 10px', borderRadius: '12px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: '8px' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#34d399' }} />
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent)' }} />
             MORNING OPERATIONAL BRIEF &bull; Property Status: High Demand
           </div>
           <h1 style={{ fontSize: '28px', fontWeight: 800, margin: '2px 0 6px', color: '#ffffff' }}>
             Executive Front-Desk Operations
           </h1>
-          <p style={{ margin: 0, fontSize: '13px', color: '#a7f3d0', maxWidth: '600px' }}>
+          <p style={{ margin: 0, fontSize: '13px', color: 'var(--surface-soft)', maxWidth: '600px' }}>
             128-key boutique inventory running near capacity. Priority VIP turn-downs scheduled for Penthouse tier.
           </p>
         </div>
@@ -443,27 +768,27 @@ const Dashboard = () => {
         {/* Top Right KPI Pills */}
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
           <div style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)', borderRadius: '12px', padding: '12px 18px', border: '1px solid rgba(255,255,255,0.12)', minWidth: '130px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#a7f3d0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OCCUPANCY RATE</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--surface-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OCCUPANCY RATE</span>
             <div style={{ fontSize: '22px', fontWeight: 800, margin: '2px 0', color: '#ffffff' }}>
               84.2% <span style={{ fontSize: '11px', color: '#fca5a5', fontWeight: 600 }}>&ndash; 4.1%</span>
             </div>
-            <span style={{ fontSize: '10px', color: '#6ee7b7' }}>vs yesterday</span>
+            <span style={{ fontSize: '10px', color: 'var(--jade)' }}>vs yesterday</span>
           </div>
 
           <div style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)', borderRadius: '12px', padding: '12px 18px', border: '1px solid rgba(255,255,255,0.12)', minWidth: '130px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#a7f3d0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>REVPAR</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--surface-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>REVPAR</span>
             <div style={{ fontSize: '22px', fontWeight: 800, margin: '2px 0', color: '#ffffff' }}>
               $284.50 <span style={{ fontSize: '11px', color: '#fca5a5', fontWeight: 600 }}>&ndash; $12.30</span>
             </div>
-            <span style={{ fontSize: '10px', color: '#6ee7b7' }}>Yield Index 112</span>
+            <span style={{ fontSize: '10px', color: 'var(--jade)' }}>Yield Index 112</span>
           </div>
 
           <div style={{ background: 'rgba(0,0,0,0.22)', backdropFilter: 'blur(8px)', borderRadius: '12px', padding: '12px 18px', border: '1px solid rgba(255,255,255,0.12)', minWidth: '130px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#a7f3d0', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ADR</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--surface-soft)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>ADR</span>
             <div style={{ fontSize: '22px', fontWeight: 800, margin: '2px 0', color: '#ffffff' }}>
               $338.00 <span style={{ fontSize: '11px', color: '#fca5a5', fontWeight: 600 }}>&ndash; $8.50</span>
             </div>
-            <span style={{ fontSize: '10px', color: '#6ee7b7' }}>Target: $350</span>
+            <span style={{ fontSize: '10px', color: 'var(--jade)' }}>Target: $350</span>
           </div>
         </div>
       </div>
@@ -471,20 +796,20 @@ const Dashboard = () => {
       {/* ─── 5 Top Metric Cards Row matching Image 1 ─── */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px', marginBottom: '24px' }}>
         {/* Card 1: Total Rooms */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>TOTAL ROOMS</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#065f46' }}>apartment</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>TOTAL ROOMS</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--jade)' }}>apartment</span>
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>
-            128 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Keys active</span>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text)' }}>
+            128 <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>Keys active</span>
           </div>
-          <div style={{ height: '6px', background: '#e2e8f0', borderRadius: '3px', margin: '10px 0 6px', overflow: 'hidden', display: 'flex' }}>
-            <div style={{ width: '84%', background: '#065f46' }} />
-            <div style={{ width: '13%', background: '#10b981' }} />
-            <div style={{ width: '3%', background: '#f59e0b' }} />
+          <div style={{ height: '6px', background: 'var(--surface-line)', borderRadius: '3px', margin: '10px 0 6px', overflow: 'hidden', display: 'flex' }}>
+            <div style={{ width: '84%', background: 'var(--jade)' }} />
+            <div style={{ width: '13%', background: 'var(--accent)' }} />
+            <div style={{ width: '3%', background: 'var(--amber)' }} />
           </div>
-          <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: '10px', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between' }}>
             <span>108 Occ</span>
             <span>16 Avail</span>
             <span>4 OOO</span>
@@ -492,78 +817,78 @@ const Dashboard = () => {
         </div>
 
         {/* Card 2: Room Allocation */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>ROOM ALLOCATION</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>pie_chart</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>ROOM ALLOCATION</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>pie_chart</span>
           </div>
           <div style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
             <div>
-              <span style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>108</span>
-              <span style={{ fontSize: '9px', fontWeight: 700, color: '#ef4444', display: 'block' }}>OCCUPIED</span>
+              <span style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>108</span>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--rose)', display: 'block' }}>OCCUPIED</span>
             </div>
             <div>
-              <span style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>16</span>
-              <span style={{ fontSize: '9px', fontWeight: 700, color: '#10b981', display: 'block' }}>VACANT CLEAN</span>
+              <span style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>16</span>
+              <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--jade)', display: 'block' }}>VACANT CLEAN</span>
             </div>
           </div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '10px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '10px' }}>
             4 keys blocked for OOO inspection
           </div>
         </div>
 
         {/* Card 3: Today's Arrivals */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>TODAY'S ARRIVALS</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#10b981' }}>login</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>TODAY'S ARRIVALS</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>login</span>
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>
-            28 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Expected total</span>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text)' }}>
+            28 <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>Expected total</span>
           </div>
           <div style={{ display: 'flex', gap: '6px', margin: '8px 0 4px' }}>
-            <span style={{ background: '#dcfce7', color: '#16a34a', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>19 Checked-In</span>
-            <span style={{ background: '#fef3c7', color: '#b45309', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>9 Pending</span>
+            <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>19 Checked-In</span>
+            <span style={{ background: 'var(--surface-line)', color: 'var(--amber)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>9 Pending</span>
           </div>
-          <div style={{ fontSize: '10px', color: '#0284c7', fontWeight: 600 }}>
+          <div style={{ fontSize: '10px', color: 'var(--accent)', fontWeight: 600 }}>
             5 VIP Arrivals &bull; View list &rarr;
           </div>
         </div>
 
         {/* Card 4: Today's Departures */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>TODAY'S DEPARTURES</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#d97706' }}>logout</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>TODAY'S DEPARTURES</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--amber)' }}>logout</span>
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>
-            22 <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Keys due</span>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text)' }}>
+            22 <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 500 }}>Keys due</span>
           </div>
           <div style={{ display: 'flex', gap: '6px', margin: '8px 0 4px' }}>
-            <span style={{ background: '#f1f5f9', color: '#475569', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>18 Cleared</span>
-            <span style={{ background: '#fee2e2', color: '#dc2626', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>4 Late Req</span>
+            <span style={{ background: 'var(--surface-soft)', color: 'var(--muted)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>18 Cleared</span>
+            <span style={{ background: '#fee2e2', color: 'var(--rose)', padding: '2px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 700 }}>4 Late Req</span>
           </div>
-          <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: '10px', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between' }}>
             <span>11:00 AM Standard</span>
-            <span style={{ color: '#16a34a', fontWeight: 700 }}>62% ON-TIME</span>
+            <span style={{ color: 'var(--accent)', fontWeight: 700 }}>62% ON-TIME</span>
           </div>
         </div>
 
         {/* Card 5: 7-Day Forward Look */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>7-DAY FORWARD LOOK</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#7c3aed' }}>calendar_month</span>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>7-DAY FORWARD LOOK</span>
+            <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>calendar_month</span>
           </div>
-          <div style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a' }}>
-            142 <span style={{ fontSize: '12px', color: '#16a34a', fontWeight: 700 }}>+14 pacing</span>
+          <div style={{ fontSize: '26px', fontWeight: 800, color: 'var(--text)' }}>
+            142 <span style={{ fontSize: '12px', color: 'var(--accent)', fontWeight: 700 }}>+14 pacing</span>
           </div>
-          <div style={{ fontSize: '11px', color: '#64748b', margin: '6px 0 4px' }}>
+          <div style={{ fontSize: '11px', color: 'var(--muted)', margin: '6px 0 4px' }}>
             Upcoming in 7-day window
           </div>
-          <div style={{ fontSize: '10px', color: '#64748b', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: '10px', color: 'var(--muted)', display: 'flex', justifyContent: 'space-between' }}>
             <span>WEEKEND FORECAST</span>
-            <strong style={{ color: '#0f172a' }}>96.8% Occ</strong>
+            <strong style={{ color: 'var(--text)' }}>96.8% Occ</strong>
           </div>
         </div>
       </div>
@@ -571,31 +896,31 @@ const Dashboard = () => {
       {/* ─── Middle Section: Yield Chart & Room Status Donut Meter ─── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '20px', marginBottom: '24px', alignItems: 'start' }}>
         {/* Left: 7-Day Yield Performance Chart */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
             <div>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>7-DAY YIELD PERFORMANCE</span>
-              <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>7-DAY YIELD PERFORMANCE</span>
+              <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: 'var(--text)' }}>
                 Occupancy Pace &amp; Daily Gross Revenue
               </h2>
             </div>
             <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#475569' }}>
-                <span style={{ width: '10px', height: '10px', background: '#065f46', borderRadius: '2px' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--muted)' }}>
+                <span style={{ width: '10px', height: '10px', background: 'var(--jade)', borderRadius: '2px' }} />
                 <span>Occupancy %</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#475569' }}>
-                <span style={{ width: '10px', height: '10px', background: '#b45309', borderRadius: '50%' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--muted)' }}>
+                <span style={{ width: '10px', height: '10px', background: 'var(--amber)', borderRadius: '50%' }} />
                 <span>Revenue ($)</span>
               </div>
-              <span style={{ background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
+              <span style={{ background: 'var(--surface-soft)', color: 'var(--muted)', padding: '3px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
                 OCT 20 &ndash; 26
               </span>
             </div>
           </div>
 
           {/* Visual Chart Bars & Trend Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', height: '180px', alignItems: 'flex-end', paddingTop: '20px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '12px', height: '180px', alignItems: 'flex-end', paddingTop: '20px', borderBottom: '1px solid var(--surface-line)', paddingBottom: '12px' }}>
             {[
               { day: 'Mon 20', rev: '$27.4k', occ: 74, h: 100 },
               { day: 'Tue 21', rev: '$29.8k', occ: 80, h: 115 },
@@ -606,26 +931,26 @@ const Dashboard = () => {
               { day: 'Sun 26', rev: '$31.5k', occ: 82, h: 120 },
             ].map((d) => (
               <div key={d.day} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end' }}>
-                <div style={{ position: 'relative', width: '32px', height: `${d.h}px`, background: '#e2e8f0', borderRadius: '6px 6px 0 0', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${d.occ}%`, background: '#065f46', borderRadius: '4px 4px 0 0' }} />
+                <div style={{ position: 'relative', width: '32px', height: `${d.h}px`, background: 'var(--surface-line)', borderRadius: '6px 6px 0 0', overflow: 'hidden' }}>
+                  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: `${d.occ}%`, background: 'var(--jade)', borderRadius: '4px 4px 0 0' }} />
                   {/* Revenue point marker */}
-                  <div style={{ position: 'absolute', top: '4px', left: '50%', transform: 'translateX(-50%)', width: '8px', height: '8px', borderRadius: '50%', background: '#b45309', border: '1.5px solid #ffffff' }} />
+                  <div style={{ position: 'absolute', top: '4px', left: '50%', transform: 'translateX(-50%)', width: '8px', height: '8px', borderRadius: '50%', background: 'var(--amber)', border: '1.5px solid #ffffff' }} />
                 </div>
-                <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', marginTop: '8px' }}>{d.day}</span>
-                <span style={{ fontSize: '10px', color: '#64748b' }}>{d.rev}</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text)', marginTop: '8px' }}>{d.day}</span>
+                <span style={{ fontSize: '10px', color: 'var(--muted)' }}>{d.rev}</span>
               </div>
             ))}
           </div>
         </div>
 
         {/* Right: Room Status Meter (Dynamic Donut Chart representation) */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', padding: '20px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
             <div>
-              <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>INVENTORY RACK</span>
-              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>Room Status Meter</h3>
+              <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>INVENTORY RACK</span>
+              <h3 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: 'var(--text)' }}>Room Status Meter</h3>
             </div>
-            <span style={{ background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '8px', fontSize: '11px', fontWeight: 700 }}>
+            <span style={{ background: 'var(--surface-soft)', color: 'var(--muted)', padding: '2px 8px', borderRadius: '8px', fontSize: '11px', fontWeight: 700 }}>
               {stats.totalRooms} Keys Total
             </span>
           </div>
@@ -637,12 +962,12 @@ const Dashboard = () => {
                 width: '130px',
                 height: '130px',
                 borderRadius: '50%',
-                background: `conic-gradient(#065f46 0% ${Math.max(stats.occupancyRate, 10)}%, #10b981 ${Math.max(stats.occupancyRate, 10)}% ${Math.min(stats.occupancyRate + 25, 90)}%, #0284c7 ${Math.min(stats.occupancyRate + 25, 90)}% 96%, #f59e0b 96% 100%)`,
+                background: `conic-gradient(var(--jade) 0% ${Math.max(stats.occupancyRate, 10)}%, var(--accent) ${Math.max(stats.occupancyRate, 10)}% ${Math.min(stats.occupancyRate + 25, 90)}%, var(--accent) ${Math.min(stats.occupancyRate + 25, 90)}% 96%, var(--amber) 96% 100%)`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 position: 'relative',
-                boxShadow: '0 4px 12px rgba(6, 95, 70, 0.15)',
+                boxShadow: '0 4px 12px rgba(26, 26, 26, 0.15)',
                 cursor: 'pointer',
               }}
               onClick={() => navigate('/staff/rooms')}
@@ -660,8 +985,8 @@ const Dashboard = () => {
                   justifyContent: 'center',
                 }}
               >
-                <strong style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a', lineHeight: 1 }}>{Math.round(stats.occupancyRate)}%</strong>
-                <span style={{ fontSize: '9px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>OCCUPIED</span>
+                <strong style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)', lineHeight: 1 }}>{Math.round(stats.occupancyRate)}%</strong>
+                <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>OCCUPIED</span>
               </div>
             </div>
           </div>
@@ -672,10 +997,10 @@ const Dashboard = () => {
               onClick={() => navigate('/staff/rooms')}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px', borderRadius: '6px' }}
             >
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#065f46' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--jade)' }} />
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>OCCUPIED</span>
-                <strong style={{ fontSize: '13px', color: '#0f172a' }}>{stats.occupiedRooms} Keys</strong>
+                <span style={{ fontSize: '10px', color: 'var(--muted)', display: 'block' }}>OCCUPIED</span>
+                <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{stats.occupiedRooms} Keys</strong>
               </div>
             </div>
 
@@ -683,10 +1008,10 @@ const Dashboard = () => {
               onClick={() => navigate('/staff/rooms')}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px', borderRadius: '6px' }}
             >
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)' }} />
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>VACANT / READY</span>
-                <strong style={{ fontSize: '13px', color: '#0f172a' }}>{stats.availableRooms} Keys</strong>
+                <span style={{ fontSize: '10px', color: 'var(--muted)', display: 'block' }}>VACANT / READY</span>
+                <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{stats.availableRooms} Keys</strong>
               </div>
             </div>
 
@@ -694,10 +1019,10 @@ const Dashboard = () => {
               onClick={() => navigate('/staff/reservations')}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px', borderRadius: '6px' }}
             >
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#0284c7' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)' }} />
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>RESERVED BLOCK</span>
-                <strong style={{ fontSize: '13px', color: '#0f172a' }}>{stats.reservedRooms} Due</strong>
+                <span style={{ fontSize: '10px', color: 'var(--muted)', display: 'block' }}>RESERVED BLOCK</span>
+                <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{stats.reservedRooms} Due</strong>
               </div>
             </div>
 
@@ -705,10 +1030,10 @@ const Dashboard = () => {
               onClick={() => navigate('/staff/rooms')}
               style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '4px', borderRadius: '6px' }}
             >
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#f59e0b' }} />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--amber)' }} />
               <div>
-                <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>MAINTENANCE OOO</span>
-                <strong style={{ fontSize: '13px', color: '#0f172a' }}>{stats.oooRooms} Keys</strong>
+                <span style={{ fontSize: '10px', color: 'var(--muted)', display: 'block' }}>MAINTENANCE OOO</span>
+                <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{stats.oooRooms} Keys</strong>
               </div>
             </div>
           </div>
@@ -716,27 +1041,27 @@ const Dashboard = () => {
       </div>
 
       {/* ─── Live Room and Table Reservation Board ─── */}
-      <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f5f9', flexWrap: 'wrap', gap: '10px' }}>
+      <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--surface-soft)', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LIVE RESERVATION BOARD</span>
-            <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>LIVE RESERVATION BOARD</span>
+            <h2 style={{ fontSize: '16px', fontWeight: 800, margin: '2px 0 0', color: 'var(--text)' }}>
               Room Bookings &amp; Table Reservations
             </h2>
           </div>
           <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <span style={{ background: '#ecfdf5', color: '#065f46', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
+            <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
               {reservations.length} Rooms
             </span>
-            <span style={{ background: '#fffbeb', color: '#b45309', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
+            <span style={{ background: 'var(--surface-line)', color: 'var(--amber)', padding: '4px 10px', borderRadius: '999px', fontSize: '11px', fontWeight: 800 }}>
               {tableReservations.length} Tables
             </span>
           </div>
         </div>
 
         {liveReservationItems.length === 0 ? (
-          <div style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-            <span className="material-symbols-outlined" style={{ fontSize: '34px', color: '#94a3b8' }}>event_busy</span>
+          <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '34px', color: 'var(--muted)' }}>event_busy</span>
             <p style={{ margin: '8px 0 0', fontSize: '13px' }}>No room or table reservations are waiting yet.</p>
           </div>
         ) : (
@@ -748,10 +1073,10 @@ const Dashboard = () => {
                 onClick={() => navigate(item.actionPath)}
                 style={{
                   textAlign: 'left',
-                  border: '1px solid #e2e8f0',
+                  border: '1px solid var(--surface-line)',
                   borderLeft: `4px solid ${item.accent}`,
                   borderRadius: '10px',
-                  background: '#f8fafc',
+                  background: 'var(--surface-soft)',
                   padding: '14px',
                   cursor: 'pointer',
                   display: 'flex',
@@ -764,16 +1089,16 @@ const Dashboard = () => {
                 </span>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <span style={{ display: 'flex', justifyContent: 'space-between', gap: '8px', alignItems: 'center' }}>
-                    <strong style={{ fontSize: '13px', color: '#0f172a' }}>{item.guestName || 'Guest'}</strong>
+                    <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{item.guestName || 'Guest'}</strong>
                     <span style={{ background: '#ffffff', color: item.accent, padding: '2px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 800 }}>
                       {item.kind}
                     </span>
                   </span>
-                  <strong style={{ display: 'block', color: '#0f172a', fontSize: '15px', marginTop: '7px' }}>{item.primary}</strong>
-                  <span style={{ display: 'block', color: '#64748b', fontSize: '12px', marginTop: '2px' }}>{item.secondary}</span>
-                  <span style={{ display: 'block', color: '#334155', fontSize: '12px', marginTop: '8px', fontWeight: 700 }}>{item.schedule}</span>
+                  <strong style={{ display: 'block', color: 'var(--text)', fontSize: '15px', marginTop: '7px' }}>{item.primary}</strong>
+                  <span style={{ display: 'block', color: 'var(--muted)', fontSize: '12px', marginTop: '2px' }}>{item.secondary}</span>
+                  <span style={{ display: 'block', color: 'var(--text-soft)', fontSize: '12px', marginTop: '8px', fontWeight: 700 }}>{item.schedule}</span>
                   <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px', gap: '8px' }}>
-                    <span style={{ color: '#64748b', fontSize: '11px' }}>{item.size}</span>
+                    <span style={{ color: 'var(--muted)', fontSize: '11px' }}>{item.size}</span>
                     <StatusBadge status={item.status} />
                   </span>
                 </span>
@@ -786,12 +1111,12 @@ const Dashboard = () => {
       {/* ─── Bottom Section: Live Arrival Manifest & Duty Dispatch / Quick Actions ─── */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '20px', alignItems: 'start', marginBottom: '32px' }}>
         {/* Left: Live Arrival Manifest Table */}
-        <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid #f1f5f9', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 20px', borderBottom: '1px solid var(--surface-soft)', flexWrap: 'wrap', gap: '10px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }} />
-              <h2 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: '#0f172a' }}>Live Arrival Manifest</h2>
-              <span style={{ background: '#ecfdf5', color: '#065f46', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)' }} />
+              <h2 style={{ fontSize: '16px', fontWeight: 800, margin: 0, color: 'var(--text)' }}>Live Arrival Manifest</h2>
+              <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
                 {manifestItems.length} Expected Next 4 Hrs
               </span>
             </div>
@@ -800,7 +1125,7 @@ const Dashboard = () => {
                 type="button"
                 className="outline-button"
                 onClick={() => setManifestFilter(manifestFilter === 'PENDING' ? 'ALL' : 'PENDING')}
-                style={{ fontSize: '11px', padding: '5px 10px', borderRadius: '6px', background: manifestFilter === 'PENDING' ? '#f0fdf4' : '#fff' }}
+                style={{ fontSize: '11px', padding: '5px 10px', borderRadius: '6px', background: manifestFilter === 'PENDING' ? 'var(--surface-line)' : '#fff' }}
               >
                 Filter: Pending Only
               </button>
@@ -832,35 +1157,35 @@ const Dashboard = () => {
                 <tr key={item.id}>
                   <td>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: '#065f46', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>
+                      <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'var(--jade)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '12px' }}>
                         {item.guestName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div>
-                        <strong style={{ fontSize: '13px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <strong style={{ fontSize: '13px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {item.guestName}
                           {item.tier && (
-                            <span style={{ background: '#0f172a', color: '#f8fafc', padding: '1px 5px', borderRadius: '4px', fontSize: '9px', fontWeight: 800 }}>
+                            <span style={{ background: 'var(--text)', color: 'var(--surface-soft)', padding: '1px 5px', borderRadius: '4px', fontSize: '9px', fontWeight: 800 }}>
                               ★ {item.tier}
                             </span>
                           )}
                         </strong>
-                        <small style={{ color: '#64748b', fontSize: '11px' }}>Res #{item.resNo} &bull; {item.nights} Nights</small>
+                        <small style={{ color: 'var(--muted)', fontSize: '11px' }}>Res #{item.resNo} &bull; {item.nights} Nights</small>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <strong style={{ color: '#0f172a', fontSize: '13px', display: 'block' }}>{item.room}</strong>
-                    <span style={{ color: '#64748b', fontSize: '11px' }}>{item.category}</span>
+                    <strong style={{ color: 'var(--text)', fontSize: '13px', display: 'block' }}>{item.room}</strong>
+                    <span style={{ color: 'var(--muted)', fontSize: '11px' }}>{item.category}</span>
                   </td>
                   <td>
-                    <strong style={{ color: '#0f172a', fontSize: '12px', display: 'block' }}>{item.eta}</strong>
-                    <span style={{ color: '#64748b', fontSize: '11px' }}>{item.travel}</span>
+                    <strong style={{ color: 'var(--text)', fontSize: '12px', display: 'block' }}>{item.eta}</strong>
+                    <span style={{ color: 'var(--muted)', fontSize: '11px' }}>{item.travel}</span>
                   </td>
                   <td>
                     <span
                       style={{
-                        background: item.hkStatus === 'ready' ? '#ecfdf5' : item.hkStatus === 'cleaning' ? '#fffbeb' : '#f1f5f9',
-                        color: item.hkStatus === 'ready' ? '#065f46' : item.hkStatus === 'cleaning' ? '#b45309' : '#475569',
+                        background: item.hkStatus === 'ready' ? 'var(--surface-soft)' : item.hkStatus === 'cleaning' ? 'var(--surface-soft)' : 'var(--surface-soft)',
+                        color: item.hkStatus === 'ready' ? 'var(--jade)' : item.hkStatus === 'cleaning' ? 'var(--amber)' : 'var(--muted)',
                         padding: '3px 8px',
                         borderRadius: '6px',
                         fontSize: '11px',
@@ -875,15 +1200,15 @@ const Dashboard = () => {
                     </span>
                   </td>
                   <td>
-                    <strong style={{ color: '#0f172a', fontSize: '12px', display: 'block' }}>{item.folio}</strong>
-                    <span style={{ color: '#16a34a', fontSize: '11px', fontWeight: 600 }}>{item.folioStatus}</span>
+                    <strong style={{ color: 'var(--text)', fontSize: '12px', display: 'block' }}>{item.folio}</strong>
+                    <span style={{ color: 'var(--jade)', fontSize: '11px', fontWeight: 600 }}>{item.folioStatus}</span>
                   </td>
                   <td style={{ textAlign: 'right' }}>
                     <button
                       type="button"
                       className="primary-button"
                       onClick={() => showToast(`Express check-in initiated for ${item.guestName}`)}
-                      style={{ padding: '6px 12px', fontSize: '11px', background: '#065f46' }}
+                      style={{ padding: '6px 12px', fontSize: '11px', background: 'var(--jade)' }}
                     >
                       Express Check In
                     </button>
@@ -893,12 +1218,12 @@ const Dashboard = () => {
             </tbody>
           </table>
 
-          <div style={{ padding: '12px 20px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Showing {manifestItems.length} active pending arrivals</span>
+          <div style={{ padding: '12px 20px', borderTop: '1px solid var(--surface-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Showing {manifestItems.length} active pending arrivals</span>
             <button
               type="button"
               onClick={() => navigate('/staff/reservations')}
-              style={{ background: 'none', border: 'none', color: '#0284c7', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+              style={{ background: 'none', border: 'none', color: 'var(--accent)', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
             >
               Open Complete Tape Chart Manifest &rarr;
             </button>
@@ -908,73 +1233,73 @@ const Dashboard = () => {
         {/* Right: Duty Dispatch & Rapid Terminal Quick Actions */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {/* Duty Dispatch: Urgent Front Desk Tasks */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+          <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
               <div>
-                <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>DUTY DISPATCH</span>
-                <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>Urgent Front Desk Tasks</h3>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>DUTY DISPATCH</span>
+                <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 0', color: 'var(--text)' }}>Urgent Front Desk Tasks</h3>
               </div>
-              <span style={{ background: '#fee2e2', color: '#dc2626', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
+              <span style={{ background: '#fee2e2', color: 'var(--rose)', width: '22px', height: '22px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: 800 }}>
                 3
               </span>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               {/* Task 1 */}
-              <div style={{ background: '#fef2f2', borderLeft: '4px solid #ef4444', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ background: '#fef2f2', borderLeft: '4px solid var(--rose)', borderRadius: '8px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <strong style={{ fontSize: '12px', color: '#991b1b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <strong style={{ fontSize: '12px', color: 'var(--rose)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>build</span>
                     Room 402 AC Inspection
                   </strong>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#dc2626', background: '#fee2e2', padding: '1px 5px', borderRadius: '3px' }}>URGENT</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--rose)', background: '#fee2e2', padding: '1px 5px', borderRadius: '3px' }}>URGENT</span>
                 </div>
-                <p style={{ margin: '0 0 8px', fontSize: '11px', color: '#7f1d1d' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '11px', color: 'var(--rose)' }}>
                   Engineering dispatched. Guest checked out; next arrival 3:00 PM.
                 </p>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  <button type="button" onClick={() => showToast('Task marked solved')} style={{ background: '#fff', border: '1px solid #fca5a5', color: '#991b1b', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
+                  <button type="button" onClick={() => showToast('Task marked solved')} style={{ background: '#fff', border: '1px solid #fca5a5', color: 'var(--rose)', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
                     Mark Solved
                   </button>
-                  <button type="button" onClick={() => showToast('Calling duty engineer...')} style={{ background: 'none', border: 'none', color: '#dc2626', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
+                  <button type="button" onClick={() => showToast('Calling duty engineer...')} style={{ background: 'none', border: 'none', color: 'var(--rose)', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
                     Call Duty Engineer
                   </button>
                 </div>
               </div>
 
               {/* Task 2 */}
-              <div style={{ background: '#fffbeb', borderLeft: '4px solid #f59e0b', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ background: 'var(--surface-line)', borderLeft: '4px solid var(--amber)', borderRadius: '8px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <strong style={{ fontSize: '12px', color: '#92400e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <strong style={{ fontSize: '12px', color: 'var(--amber)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>wine_bar</span>
                     Ste 601 Champagne &amp; Roses
                   </strong>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#b45309', background: '#fef3c7', padding: '1px 5px', borderRadius: '3px' }}>VIP AMENITY</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--amber)', background: 'var(--surface-line)', padding: '1px 5px', borderRadius: '3px' }}>VIP AMENITY</span>
                 </div>
-                <p style={{ margin: '0 0 8px', fontSize: '11px', color: '#78350f' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '11px', color: 'var(--amber)' }}>
                   For Lady Sterling arrival. Dom Pérignon 2012 chilled in cellar.
                 </p>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <button type="button" onClick={() => showToast('Amenity placement verified')} style={{ background: '#fff', border: '1px solid #fde68a', color: '#92400e', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
+                  <button type="button" onClick={() => showToast('Amenity placement verified')} style={{ background: '#fff', border: '1px solid var(--surface-line)', color: 'var(--amber)', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
                     Verify Placement
                   </button>
-                  <span style={{ fontSize: '10px', color: '#b45309', fontWeight: 600 }}>Due: 10:55 AM</span>
+                  <span style={{ fontSize: '10px', color: 'var(--amber)', fontWeight: 600 }}>Due: 10:55 AM</span>
                 </div>
               </div>
 
               {/* Task 3 */}
-              <div style={{ background: '#f0fdf4', borderLeft: '4px solid #10b981', borderRadius: '8px', padding: '12px' }}>
+              <div style={{ background: 'var(--surface-line)', borderLeft: '4px solid var(--jade)', borderRadius: '8px', padding: '12px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                  <strong style={{ fontSize: '12px', color: '#065f46', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <strong style={{ fontSize: '12px', color: 'var(--jade)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>schedule</span>
                     Room 214 Late Check-out
                   </strong>
-                  <span style={{ fontSize: '9px', fontWeight: 800, color: '#065f46', background: '#dcfce7', padding: '1px 5px', borderRadius: '3px' }}>EXTENDED 1:00 PM</span>
+                  <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--jade)', background: 'var(--surface-line)', padding: '1px 5px', borderRadius: '3px' }}>EXTENDED 1:00 PM</span>
                 </div>
-                <p style={{ margin: '0 0 8px', fontSize: '11px', color: '#166534' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '11px', color: 'var(--text)' }}>
                   Mr. Kovacs requested complementary late release. Approved by Elena V.
                 </p>
-                <button type="button" onClick={() => showToast('Housekeeping shift updated for Room 214')} style={{ background: '#fff', border: '1px solid #a7f3d0', color: '#065f46', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
+                <button type="button" onClick={() => showToast('Housekeeping shift updated for Room 214')} style={{ background: '#fff', border: '1px solid var(--surface-line)', color: 'var(--jade)', borderRadius: '4px', fontSize: '10px', padding: '3px 8px', fontWeight: 700, cursor: 'pointer' }}>
                   Update Housekeeping
                 </button>
               </div>
@@ -982,56 +1307,56 @@ const Dashboard = () => {
           </div>
 
           {/* Rapid Terminal: Front-Desk Quick Actions */}
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
-            <span style={{ fontSize: '10px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>RAPID TERMINAL</span>
-            <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 14px', color: '#0f172a' }}>Front-Desk Quick Actions</h3>
+          <div style={{ background: '#ffffff', border: '1px solid var(--surface-line)', borderRadius: '14px', padding: '18px', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+            <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>RAPID TERMINAL</span>
+            <h3 style={{ fontSize: '15px', fontWeight: 800, margin: '2px 0 14px', color: 'var(--text)' }}>Front-Desk Quick Actions</h3>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
               <button
                 type="button"
                 onClick={() => setQuickActionModal('walkIn')}
-                style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
+                style={{ background: 'var(--surface-soft)', border: '1px solid var(--surface-line)', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
               >
-                <span className="material-symbols-outlined" style={{ color: '#065f46', fontSize: '22px' }}>person_add</span>
+                <span className="material-symbols-outlined" style={{ color: 'var(--jade)', fontSize: '22px' }}>person_add</span>
                 <div>
-                  <strong style={{ fontSize: '12px', color: '#0f172a', display: 'block' }}>Walk-in Booking</strong>
-                  <span style={{ fontSize: '10px', color: '#64748b' }}>Instant Guest Check-in</span>
+                  <strong style={{ fontSize: '12px', color: 'var(--text)', display: 'block' }}>Walk-in Booking</strong>
+                  <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Instant Guest Check-in</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setQuickActionModal('keycard')}
-                style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
+                style={{ background: 'var(--surface-soft)', border: '1px solid var(--surface-line)', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
               >
-                <span className="material-symbols-outlined" style={{ color: '#0284c7', fontSize: '22px' }}>badge</span>
+                <span className="material-symbols-outlined" style={{ color: 'var(--accent)', fontSize: '22px' }}>badge</span>
                 <div>
-                  <strong style={{ fontSize: '12px', color: '#0f172a', display: 'block' }}>Issue Keycard</strong>
-                  <span style={{ fontSize: '10px', color: '#64748b' }}>RFID Encoder Ready</span>
+                  <strong style={{ fontSize: '12px', color: 'var(--text)', display: 'block' }}>Issue Keycard</strong>
+                  <span style={{ fontSize: '10px', color: 'var(--muted)' }}>RFID Encoder Ready</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setQuickActionModal('maintenance')}
-                style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
+                style={{ background: 'var(--surface-soft)', border: '1px solid var(--surface-line)', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
               >
-                <span className="material-symbols-outlined" style={{ color: '#d97706', fontSize: '22px' }}>handyman</span>
+                <span className="material-symbols-outlined" style={{ color: 'var(--amber)', fontSize: '22px' }}>handyman</span>
                 <div>
-                  <strong style={{ fontSize: '12px', color: '#0f172a', display: 'block' }}>Log Maintenance</strong>
-                  <span style={{ fontSize: '10px', color: '#64748b' }}>Ticket to Facilities</span>
+                  <strong style={{ fontSize: '12px', color: 'var(--text)', display: 'block' }}>Log Maintenance</strong>
+                  <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Ticket to Facilities</span>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setQuickActionModal('folio')}
-                style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
+                style={{ background: 'var(--surface-soft)', border: '1px solid var(--surface-line)', borderRadius: '10px', padding: '14px 10px', textAlign: 'left', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: '6px' }}
               >
-                <span className="material-symbols-outlined" style={{ color: '#7c3aed', fontSize: '22px' }}>receipt</span>
+                <span className="material-symbols-outlined" style={{ color: 'var(--accent)', fontSize: '22px' }}>receipt</span>
                 <div>
-                  <strong style={{ fontSize: '12px', color: '#0f172a', display: 'block' }}>Audit Folio</strong>
-                  <span style={{ fontSize: '10px', color: '#64748b' }}>Zero Balance Check</span>
+                  <strong style={{ fontSize: '12px', color: 'var(--text)', display: 'block' }}>Audit Folio</strong>
+                  <span style={{ fontSize: '10px', color: 'var(--muted)' }}>Zero Balance Check</span>
                 </div>
               </button>
             </div>
@@ -1045,8 +1370,8 @@ const Dashboard = () => {
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
             <div className="modal-header">
               <div>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Walk-in Guest Check-In</h3>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>Immediate reservation &amp; room assignment</p>
+                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Walk-in Guest Check-In</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--muted)' }}>Immediate reservation &amp; room assignment</p>
               </div>
               <button className="modal-close-btn" onClick={() => setQuickActionModal(null)}>
                 <span className="material-symbols-outlined">close</span>
@@ -1055,21 +1380,21 @@ const Dashboard = () => {
             <form onSubmit={handleConfirmWalkIn} style={{ padding: '20px 24px' }}>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Guest First Name</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Guest First Name</label>
                   <input type="text" required placeholder="e.g. Marcus" value={walkInData.firstName} onChange={(e) => setWalkInData({ ...walkInData, firstName: e.target.value })} className="field" />
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Guest Last Name</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Guest Last Name</label>
                   <input type="text" required placeholder="e.g. Hayes" value={walkInData.lastName} onChange={(e) => setWalkInData({ ...walkInData, lastName: e.target.value })} className="field" />
                 </div>
               </div>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Email Address</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Email Address</label>
                 <input type="email" required placeholder="guest@example.com" value={walkInData.email} onChange={(e) => setWalkInData({ ...walkInData, email: e.target.value })} className="field" />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Assign Available Room</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Assign Available Room</label>
                   <select value={walkInData.roomId} onChange={(e) => setWalkInData({ ...walkInData, roomId: e.target.value })} className="field">
                     {rooms.filter(r => r.status === 'AVAILABLE').map(r => (
                       <option key={r.id} value={r.id}>Room {r.roomNumber} ({r.roomType} - ${r.basePrice}/nt)</option>
@@ -1077,7 +1402,7 @@ const Dashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Stay Duration</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Stay Duration</label>
                   <select value={walkInData.nights} onChange={(e) => setWalkInData({ ...walkInData, nights: Number(e.target.value) })} className="field">
                     <option value={1}>1 Night</option>
                     <option value={2}>2 Nights</option>
@@ -1088,7 +1413,7 @@ const Dashboard = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
                 <button type="button" className="outline-button" onClick={() => setQuickActionModal(null)}>Cancel</button>
-                <button type="submit" className="primary-button" style={{ background: '#065f46' }}>Confirm &amp; Check In Guest</button>
+                <button type="submit" className="primary-button" style={{ background: 'var(--jade)' }}>Confirm &amp; Check In Guest</button>
               </div>
             </form>
           </div>
@@ -1099,20 +1424,20 @@ const Dashboard = () => {
         <div className="modal-backdrop" onClick={() => setQuickActionModal(null)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '440px', textAlign: 'center' }}>
             <div className="modal-header">
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Issue RFID Keycard</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Issue RFID Keycard</h3>
               <button className="modal-close-btn" onClick={() => setQuickActionModal(null)}>
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
             <div style={{ padding: '24px' }}>
-              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--surface-line)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
                 <span className="material-symbols-outlined" style={{ fontSize: '36px' }}>contactless</span>
               </div>
-              <p style={{ fontSize: '13px', color: '#64748b', margin: '0 0 18px' }}>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', margin: '0 0 18px' }}>
                 Place blank hotel RFID card onto the desktop encoder reader to write encrypted room access keys.
               </p>
               <div style={{ textAlign: 'left', marginBottom: '18px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Select Room Key to Issue</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Select Room Key to Issue</label>
                 <select className="field" id="keycard-room-sel">
                   {rooms.map(r => (
                     <option key={r.id} value={r.roomNumber}>Room {r.roomNumber} - {r.roomType}</option>
@@ -1122,7 +1447,7 @@ const Dashboard = () => {
               <button
                 type="button"
                 className="primary-button"
-                style={{ width: '100%', background: '#0284c7' }}
+                style={{ width: '100%', background: 'var(--accent)' }}
                 onClick={() => {
                   showToast('Keycard #RFID-9941 encoded successfully for Room access!');
                   setQuickActionModal(null);
@@ -1140,8 +1465,8 @@ const Dashboard = () => {
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '480px' }}>
             <div className="modal-header">
               <div>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Log Facilities Maintenance</h3>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>Dispatch immediate ticket to engineering team</p>
+                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Log Facilities Maintenance</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--muted)' }}>Dispatch immediate ticket to engineering team</p>
               </div>
               <button className="modal-close-btn" onClick={() => setQuickActionModal(null)}>
                 <span className="material-symbols-outlined">close</span>
@@ -1149,7 +1474,7 @@ const Dashboard = () => {
             </div>
             <form onSubmit={handleDispatchMaintenance} style={{ padding: '20px 24px' }}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Select Target Room</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Select Target Room</label>
                 <select value={maintData.roomNumber} onChange={(e) => setMaintData({ ...maintData, roomNumber: e.target.value })} className="field">
                   {rooms.map(r => (
                     <option key={r.id} value={r.roomNumber}>Room {r.roomNumber} ({r.roomType} - {r.status})</option>
@@ -1158,7 +1483,7 @@ const Dashboard = () => {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Issue Category</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Issue Category</label>
                   <select value={maintData.issue} onChange={(e) => setMaintData({ ...maintData, issue: e.target.value })} className="field">
                     <option value="HVAC / Air Conditioning">HVAC / Air Conditioning</option>
                     <option value="Plumbing & Shower">Plumbing &amp; Shower</option>
@@ -1167,7 +1492,7 @@ const Dashboard = () => {
                   </select>
                 </div>
                 <div>
-                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Priority Level</label>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Priority Level</label>
                   <select value={maintData.priority} onChange={(e) => setMaintData({ ...maintData, priority: e.target.value })} className="field">
                     <option value="URGENT">URGENT (Next Check-in &lt; 3hr)</option>
                     <option value="ROUTINE">ROUTINE</option>
@@ -1177,7 +1502,7 @@ const Dashboard = () => {
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
                 <button type="button" className="outline-button" onClick={() => setQuickActionModal(null)}>Cancel</button>
-                <button type="submit" className="primary-button" style={{ background: '#d97706' }}>Dispatch Maintenance Ticket</button>
+                <button type="submit" className="primary-button" style={{ background: 'var(--amber)' }}>Dispatch Maintenance Ticket</button>
               </div>
             </form>
           </div>
@@ -1189,42 +1514,42 @@ const Dashboard = () => {
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
             <div className="modal-header">
               <div>
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Guest Folio &amp; Ledger Audit</h3>
-                <p style={{ margin: '2px 0 0', fontSize: '12px', color: '#64748b' }}>Front-desk zero-balance audit and payment release</p>
+                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Guest Folio &amp; Ledger Audit</h3>
+                <p style={{ margin: '2px 0 0', fontSize: '12px', color: 'var(--muted)' }}>Front-desk zero-balance audit and payment release</p>
               </div>
               <button className="modal-close-btn" onClick={() => setQuickActionModal(null)}>
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
             <div style={{ padding: '20px 24px' }}>
-              <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '16px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+              <div style={{ background: 'var(--surface-soft)', borderRadius: '10px', padding: '16px', border: '1px solid var(--surface-line)', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
-                  <span style={{ color: '#64748b' }}>Room &amp; Suite Charges (4 Nights):</span>
+                  <span style={{ color: 'var(--muted)' }}>Room &amp; Suite Charges (4 Nights):</span>
                   <strong>$2,760.00</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
-                  <span style={{ color: '#64748b' }}>Chef Jean-Luc Dining &amp; Wine Cellar:</span>
+                  <span style={{ color: 'var(--muted)' }}>Chef Jean-Luc Dining &amp; Wine Cellar:</span>
                   <strong>$480.00</strong>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}>
-                  <span style={{ color: '#64748b' }}>Alabaster Spa Treatment &amp; Taxes:</span>
+                  <span style={{ color: 'var(--muted)' }}>Alabaster Spa Treatment &amp; Taxes:</span>
                   <strong>$180.00</strong>
                 </div>
-                <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
+                <div style={{ borderTop: '1px dashed var(--surface-line)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '14px' }}>
                   <strong>Total Account Folio:</strong>
-                  <strong style={{ color: '#065f46' }}>$3,420.00</strong>
+                  <strong style={{ color: 'var(--jade)' }}>$3,420.00</strong>
                 </div>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', fontSize: '12px' }}>
-                <span style={{ color: '#16a34a', fontWeight: 700 }}>✓ Pre-Authorization Approved (Amex Centurion)</span>
-                <span style={{ color: '#64748b' }}>Balance Due: $0.00</span>
+                <span style={{ color: 'var(--jade)', fontWeight: 700 }}>✓ Pre-Authorization Approved (Amex Centurion)</span>
+                <span style={{ color: 'var(--muted)' }}>Balance Due: $0.00</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                 <button type="button" className="outline-button" onClick={() => setQuickActionModal(null)}>Close</button>
                 <button
                   type="button"
                   className="primary-button"
-                  style={{ background: '#7c3aed' }}
+                  style={{ background: 'var(--accent)' }}
                   onClick={() => {
                     showToast('Folio audited and settled successfully! Electronic receipt dispatched to guest.');
                     setQuickActionModal(null);

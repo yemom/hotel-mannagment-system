@@ -158,9 +158,9 @@ const Guests = () => {
       {/* Header matching Image 3 */}
       <div className="section-heading" style={{ marginBottom: '20px' }}>
         <div>
-          <span className="eyebrow" style={{ color: '#065f46' }}>HOSPITALITY OPERATIONS &bull; ATELIER GRAND HOTEL</span>
-          <h1 style={{ fontSize: '26px', margin: '4px 0 0', color: '#0f172a' }}>Guest Relations &amp; Profile Directory</h1>
-          <p style={{ color: '#64748b', fontSize: '13px', margin: 0 }}>
+          <span className="eyebrow" style={{ color: 'var(--jade)' }}>HOSPITALITY OPERATIONS &bull; ATELIER GRAND HOTEL</span>
+          <h1 style={{ fontSize: '26px', margin: '4px 0 0', color: 'var(--text)' }}>Guest Relations &amp; Profile Directory</h1>
+          <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
             Centralized guest portfolio with VIP status verification, preference logs, and stay ledger.
           </p>
         </div>
@@ -168,7 +168,7 @@ const Guests = () => {
           className="primary-button"
           type="button"
           onClick={openAddModal}
-          style={{ background: '#065f46', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px' }}
+          style={{ background: 'var(--jade)', display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 18px' }}
         >
           <span className="material-symbols-outlined">person_add</span>
           <span>New Guest Profile</span>
@@ -177,52 +177,52 @@ const Guests = () => {
 
       {/* KPI Stats Strip */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'var(--surface-line)', color: 'var(--jade)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-symbols-outlined">group</span>
           </div>
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>TOTAL REGISTERED</span>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>{Math.max(filteredGuests.length, 1420)}</div>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>TOTAL REGISTERED</span>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>{Math.max(filteredGuests.length, 1420)}</div>
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'var(--surface-line)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-symbols-outlined">hotel</span>
           </div>
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>IN-HOUSE GUESTS</span>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>108</div>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>IN-HOUSE GUESTS</span>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>108</div>
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#fef3c7', color: '#b45309', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'var(--surface-line)', color: 'var(--amber)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-symbols-outlined">workspace_premium</span>
           </div>
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>VIP DIAMOND TIER</span>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>24</div>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>VIP DIAMOND TIER</span>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>24</div>
           </div>
         </div>
 
-        <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#f3e8ff', color: '#7c3aed', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', border: '1px solid var(--surface-line)', borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: 'var(--surface-line)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <span className="material-symbols-outlined">verified</span>
           </div>
           <div>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase' }}>ID VERIFIED</span>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f172a' }}>98.4%</div>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase' }}>ID VERIFIED</span>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--text)' }}>98.4%</div>
           </div>
         </div>
       </div>
 
       {/* Main Guest Table */}
-      <div className="panel" style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <div className="panel-header toolbar" style={{ padding: '14px 18px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+      <div className="panel" style={{ background: '#ffffff', borderRadius: '14px', border: '1px solid var(--surface-line)', overflow: 'hidden' }}>
+        <div className="panel-header toolbar" style={{ padding: '14px 18px', borderBottom: '1px solid var(--surface-soft)', display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ position: 'relative', flex: 1, maxWidth: '360px' }}>
-            <span className="material-symbols-outlined" style={{ position: 'absolute', left: '10px', top: '9px', color: '#94a3b8', fontSize: '18px' }}>search</span>
+            <span className="material-symbols-outlined" style={{ position: 'absolute', left: '10px', top: '9px', color: 'var(--muted)', fontSize: '18px' }}>search</span>
             <input
               className="field"
               placeholder="Search name, email, or folio ID..."
@@ -253,13 +253,13 @@ const Guests = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: '#64748b' }}>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '32px', color: 'var(--muted)' }}>
                   Loading guest profiles...
                 </td>
               </tr>
             ) : filteredGuests.length === 0 ? (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: '#64748b' }}>
+                <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: 'var(--muted)' }}>
                   No guest profiles found. Click "New Guest Profile" to add.
                 </td>
               </tr>
@@ -271,34 +271,34 @@ const Guests = () => {
                   <tr key={guest.id || guest.email}>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: isVip ? '#b45309' : '#065f46', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '13px' }}>
+                        <div style={{ width: '38px', height: '38px', borderRadius: '50%', background: isVip ? 'var(--amber)' : 'var(--jade)', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '13px' }}>
                           {initials}
                         </div>
                         <div>
-                          <strong style={{ fontSize: '14px', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <strong style={{ fontSize: '14px', color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             {guest.firstName} {guest.lastName}
                             {isVip && (
-                              <span style={{ background: '#fef3c7', color: '#92400e', padding: '1px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 800, border: '1px solid #fde68a' }}>
+                              <span style={{ background: 'var(--surface-line)', color: 'var(--amber)', padding: '1px 6px', borderRadius: '4px', fontSize: '10px', fontWeight: 800, border: '1px solid var(--surface-line)' }}>
                                 VIP
                               </span>
                             )}
                           </strong>
-                          <small style={{ color: '#64748b', fontSize: '12px' }}>Profile #ATG-{String(guest.id || 88914).padStart(5, '0')}</small>
+                          <small style={{ color: 'var(--muted)', fontSize: '12px' }}>Profile #ATG-{String(guest.id || 88914).padStart(5, '0')}</small>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <strong style={{ fontSize: '13px', color: '#334155' }}>{guest.email}</strong>
-                      <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>{guest.phone || '+1(415) 882-9014'}</p>
+                      <strong style={{ fontSize: '13px', color: 'var(--text-soft)' }}>{guest.email}</strong>
+                      <p style={{ margin: 0, fontSize: '12px', color: 'var(--muted)' }}>{guest.phone || '+1(415) 882-9014'}</p>
                     </td>
                     <td>
                       <StatusBadge status={displayGuestStatus(guest)} type="guest" />
                     </td>
                     <td>
-                      <span style={{ fontSize: '13px', color: '#334155' }}>{guest.country || 'United States'}</span>
+                      <span style={{ fontSize: '13px', color: 'var(--text-soft)' }}>{guest.country || 'United States'}</span>
                     </td>
                     <td>
-                      <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '13px' }}>
+                      <span style={{ fontWeight: 700, color: 'var(--text)', fontSize: '13px' }}>
                         {reservations.filter((r) => r.guest?.id === guest.id).length || 2} Stays
                       </span>
                     </td>
@@ -322,25 +322,25 @@ const Guests = () => {
 
       {/* Guest Detail & Edit Modal matching Image 3 */}
       {showModal && (
-        <div className="modal-backdrop" onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: '20px' }}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '780px', width: '100%', maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid #e2e8f0', padding: '28px' }}>
+        <div className="modal-backdrop" onClick={() => setShowModal(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(26, 26, 26,0.65)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1200, padding: '20px' }}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ background: '#ffffff', borderRadius: '16px', maxWidth: '780px', width: '100%', maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', border: '1px solid var(--surface-line)', padding: '28px' }}>
             {/* Modal Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #f1f5f9' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--surface-soft)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: '#065f46', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px', position: 'relative' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'var(--jade)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '16px', position: 'relative' }}>
                   {formData.firstName?.[0] || 'E'}{formData.lastName?.[0] || 'M'}
-                  <span style={{ position: 'absolute', bottom: -2, right: -2, background: '#f59e0b', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
+                  <span style={{ position: 'absolute', bottom: -2, right: -2, background: 'var(--amber)', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px' }}>
                     ★
                   </span>
                 </div>
                 <div>
-                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {formData.firstName || 'Eleanor'} {formData.lastName || 'Montgomery'}
-                    <span style={{ background: '#ecfdf5', color: '#065f46', border: '1px solid #a7f3d0', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
+                    <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', border: '1px solid var(--surface-line)', padding: '2px 8px', borderRadius: '6px', fontSize: '11px', fontWeight: 800 }}>
                       VIP Diamond
                     </span>
                   </h2>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--muted)' }}>
                     Profile #ATG-88914 &bull; Primary Guest &bull; Concierge Flagged
                   </span>
                 </div>
@@ -348,14 +348,14 @@ const Guests = () => {
               <button
                 type="button"
                 onClick={() => setShowModal(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: '4px' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', padding: '4px' }}
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
 
             {/* Navigation Tabs */}
-            <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #e2e8f0', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--surface-line)', marginBottom: '20px' }}>
               {[
                 { id: '1', label: '1. Personal Identity' },
                 { id: '2', label: '2. Classification & Preferences' },
@@ -372,8 +372,8 @@ const Guests = () => {
                     padding: '8px 14px',
                     fontSize: '13px',
                     fontWeight: activeTab === tab.id ? 700 : 500,
-                    color: activeTab === tab.id ? '#065f46' : '#64748b',
-                    borderBottom: activeTab === tab.id ? '2px solid #065f46' : '2px solid transparent',
+                    color: activeTab === tab.id ? 'var(--jade)' : 'var(--muted)',
+                    borderBottom: activeTab === tab.id ? '2px solid var(--jade)' : '2px solid transparent',
                     cursor: 'pointer',
                     marginBottom: '-1px',
                   }}
@@ -388,11 +388,11 @@ const Guests = () => {
               {activeTab === '1' && (
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#065f46' }}>badge</span>
+                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--jade)' }}>badge</span>
                       1. Personal &amp; Passport Details
                     </h3>
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--jade)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>verified</span>
                       VERIFIED ID CHECK COMPLETE
                     </span>
@@ -400,57 +400,57 @@ const Guests = () => {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>First Name *</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>First Name *</label>
                       <input
                         type="text"
                         required
                         value={formData.firstName}
                         onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Last Name *</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Last Name *</label>
                       <input
                         type="text"
                         required
                         value={formData.lastName}
                         onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       />
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '14px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Email Address *</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Email Address *</label>
                       <input
                         type="email"
                         required
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       />
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Phone Number *</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Phone Number *</label>
                       <input
                         type="text"
                         required
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       />
                     </div>
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '20px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Nationality / Country</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Nationality / Country</label>
                       <select
                         value={formData.nationality}
                         onChange={(e) => setFormData({ ...formData, nationality: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       >
                         <option value="United States (USA)">United States (USA)</option>
                         <option value="United Kingdom (UK)">United Kingdom (UK)</option>
@@ -461,15 +461,15 @@ const Guests = () => {
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Passport / Official ID Number</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Passport / Official ID Number</label>
                       <div style={{ position: 'relative' }}>
                         <input
                           type="text"
                           value={formData.passportNumber}
                           onChange={(e) => setFormData({ ...formData, passportNumber: e.target.value })}
-                          style={{ width: '100%', padding: '9px 34px 9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', fontWeight: 600 }}
+                          style={{ width: '100%', padding: '9px 34px 9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', fontWeight: 600 }}
                         />
-                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: '10px', top: '9px', color: '#10b981', fontSize: '18px' }}>verified_user</span>
+                        <span className="material-symbols-outlined" style={{ position: 'absolute', right: '10px', top: '9px', color: 'var(--accent)', fontSize: '18px' }}>verified_user</span>
                       </div>
                     </div>
                   </div>
@@ -478,20 +478,20 @@ const Guests = () => {
 
               {/* Tab 2: Classification & Directives */}
               {(activeTab === '1' || activeTab === '2') && (
-                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
-                  <h3 style={{ margin: '0 0 14px', fontSize: '14px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#f59e0b' }}>stars</span>
+                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--surface-soft)' }}>
+                  <h3 style={{ margin: '0 0 14px', fontSize: '14px', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--amber)' }}>stars</span>
                     2. Guest Classification &amp; Concierge Directives
                   </h3>
 
                   {/* Account Status Pills */}
                   <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>Account Status</label>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '6px' }}>Account Status</label>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                       {[
-                        { val: 'ACTIVE', label: 'Standard Active', bg: '#f8fafc', color: '#334155' },
-                        { val: 'VIP', label: 'VIP Status', bg: '#ecfdf5', color: '#065f46' },
-                        { val: 'BLACKLISTED', label: 'Blacklisted', bg: '#fef2f2', color: '#991b1b' },
+                        { val: 'ACTIVE', label: 'Standard Active', bg: 'var(--surface-soft)', color: 'var(--text-soft)' },
+                        { val: 'VIP', label: 'VIP Status', bg: 'var(--surface-soft)', color: 'var(--jade)' },
+                        { val: 'BLACKLISTED', label: 'Blacklisted', bg: '#fef2f2', color: 'var(--rose)' },
                       ].map((st) => (
                         <label
                           key={st.val}
@@ -501,7 +501,7 @@ const Guests = () => {
                             gap: '8px',
                             padding: '10px',
                             borderRadius: '8px',
-                            border: formData.accountStatus === st.val ? `2px solid ${st.color}` : '1px solid #cbd5e1',
+                            border: formData.accountStatus === st.val ? `2px solid ${st.color}` : '1px solid var(--surface-line)',
                             background: formData.accountStatus === st.val ? st.bg : '#ffffff',
                             cursor: 'pointer',
                             fontSize: '13px',
@@ -524,11 +524,11 @@ const Guests = () => {
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', marginBottom: '16px' }}>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>VIP Tier Recognition</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>VIP Tier Recognition</label>
                       <select
                         value={formData.vipTier}
                         onChange={(e) => setFormData({ ...formData, vipTier: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       >
                         <option value="Diamond Tier (Bespoke White-Glove)">Diamond Tier (Bespoke White-Glove)</option>
                         <option value="Gold Tier (Priority Access)">Gold Tier (Priority Access)</option>
@@ -536,27 +536,27 @@ const Guests = () => {
                       </select>
                     </div>
                     <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>Assigned In-House Suite</label>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>Assigned In-House Suite</label>
                       <input
                         type="text"
                         value={formData.assignedSuite}
                         onChange={(e) => setFormData({ ...formData, assignedSuite: e.target.value })}
-                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px' }}
+                        style={{ width: '100%', padding: '9px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px' }}
                       />
                     </div>
                   </div>
 
                   <div style={{ marginBottom: '16px' }}>
-                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#334155', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: 'var(--text-soft)', marginBottom: '4px' }}>
                       Special Preferences &amp; Concierge Directives
                     </label>
                     <textarea
                       rows="2"
                       value={formData.preferences}
                       onChange={(e) => setFormData({ ...formData, preferences: e.target.value })}
-                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #cbd5e1', fontSize: '13px', resize: 'vertical' }}
+                      style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid var(--surface-line)', fontSize: '13px', resize: 'vertical' }}
                     />
-                    <small style={{ color: '#64748b', fontSize: '11px', display: 'block', marginTop: '2px' }}>
+                    <small style={{ color: 'var(--muted)', fontSize: '11px', display: 'block', marginTop: '2px' }}>
                       Visible to Front Desk, Housekeeping Leads, and Butler Staff.
                     </small>
                   </div>
@@ -565,42 +565,42 @@ const Guests = () => {
 
               {/* Tab 3: Stay & Reservation Ledger */}
               {(activeTab === '3' || activeTab === '1') && (
-                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid var(--surface-soft)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: '#0284c7' }}>receipt_long</span>
+                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 700, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px', color: 'var(--accent)' }}>receipt_long</span>
                       3. Stay &amp; Reservation Ledger
                     </h3>
-                    <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 600 }}>12 Total Stays Logged</span>
+                    <span style={{ fontSize: '12px', color: 'var(--muted)', fontWeight: 600 }}>12 Total Stays Logged</span>
                   </div>
 
-                  <div style={{ background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--surface-soft)', borderRadius: '8px', border: '1px solid var(--surface-line)', overflow: 'hidden' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                       <thead>
-                        <tr style={{ background: '#f1f5f9', borderBottom: '1px solid #e2e8f0', textAlign: 'left' }}>
-                          <th style={{ padding: '8px 12px', fontWeight: 700, color: '#475569' }}>DATE INTERVAL</th>
-                          <th style={{ padding: '8px 12px', fontWeight: 700, color: '#475569' }}>ROOM / CATEGORY</th>
-                          <th style={{ padding: '8px 12px', fontWeight: 700, color: '#475569' }}>TOTAL AMOUNT</th>
-                          <th style={{ padding: '8px 12px', fontWeight: 700, color: '#475569' }}>SETTLEMENT</th>
+                        <tr style={{ background: 'var(--surface-soft)', borderBottom: '1px solid var(--surface-line)', textAlign: 'left' }}>
+                          <th style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--muted)' }}>DATE INTERVAL</th>
+                          <th style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--muted)' }}>ROOM / CATEGORY</th>
+                          <th style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--muted)' }}>TOTAL AMOUNT</th>
+                          <th style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--muted)' }}>SETTLEMENT</th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={{ padding: '8px 12px', color: '#0f172a', fontWeight: 600 }}>Oct 21 &ndash; Oct 26, 2024</td>
-                          <td style={{ padding: '8px 12px', color: '#334155' }}>Penthouse 701</td>
-                          <td style={{ padding: '8px 12px', fontWeight: 700, color: '#0f172a' }}>$3,200.00</td>
+                        <tr style={{ borderBottom: '1px solid var(--surface-soft)' }}>
+                          <td style={{ padding: '8px 12px', color: 'var(--text)', fontWeight: 600 }}>Oct 21 &ndash; Oct 26, 2024</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text-soft)' }}>Penthouse 701</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--text)' }}>$3,200.00</td>
                           <td style={{ padding: '8px 12px' }}>
-                            <span style={{ background: '#ecfdf5', color: '#065f46', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
+                            <span style={{ background: 'var(--surface-line)', color: 'var(--jade)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 700 }}>
                               Active In-House
                             </span>
                           </td>
                         </tr>
                         <tr>
-                          <td style={{ padding: '8px 12px', color: '#0f172a', fontWeight: 600 }}>Jul 14 &ndash; Jul 18, 2024</td>
-                          <td style={{ padding: '8px 12px', color: '#334155' }}>Executive Suite 504</td>
-                          <td style={{ padding: '8px 12px', fontWeight: 700, color: '#0f172a' }}>$2,100.00</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text)', fontWeight: 600 }}>Jul 14 &ndash; Jul 18, 2024</td>
+                          <td style={{ padding: '8px 12px', color: 'var(--text-soft)' }}>Executive Suite 504</td>
+                          <td style={{ padding: '8px 12px', fontWeight: 700, color: 'var(--text)' }}>$2,100.00</td>
                           <td style={{ padding: '8px 12px' }}>
-                            <span style={{ background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
+                            <span style={{ background: 'var(--surface-soft)', color: 'var(--muted)', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
                               Completed
                             </span>
                           </td>
@@ -614,25 +614,25 @@ const Guests = () => {
               {/* Tab 4: Folio & Billing */}
               {activeTab === '4' && (
                 <div style={{ padding: '16px 0' }}>
-                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
-                    <strong style={{ color: '#065f46', fontSize: '14px' }}>Direct Corporate Billing Pre-Approved</strong>
-                    <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#166534' }}>
+                  <div style={{ background: 'var(--surface-line)', border: '1px solid var(--surface-line)', borderRadius: '10px', padding: '16px', marginBottom: '16px' }}>
+                    <strong style={{ color: 'var(--jade)', fontSize: '14px' }}>Direct Corporate Billing Pre-Approved</strong>
+                    <p style={{ margin: '4px 0 0', fontSize: '12px', color: 'var(--text)' }}>
                       Account linked to Vanguard Corp Executive Travel Account #VG-8812. Zero personal credit card pre-auth required.
                     </p>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '13px', color: '#475569' }}>Current Running Folio Balance:</span>
-                    <strong style={{ fontSize: '15px', color: '#0f172a' }}>$3,200.00 USD (Pre-Authorized)</strong>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px', background: 'var(--surface-soft)', borderRadius: '8px', border: '1px solid var(--surface-line)' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--muted)' }}>Current Running Folio Balance:</span>
+                    <strong style={{ fontSize: '15px', color: 'var(--text)' }}>$3,200.00 USD (Pre-Authorized)</strong>
                   </div>
                 </div>
               )}
 
               {/* Modal Footer Actions */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', marginTop: '20px', borderTop: '1px solid #e2e8f0' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '20px', marginTop: '20px', borderTop: '1px solid var(--surface-line)' }}>
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  style={{ padding: '9px 18px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#475569', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
+                  style={{ padding: '9px 18px', borderRadius: '8px', border: '1px solid var(--surface-line)', background: 'var(--surface-soft)', color: 'var(--muted)', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
                 >
                   Cancel
                 </button>
@@ -643,14 +643,14 @@ const Guests = () => {
                       showToast('success', 'Guest folio generated for printing!');
                       window.print();
                     }}
-                    style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#ffffff', color: '#334155', cursor: 'pointer', fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    style={{ padding: '9px 16px', borderRadius: '8px', border: '1px solid var(--surface-line)', background: '#ffffff', color: 'var(--text-soft)', cursor: 'pointer', fontWeight: 600, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>print</span>
                     <span>Print Guest Folio</span>
                   </button>
                   <button
                     type="submit"
-                    style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', background: '#065f46', color: '#ffffff', cursor: 'pointer', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    style={{ padding: '9px 20px', borderRadius: '8px', border: 'none', background: 'var(--jade)', color: '#ffffff', cursor: 'pointer', fontWeight: 700, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
                   >
                     <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>save</span>
                     <span>Save Guest Profile</span>

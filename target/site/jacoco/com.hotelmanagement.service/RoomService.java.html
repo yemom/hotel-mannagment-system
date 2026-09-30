@@ -120,11 +120,11 @@ public class RoomService {
     }
 
     private boolean isValidRoom(Room room) {
-<span class="pc bpc" id="L123" title="2 of 6 branches missed.">        return room.getRoomNumber() != null &amp;&amp; !room.getRoomNumber().isEmpty()</span>
+<span class="pc bpc" id="L123" title="2 of 4 branches missed.">        return room.getRoomNumber() != null &amp;&amp; !room.getRoomNumber().isEmpty()</span>
 <span class="pc bpc" id="L124" title="1 of 2 branches missed.">            &amp;&amp; room.getRoomType() != null</span>
 <span class="pc bpc" id="L125" title="1 of 2 branches missed.">            &amp;&amp; room.getBasePrice() != null</span>
 <span class="fc bfc" id="L126" title="All 2 branches covered.">            &amp;&amp; pricingService.isValidPrice(room.getBasePrice())</span>
-<span class="pc bpc" id="L127" title="1 of 2 branches missed.">            &amp;&amp; room.getCapacity() != null &amp;&amp; room.getCapacity() &gt; 0;</span>
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">            &amp;&amp; room.getCapacity() != null &amp;&amp; room.getCapacity() &gt; 0;</span>
     }
 
     private boolean isValidDateRange(LocalDate checkIn, LocalDate checkOut) {

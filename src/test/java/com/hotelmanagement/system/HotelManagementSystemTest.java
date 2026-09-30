@@ -194,6 +194,17 @@ class HotelManagementSystemTest extends BaseSystemTest {
 
                 SearchRoomsPage search = new SearchRoomsPage(driver);
 
+                /*
+                 * Room 301 is reserved by every end-to-end run for the same stay
+                 * window. Release any still-active overlapping reservation first so
+                 * this run is repeatable - the backend correctly refuses double
+                 * bookings for the same room and dates.
+                 */
+                releaseRoomForStay(
+                                "301",
+                                checkIn,
+                                checkOut);
+
                 search.openBookingTab();
 
                 pauseForVisual();

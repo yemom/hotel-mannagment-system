@@ -25,6 +25,15 @@ public abstract class BaseSystemTest {
                         "frontend.url",
                         "http://localhost:5173");
 
+        /**
+         * REST base of the running Spring Boot backend. The application is deployed
+         * with {@code server.servlet.context-path=/api} and every controller is
+         * mapped under {@code /api/**}, so the effective prefix is {@code /api/api}.
+         */
+        protected static final String BACKEND_URL = System.getProperty(
+                        "backend.url",
+                        "http://localhost:8085/api/api");
+
         private final long visualPauseMs = Long.parseLong(
                         System.getProperty(
                                         "visual.pause.ms",
@@ -107,6 +116,136 @@ public abstract class BaseSystemTest {
                                 .window()
                                 .maximize();
         }
+
+        /**
+         * Releases a room for the requested stay window so an end-to-end run stays
+         * repeatable.
+         *
+         * <p>
+         * The backend intentionally refuses overlapping stays for the same room
+         * (a real double-booking guard), therefore reservation rows left behind by
+         * an earlier (possibly failed) run would otherwise block the next one.
+         * Every overlapping, still-active reservation for that room is cancelled
+         * through the public REST API before the browser starts booking.
+         * </p>
+         *
+         * @param roomNumber room to release, e.g. {@code 301}
+         * @param checkIn    ISO check-in date of the stay about to be booked
+         * @param checkOut   ISO check-out date of the stay about to be booked
+         */
+        protected void releaseRoomForStay(
+                        String roomNumber,
+                        String checkIn,
+                        String checkOut) {
+
+                try {
+
+                        java.net.http.HttpClient client = java.net.http.HttpClient
+                                        .newHttpClient();
+
+                        java.net.http.HttpRequest listRequest = java.net.http.HttpRequest
+                                        .newBuilder(
+                                                        java.net.URI.create(
+                                                                        BACKEND_URL + "/reservations"))
+                                        .GET()
+                                        .build();
+
+                        java.net.http.HttpResponse<String> listResponse = client.send(
+                                        listRequest,
+                                        java.net.http.HttpResponse.BodyHandlers.ofString());
+
+                        if (listResponse.statusCode() != 200) {
+
+                                System.err.println(
+                                                "Room release skipped: backend returned "
+                                                                + listResponse.statusCode());
+
+                                return;
+                        }
+
+                        com.fasterxml.jackson.databind.JsonNode rows = new com.fasterxml.jackson.databind.ObjectMapper()
+                                        .readTree(
+                                                        listResponse.body());
+
+                        java.time.LocalDate wantedIn = java.time.LocalDate.parse(
+                                        checkIn);
+
+                        java.time.LocalDate wantedOut = java.time.LocalDate.parse(
+                                        checkOut);
+
+
+                        for (com.fasterxml.jackson.databind.JsonNode row : rows) {
+
+                                if (!roomNumber.equals(
+                                                row.path("room")
+                                                                .path("roomNumber")
+                                                                .asText(""))) {
+
+                                        continue;
+                                }
+
+                                String status = row.path("status")
+                                                .asText("");
+
+                                if ("CANCELLED".equals(status)
+                                                || "COMPLETED".equals(status)
+                                                || "CHECKED_OUT".equals(status)) {
+
+                                        continue;
+                                }
+
+                                java.time.LocalDate rowIn = java.time.LocalDate.parse(
+                                                row.path("checkInDate")
+                                                                .asText());
+
+                                java.time.LocalDate rowOut = java.time.LocalDate.parse(
+                                                row.path("checkOutDate")
+                                                                .asText());
+
+                                boolean overlaps = rowIn.isBefore(wantedOut)
+                                                && rowOut.isAfter(wantedIn);
+
+                                if (!overlaps) {
+
+                                        continue;
+                                }
+
+                                long reservationId = row.path("id")
+                                                .asLong();
+
+                                java.net.http.HttpRequest cancelRequest = java.net.http.HttpRequest
+                                                .newBuilder(
+                                                                java.net.URI.create(
+                                                                                BACKEND_URL
+                                                                                                + "/reservations/"
+                                                                                                + reservationId
+                                                                                                + "/cancel"))
+                                                .POST(
+                                                                java.net.http.HttpRequest.BodyPublishers
+                                                                                .noBody())
+                                                .build();
+
+                                client.send(
+                                                cancelRequest,
+                                                java.net.http.HttpResponse.BodyHandlers
+                                                                .ofString());
+
+                                System.out.println(
+                                                "Released Room " + roomNumber
+                                                                + " by cancelling overlapping reservation #"
+                                                                + reservationId);
+                        }
+
+                } catch (Exception e) {
+
+                        System.err.println(
+                                        "Could not release Room "
+                                                        + roomNumber
+                                                        + ": "
+                                                        + e.getMessage());
+                }
+        }
+
 
         protected void pauseForVisual() {
 

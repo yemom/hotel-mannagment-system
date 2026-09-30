@@ -1,0 +1,130 @@
+          {/* --- Live itinerary: real rows from the database for this guest --- */}
+          <section className="itinerary-list-section">
+            <div className="itinerary-list-head">
+              <div>
+                <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+                  LIVE FROM YOUR FOLIO
+                </span>
+                <h2>Your Upcoming Reservations</h2>
+                <p>
+                  Every row below is read from the hotel database - room stays, dining tables and spa
+                  rituals booked under your account.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="outline-button"
+                  onClick={() => setActiveTab('reservations')}
+                >
+                  <span className="material-symbols-outlined">event_note</span>
+                  <span>My Reservations</span>
+                </button>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={() => setActiveTab('spa')}
+                >
+                  <span className="material-symbols-outlined">spa</span>
+                  <span>Reserve Spa</span>
+                </button>
+              </div>
+            </div>
+
+            {loadingReservations || loadingTableRes || loadingSpaRes ? (
+              <div className="catalog-loading">
+                <span className="spinner" />
+                <p>Loading your reservations...</p>
+              </div>
+            ) : reservationsError || tableResError || spaResError ? (
+              <div className="api-error-panel" role="alert">
+                <span className="material-symbols-outlined">error</span>
+                <div>
+                  <strong>We couldn&apos;t load your reservations.</strong>
+                  <p>{reservationsError || tableResError || spaResError}</p>
+                </div>
+                <button type="button" className="outline-button" onClick={reloadAllReservations}>
+                  Try Again
+                </button>
+              </div>
+            ) : upcomingBookings.length === 0 ? (
+              <div className="empty-card" style={{ padding: '48px 20px', textAlign: 'center' }}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: '44px', color: 'var(--muted)' }}
+                >
+                  event_available
+                </span>
+                <h3 style={{ marginTop: '12px' }}>No reservations on your account yet</h3>
+                <p style={{ color: 'var(--muted)' }}>
+                  Choose a suite below to start a stay, or reserve a dining table or spa ritual.
+                </p>
+              </div>
+            ) : (
+              <div className="itinerary-list-panel">
+                <div className="table-wrap">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Reference</th>
+                        <th>Reservation</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {upcomingBookings.map((item) => {
+                        const bucket = statusBucket(item.status);
+                        const statusClass =
+                          bucket === 'CONFIRMED'
+                            ? 'status-green'
+                            : bucket === 'CANCELLED'
+                            ? 'status-red'
+                            : bucket === 'COMPLETED'
+                            ? 'status-navy'
+                            : 'status-amber';
+                        const amount = Number(item.amount);
+                        return (
+                          <tr key={item.key}>
+                            <td>
+                              <span className="itinerary-type-chip">
+                                {item.type === 'ROOM'
+                                  ? 'Room'
+                                  : item.type === 'TABLE'
+                                  ? 'Dining'
+                                  : 'Spa'}
+                              </span>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+                                #{item.id}
+                              </div>
+                            </td>
+                            <td>
+                              <strong>{item.title}</strong>
+                            </td>
+                            <td>
+                              {item.date}
+                              {item.endDate ? ` - ${item.endDate}` : ''}
+                            </td>
+                            <td>{item.time}</td>
+                            <td>{item.guests || 1} Guests</td>
+                            <td>
+                              <span className={`status-badge ${statusClass}`}>{item.status}</span>
+                            </td>
+                            <td>
+                              {Number.isFinite(amount) && item.amount != null
+                                ? `$${amount.toFixed(2)}`
+                                : '-'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </section>
+

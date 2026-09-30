@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { CalendarGrid, AnalogClock } from './ReservationDateTimePicker';
+
+const isoToday = () => new Date().toISOString().split('T')[0];
 
 const ClientBookingModal = ({
   room,
@@ -13,9 +16,28 @@ const ClientBookingModal = ({
       new Date(Date.now() + 86400000).toISOString().split('T')[0]
   );
   const [modalGuests, setModalGuests] = useState(Number(searchDates.guests || 2));
+  const [arrivalTime, setArrivalTime] = useState(searchDates.arrivalTime || '15:00');
   const [specialRequests, setSpecialRequests] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  /** Choosing a check-in date on the calendar keeps the stay at least one night. */
+  const handleCheckInPick = (iso) => {
+    setModalCheckIn(iso);
+    if (!modalCheckOut || modalCheckOut <= iso) {
+      const next = new Date(iso);
+      next.setDate(next.getDate() + 1);
+      setModalCheckOut(next.toISOString().split('T')[0]);
+    }
+  };
+
+  /** Estimated arrival is recorded with the reservation notes (15:00 is standard). */
+  const buildSpecialRequests = () => {
+    const notes = (specialRequests || '').trim();
+    if (!arrivalTime || arrivalTime === '15:00') return notes;
+    const arrivalNote = `Estimated arrival ${arrivalTime}`;
+    return notes ? `${notes} · ${arrivalNote}` : arrivalNote;
+  };
 
   // Calculate nights
   const start = new Date(modalCheckIn);
@@ -45,7 +67,7 @@ const ClientBookingModal = ({
         checkInDate: modalCheckIn,
         checkOutDate: modalCheckOut,
         numberOfGuests: Number(modalGuests || 1),
-        specialRequests,
+        specialRequests: buildSpecialRequests(),
         totalPrice: grandTotal,
       });
     } catch (err) {
@@ -56,11 +78,11 @@ const ClientBookingModal = ({
 
   return (
     <div className="modal-backdrop">
-      <div className="modal-card booking-summary-modal" style={{ maxWidth: '640px' }}>
+      <div className="modal-card booking-summary-modal" style={{ maxWidth: '880px' }}>
         {/* Header */}
         <div className="modal-header">
           <div>
-            <span className="eyebrow" style={{ color: '#064e3b' }}>የ-mom Hotel Accommodations</span>
+            <span className="eyebrow" style={{ color: 'var(--accent)' }}>Aurelia Grand Accommodations</span>
             <h2>Confirm Your Room Stay</h2>
           </div>
           <button type="button" className="icon-button" onClick={onClose} aria-label="Close">
@@ -98,7 +120,7 @@ const ClientBookingModal = ({
             </div>
 
             {/* Editable Stay Dates & Guests Selection */}
-            <div className="summary-section" style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div className="summary-section" style={{ background: 'var(--surface-soft)', padding: '16px', borderRadius: '12px', border: '1px solid var(--surface-line)' }}>
               <div className="summary-section-title" style={{ marginBottom: '12px' }}>
                 <span className="material-symbols-outlined">calendar_month</span>
                 <h4>Dates &amp; Guest Count</h4>
@@ -154,9 +176,55 @@ const ClientBookingModal = ({
                 </select>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: '#475569', marginTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--muted)', marginTop: '8px' }}>
                 <span>Duration: <strong>{nights} {nights === 1 ? 'Night' : 'Nights'}</strong></span>
                 <span>Check-in: 3:00 PM · Check-out: 11:00 AM</span>
+              </div>
+            </div>
+
+            {/* Calendar & analog clock — pick the stay dates visually */}
+            <div className="summary-section">
+              <div className="summary-section-title">
+                <span className="material-symbols-outlined">calendar_month</span>
+                <h4>Calendar &amp; Arrival Time</h4>
+              </div>
+              <div className="rdt-picker">
+                <div className="rdt-picker-col">
+                  <span className="rdt-col-label">
+                    <span className="material-symbols-outlined">login</span>
+                    Check-in date
+                  </span>
+                  <CalendarGrid
+                    value={modalCheckIn}
+                    onChange={handleCheckInPick}
+                    minDate={isoToday()}
+                    idPrefix="room-checkin"
+                  />
+                </div>
+                <div className="rdt-picker-col">
+                  <span className="rdt-col-label">
+                    <span className="material-symbols-outlined">logout</span>
+                    Check-out date
+                  </span>
+                  <CalendarGrid
+                    value={modalCheckOut}
+                    onChange={setModalCheckOut}
+                    minDate={modalCheckIn || isoToday()}
+                    idPrefix="room-checkout"
+                  />
+                </div>
+                <div className="rdt-picker-col">
+                  <span className="rdt-col-label">
+                    <span className="material-symbols-outlined">schedule</span>
+                    Estimated arrival
+                  </span>
+                  <AnalogClock
+                    value={arrivalTime}
+                    onChange={setArrivalTime}
+                    label="Estimated arrival"
+                    idPrefix="room-arrival"
+                  />
+                </div>
               </div>
             </div>
 
@@ -183,7 +251,7 @@ const ClientBookingModal = ({
                 </div>
                 <div className="prefill-item">
                   <span className="prefill-label">Hotel Member</span>
-                  <span className="prefill-val prefill-badge">የ-mom VIP Guest</span>
+                  <span className="prefill-val prefill-badge">Aurelia Grand VIP Guest</span>
                 </div>
               </div>
             </div>

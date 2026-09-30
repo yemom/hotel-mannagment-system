@@ -58,7 +58,7 @@ public class TableReservation {
     }
     public boolean canMarkNoShow() {
 <span class="pc bpc" id="L60" title="1 of 2 branches missed.">        return TableReservationStatus.CONFIRMED.equals(status) ||</span>
-<span class="nc bnc" id="L61" title="All 2 branches missed.">               TableReservationStatus.PENDING.equals(status);</span>
+<span class="pc bnc" id="L61" title="All 2 branches missed.">               TableReservationStatus.PENDING.equals(status);</span>
     }
 
 <span class="pc bpc" id="L64" title="1 of 2 branches missed.">    public void confirm()    { if (canConfirm())    status = TableReservationStatus.CONFIRMED;  else throw new IllegalStateException(&quot;Cannot confirm&quot;); }</span>

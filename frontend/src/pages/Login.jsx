@@ -75,9 +75,9 @@ const Login = () => {
         <div className="auth-card">
           {/* Hotel Brand Header */}
           <div className="auth-brand">
-            <div className="auth-brand-mark">የ</div>
+            <div className="auth-brand-mark">A</div>
             <div>
-              <h2 className="auth-brand-title">የ-mom Hotel</h2>
+              <h2 className="auth-brand-title">Aurelia Grand</h2>
               <span className="auth-brand-subtitle">Boutique Stays & Hospitality PMS</span>
             </div>
           </div>
@@ -124,26 +124,25 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   style={{ paddingRight: '40px' }}
                 />
-                <button
-                  type="button"
-                  className="password-toggle-btn"
-                  onClick={() => setShowPassword(!showPassword)}
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                  tabIndex={-1}
-                  style={{
-                    position: 'absolute',
-                    right: '12px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: '#64748b',
-                    padding: 0,
-                    display: 'flex',
-                    alignItems: 'center',
-                  }}
-                >
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--muted)',
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}
+                  >
                   <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>
                     {showPassword ? 'visibility_off' : 'visibility'}
                   </span>
@@ -230,7 +229,7 @@ const Login = () => {
               </div>
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} style={{ marginTop: '16px' }}>
-                <p style={{ color: '#64748b', fontSize: '14px', lineHeight: '1.5' }}>
+                <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: '1.5' }}>
                   Enter your registered email address and we'll send you instructions to reset your password.
                 </p>
                 <div className="form-group" style={{ marginTop: '16px' }}>

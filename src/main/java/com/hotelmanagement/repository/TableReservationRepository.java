@@ -15,4 +15,12 @@ public interface TableReservationRepository extends JpaRepository<TableReservati
     List<TableReservation> findByStatus(TableReservationStatus status);
     List<TableReservation> findByRestaurantTableIdAndReservationDateAndTimeSlot(
         Long tableId, LocalDate date, String timeSlot);
+
+    /**
+     * Finds a conflicting booking for the same table/date/time slot, excluding one
+     * reservation id (used when re-scheduling so a booking does not clash with itself).
+     */
+    List<TableReservation> findByRestaurantTableIdAndReservationDateAndTimeSlotAndStatusNotAndIdNot(
+        Long tableId, LocalDate date, String timeSlot,
+        TableReservationStatus status, Long excludeId);
 }

@@ -2,187 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
-import { roomAPI, reservationAPI } from '../services/api';
+import { roomAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { withRoomImage } from '../utils/propertyImages';
+import { goToReserve } from '../utils/reserve';
 
-const ROOM_IMAGES = {
-  SINGLE: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80',
-  DOUBLE: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80',
-  SUITE: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?auto=format&fit=crop&w=1000&q=80',
-  DELUXE: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80',
-  PENTHOUSE: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1000&q=80',
-};
-
-const SEED_ROOMS = [
-  {
-    id: 101,
-    roomNumber: '101',
-    roomType: 'SINGLE',
-    basePrice: 85,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Cozy retreat with a plush queen bed, dedicated ergonomic workstation, and quiet garden views.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 102,
-    roomNumber: '102',
-    roomType: 'DOUBLE',
-    basePrice: 140,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Spacious modern room featuring two premium queen beds, artisan coffee bar, and skyline windows.',
-    hasBathtub: true,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 103,
-    roomNumber: '103',
-    roomType: 'SINGLE',
-    basePrice: 95,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Serene corner single with floor-to-ceiling windows, rain shower, and acoustic soundproofing.',
-    hasBathtub: false,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 104,
-    roomNumber: '104',
-    roomType: 'SINGLE',
-    basePrice: 90,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Sunlit garden single with French doors leading to a private botanical courtyard.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: false,
-  },
-  {
-    id: 201,
-    roomNumber: '201',
-    roomType: 'SUITE',
-    basePrice: 220,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Executive boutique suite with a partitioned salon lounge, Italian marble bath, and private terrace.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 202,
-    roomNumber: '202',
-    roomType: 'DOUBLE',
-    basePrice: 155,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Superior double with sweeping courtyard views, king featherbed, and artisan refreshments.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 203,
-    roomNumber: '203',
-    roomType: 'DOUBLE',
-    basePrice: 145,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Artisan twin double with custom timber furnishings, designer reading nook, and espresso bar.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 204,
-    roomNumber: '204',
-    roomType: 'DOUBLE',
-    basePrice: 160,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Corner double suite with wrap-around city panorama, heated bathroom floors, and balcony.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 301,
-    roomNumber: '301',
-    roomType: 'DELUXE',
-    basePrice: 290,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Ultra-luxurious corner suite with panoramic skyline views, walk-in dressing room, and deep soaking tub.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 302,
-    roomNumber: '302',
-    roomType: 'SUITE',
-    basePrice: 240,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Grand family suite with dual vanity bath, private sun deck, and plush sleeper sofa.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 303,
-    roomNumber: '303',
-    roomType: 'SUITE',
-    basePrice: 255,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Romantic bridal suite with private jacuzzi whirlpool, chilled champagne service, and city lights.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 304,
-    roomNumber: '304',
-    roomType: 'DELUXE',
-    basePrice: 310,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Royal deluxe family suite with dual king suites, private dining nook, and full luxury amenities.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 401,
-    roomNumber: '401',
-    roomType: 'PENTHOUSE',
-    basePrice: 480,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 402,
-    roomNumber: '402',
-    roomType: 'PENTHOUSE',
-    basePrice: 520,
-    capacity: 5,
-    status: 'AVAILABLE',
-    description: 'Sky-level penthouse estate with private rooftop plunge pool, dedicated chef service, and helipad views.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-];
+// Guest room & bed photography by room type
 
 const PublicRooms = () => {
   const [searchParams] = useSearchParams();
@@ -214,48 +39,58 @@ const PublicRooms = () => {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Booking Modal & Details
-  const [activeBookingRoom, setActiveBookingRoom] = useState(null);
-  const [specialRequests, setSpecialRequests] = useState('');
-  const [submittingBooking, setSubmittingBooking] = useState(false);
-  const [bookingSuccessNotice, setBookingSuccessNotice] = useState(null);
+  // Booking state — the public catalogue only *browses*; reserving happens in the client area.
+  const [catalogError, setCatalogError] = useState('');
+  const [roomTypeOptions, setRoomTypeOptions] = useState([]);
 
-  // Fetch real rooms from backend
+  // Fetch real rooms from the backend. The database is the single source of truth.
+  const loadCatalog = async () => {
+    setLoading(true);
+    setCatalogError('');
+    try {
+      const res = await roomAPI.getAll();
+      const serverList = res.data && Array.isArray(res.data) ? res.data : [];
+      setRooms(serverList.map(withRoomImage));
+      setRoomTypeOptions(
+        Array.from(new Set(serverList.map((r) => r.roomType).filter(Boolean))).sort()
+      );
+    } catch (err) {
+      setRooms([]);
+      setCatalogError(
+        err?.response?.data?.message ||
+          'We could not load the room catalogue. Please check your connection and retry.'
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadCatalog = async () => {
-      setLoading(true);
-      try {
-        const res = await roomAPI.getAll();
-        const serverList = res.data && Array.isArray(res.data) ? res.data : [];
-        const serverNumbers = new Set(serverList.map((r) => r.roomNumber));
-        const missingSeeds = SEED_ROOMS.filter((s) => !serverNumbers.has(s.roomNumber));
-        const merged = [...serverList, ...missingSeeds].map((r) => ({
-          ...r,
-          image: ROOM_IMAGES[r.roomType] || ROOM_IMAGES.SINGLE,
-        }));
-        setRooms(merged);
-
-        // If 'select' parameter was given in URL, auto-open modal for that room if logged in
-        if (selectedParamRoom) {
-          const target = merged.find((r) => r.roomNumber === selectedParamRoom);
-          if (target) {
-            handleBookNowClick(target);
-          }
-        }
-      } catch (err) {
-        console.warn('Backend rooms catalog load failed, using catalog seeds:', err);
-        setRooms(
-          SEED_ROOMS.map((r) => ({
-            ...r,
-            image: ROOM_IMAGES[r.roomType] || ROOM_IMAGES.SINGLE,
-          }))
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
     loadCatalog();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // When arriving from the landing page search with ?select=<roomNumber>,
+  // send the visitor straight into the reservation flow for that room.
+  useEffect(() => {
+    if (!selectedParamRoom || rooms.length === 0) return;
+    const target = rooms.find((r) => String(r.roomNumber) === String(selectedParamRoom));
+    if (target) {
+      goToReserve(navigate, {
+        user: currentUser,
+        target: '/client?tab=book',
+        intent: {
+          type: 'ROOM',
+          roomId: target.id,
+          roomNumber: target.roomNumber,
+          checkInDate: checkIn,
+          checkOutDate: checkOut,
+          numberOfGuests: Number(guests || 1),
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms, selectedParamRoom]);
 
   // Filtered rooms
   const filteredRooms = useMemo(() => {
@@ -277,11 +112,15 @@ const PublicRooms = () => {
     });
   }, [rooms, selectedType, maxPrice, guests, keyword]);
 
-  // Handle "Book Now" click
-  const handleBookNowClick = (room) => {
-    if (!currentUser) {
-      // Save intent to sessionStorage
-      const intent = {
+  // ── Reserve a room ──────────────────────────────────────────────────────
+  // The public catalogue never creates reservations (and never fabricates a
+  // "CONFIRMED" record). Visitors are sent to sign in; authenticated clients
+  // continue into the reservation flow on the client area.
+  const handleReserveRoom = (room) =>
+    goToReserve(navigate, {
+      user: currentUser,
+      target: '/client?tab=book',
+      intent: {
         type: 'ROOM',
         roomId: room.id,
         roomNumber: room.roomNumber,
@@ -289,84 +128,8 @@ const PublicRooms = () => {
         checkInDate: checkIn,
         checkOutDate: checkOut,
         numberOfGuests: Number(guests || 1),
-        basePrice: room.basePrice,
-      };
-      sessionStorage.setItem('pending_booking', JSON.stringify(intent));
-      navigate('/login', {
-        state: {
-          redirectTo: `/rooms?select=${room.roomNumber}`,
-          bookingIntent: intent,
-        },
-      });
-      return;
-    }
-
-    // Authenticated user: open modal
-    setActiveBookingRoom(room);
-  };
-
-  // Submit Room Reservation
-  const handleConfirmReservation = async (e) => {
-    e.preventDefault();
-    if (!activeBookingRoom) return;
-
-    setSubmittingBooking(true);
-    try {
-      const payload = {
-        guestId: currentUser.id || 1,
-        roomId: activeBookingRoom.id,
-        checkInDate: checkIn,
-        checkOutDate: checkOut,
-        numberOfGuests: Number(guests || 1),
-        specialRequests: specialRequests || 'Bespoke high-floor preference',
-      };
-
-      let created = null;
-      try {
-        const res = await reservationAPI.create(payload);
-        if (res && res.data) {
-          created = res.data;
-        }
-      } catch (err) {
-        console.warn('Backend reservation create offline, storing locally:', err);
-      }
-
-      if (!created) {
-        created = {
-          id: Date.now(),
-          guest: currentUser,
-          room: activeBookingRoom,
-          checkInDate: checkIn,
-          checkOutDate: checkOut,
-          numberOfGuests: Number(guests || 1),
-          status: 'CONFIRMED',
-          specialRequests,
-        };
-      }
-
-      // Sync local storage for client portal
-      try {
-        const key = `client_res_${currentUser.email}`;
-        const existing = JSON.parse(localStorage.getItem(key) || '[]');
-        localStorage.setItem(key, JSON.stringify([created, ...existing]));
-      } catch (_) {}
-
-      // Clear pending intent
-      sessionStorage.removeItem('pending_booking');
-
-      setBookingSuccessNotice({
-        roomNumber: activeBookingRoom.roomNumber,
-        checkIn,
-        checkOut,
-        guests,
-      });
-      setActiveBookingRoom(null);
-    } catch (err) {
-      alert(err.message || 'Failed to complete reservation. Please try again.');
-    } finally {
-      setSubmittingBooking(false);
-    }
-  };
+      },
+    });
 
   return (
     <div className="public-rooms-page">
@@ -467,23 +230,16 @@ const PublicRooms = () => {
         </div>
       </div>
 
-      {/* Success Banner if booking confirmed */}
-      {bookingSuccessNotice && (
+      {/* API error state with retry */}
+      {catalogError && (
         <div className="section-container" style={{ marginTop: '24px' }}>
-          <div className="booking-confirmation-banner">
-            <span className="material-symbols-outlined" style={{ fontSize: '32px', color: '#059669' }}>
-              verified
-            </span>
-            <div>
-              <h3>Reservation Confirmed — Suite {bookingSuccessNotice.roomNumber}</h3>
-              <p>
-                {bookingSuccessNotice.checkIn} to {bookingSuccessNotice.checkOut} &bull;{' '}
-                {bookingSuccessNotice.guests} Guests. A confirmation notice has been saved to your account.
-              </p>
-            </div>
-            <Link to="/client" className="public-cta-btn" style={{ marginLeft: 'auto' }}>
-              View in My Reservations
-            </Link>
+          <div className="api-error-state" role="alert">
+            <span className="material-symbols-outlined">cloud_off</span>
+            <h3>We couldn&apos;t load our accommodations</h3>
+            <p>{catalogError}</p>
+            <button type="button" className="public-cta-btn" onClick={loadCatalog}>
+              Try Again
+            </button>
           </div>
         </div>
       )}
@@ -502,7 +258,7 @@ const PublicRooms = () => {
           </div>
         ) : filteredRooms.length === 0 ? (
           <div className="catalog-empty">
-            <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>
+            <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)' }}>
               hotel
             </span>
             <h3>No suites match your current criteria</h3>
@@ -525,7 +281,7 @@ const PublicRooms = () => {
               <article key={room.id} className="catalog-room-card">
                 <div className="card-media">
                   <img
-                    src={room.image || ROOM_IMAGES[room.roomType] || ROOM_IMAGES.SINGLE}
+                    src={room.image}
                     alt={`Suite ${room.roomNumber} - ${room.roomType}`}
                     loading="lazy"
                   />
@@ -574,7 +330,7 @@ const PublicRooms = () => {
                     <button
                       type="button"
                       className="card-book-btn"
-                      onClick={() => handleBookNowClick(room)}
+                      onClick={() => handleReserveRoom(room)}
                     >
                       {currentUser ? 'Book Now' : 'Reserve'}
                     </button>
@@ -585,79 +341,6 @@ const PublicRooms = () => {
           </div>
         )}
       </main>
-
-      {/* Reservation Modal for Authenticated User */}
-      {activeBookingRoom && (
-        <div className="modal-backdrop">
-          <div className="modal-card" style={{ maxWidth: '540px' }}>
-            <div className="section-heading">
-              <div>
-                <span className="eyebrow">CONFIRM RESERVATION</span>
-                <h2>Suite {activeBookingRoom.roomNumber} &bull; {activeBookingRoom.roomType}</h2>
-              </div>
-              <button
-                type="button"
-                className="icon-button"
-                onClick={() => setActiveBookingRoom(null)}
-                aria-label="Close"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
-
-            <form onSubmit={handleConfirmReservation} style={{ marginTop: '20px' }}>
-              <div className="reservation-summary-box">
-                <div className="summary-row">
-                  <span>Rate:</span>
-                  <strong>${activeBookingRoom.basePrice} per night</strong>
-                </div>
-                <div className="summary-row">
-                  <span>Dates:</span>
-                  <strong>{checkIn} to {checkOut}</strong>
-                </div>
-                <div className="summary-row">
-                  <span>Guest Count:</span>
-                  <strong>{guests} Guests (Capacity: {activeBookingRoom.capacity})</strong>
-                </div>
-                <div className="summary-row">
-                  <span>Guest Name:</span>
-                  <strong>{currentUser?.firstName} {currentUser?.lastName} ({currentUser?.email})</strong>
-                </div>
-              </div>
-
-              <div className="form-group" style={{ marginTop: '16px' }}>
-                <label htmlFor="booking-requests">Special Requests &amp; Preferences</label>
-                <textarea
-                  id="booking-requests"
-                  rows="3"
-                  className="field"
-                  placeholder="e.g. Feather-free pillows, late arrival, quiet floor..."
-                  value={specialRequests}
-                  onChange={(e) => setSpecialRequests(e.target.value)}
-                />
-              </div>
-
-              <div className="modal-actions" style={{ marginTop: '24px' }}>
-                <button
-                  type="button"
-                  className="secondary-button"
-                  onClick={() => setActiveBookingRoom(null)}
-                  disabled={submittingBooking}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="primary-button"
-                  disabled={submittingBooking}
-                >
-                  {submittingBooking ? 'Securing Suite...' : 'Confirm Reservation'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       <PublicFooter />
     </div>

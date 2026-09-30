@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ClientNavbar from '../components/ClientNavbar';
 import ClientBookingModal from '../components/ClientBookingModal';
 import ClientProfile from '../components/ClientProfile';
@@ -6,224 +7,26 @@ import ClientSpaView from '../components/ClientSpaView';
 import StatusBadge from '../components/StatusBadge';
 import RestaurantPage from './RestaurantPage';
 import { useAuth } from '../context/AuthContext';
-import { reservationAPI, roomAPI, tableReservationAPI } from '../services/api';
+import {
+  reservationAPI,
+  roomAPI,
+  tableReservationAPI,
+  spaBookingAPI,
+  restaurantTableAPI,
+  spaServiceAPI,
+} from '../services/api';
+import { withRoomImage } from '../utils/propertyImages';
+import { readBookingIntent, clearBookingIntent } from '../utils/reserve';
+import { CalendarGrid, AnalogClock } from '../components/ReservationDateTimePicker';
 
-// Curated high-resolution hospitality room images
-const TABLE_RESERVATION_IMAGE =
-  'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1920&q=85';
+const ROOM_RESERVATION_IMAGE =
+  'https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=1920&q=85';
 
-const TABLE_RESERVATION_SHOWCASE = [
-  {
-    img: 'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=1000&q=80',
-    label: 'Beside Window Table',
-    sub: 'Fountain view · 2 Guests',
-    badge: 'Dining View',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1000&q=80',
-    label: 'Balcony Terrace',
-    sub: 'Open-air table · 4 Guests',
-    badge: 'Terrace',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?auto=format&fit=crop&w=1000&q=80',
-    label: 'Poolside Pergola',
-    sub: 'Private evening seating',
-    badge: 'Lounge',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1000&q=80',
-    label: 'Chef Table',
-    sub: 'Signature dining · 6 Guests',
-    badge: 'Culinary',
-  },
-  {
-    img: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?auto=format&fit=crop&w=1000&q=80',
-    label: 'Private Suite Table',
-    sub: 'Executive private room',
-    badge: 'Private',
-  },
-];
 
-const ROOM_IMAGES = {
-  SINGLE: TABLE_RESERVATION_SHOWCASE[0].img,
-  DOUBLE: TABLE_RESERVATION_SHOWCASE[1].img,
-  SUITE: TABLE_RESERVATION_SHOWCASE[2].img,
-  DELUXE: TABLE_RESERVATION_SHOWCASE[3].img,
-  PENTHOUSE: TABLE_RESERVATION_SHOWCASE[4].img,
-};
+// Spa sanctuary photography (used for the spa reservation page)
+const SPA_RESERVATION_IMAGE =
+  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1920&q=85';
 
-// Seed catalog in case backend starts with blank H2 DB
-const SEED_ROOMS = [
-  {
-    id: 101,
-    roomNumber: '101',
-    roomType: 'SINGLE',
-    basePrice: 85,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Cozy boutique retreat with a plush queen bed, dedicated ergonomic workstation, and quiet garden views.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 102,
-    roomNumber: '102',
-    roomType: 'DOUBLE',
-    basePrice: 140,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Spacious modern room featuring two premium queen beds, artisan coffee bar, and skyline windows.',
-    hasBathtub: true,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 103,
-    roomNumber: '103',
-    roomType: 'SINGLE',
-    basePrice: 95,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Serene corner single with floor-to-ceiling windows, rain shower, and acoustic soundproofing.',
-    hasBathtub: false,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 104,
-    roomNumber: '104',
-    roomType: 'SINGLE',
-    basePrice: 90,
-    capacity: 1,
-    status: 'AVAILABLE',
-    description: 'Sunlit garden single with French doors leading to a private botanical courtyard.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: false,
-  },
-  {
-    id: 201,
-    roomNumber: '201',
-    roomType: 'SUITE',
-    basePrice: 220,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Executive boutique suite with a partitioned salon lounge, Italian marble bath, and private terrace.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 202,
-    roomNumber: '202',
-    roomType: 'DOUBLE',
-    basePrice: 155,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Superior double with sweeping courtyard views, king featherbed, and complimentary artisan refreshments.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 203,
-    roomNumber: '203',
-    roomType: 'DOUBLE',
-    basePrice: 145,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Artisan twin double with custom timber furnishings, designer reading nook, and espresso bar.',
-    hasBathtub: false,
-    hasBalcony: false,
-    hasMinibar: true,
-  },
-  {
-    id: 204,
-    roomNumber: '204',
-    roomType: 'DOUBLE',
-    basePrice: 160,
-    capacity: 2,
-    status: 'AVAILABLE',
-    description: 'Corner double suite with wrap-around city panorama, heated bathroom floors, and balcony.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 301,
-    roomNumber: '301',
-    roomType: 'DELUXE',
-    basePrice: 290,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Ultra-luxurious corner suite with panoramic skyline views, walk-in dressing room, and soaking tub.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 302,
-    roomNumber: '302',
-    roomType: 'SUITE',
-    basePrice: 240,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Grand family suite with dual vanity bath, private sun deck, and plush sleeper sofa for extra comfort.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 303,
-    roomNumber: '303',
-    roomType: 'SUITE',
-    basePrice: 255,
-    capacity: 3,
-    status: 'AVAILABLE',
-    description: 'Romantic bridal suite with private jacuzzi whirlpool, chilled champagne service, and city lights.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 304,
-    roomNumber: '304',
-    roomType: 'DELUXE',
-    basePrice: 310,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Royal deluxe family suite with dual king suites, private dining nook, and full luxury amenities.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 401,
-    roomNumber: '401',
-    roomType: 'PENTHOUSE',
-    basePrice: 480,
-    capacity: 4,
-    status: 'AVAILABLE',
-    description: 'Top-floor presidential penthouse with private wraparound balcony, fireplace salon, and butler service.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-  {
-    id: 402,
-    roomNumber: '402',
-    roomType: 'PENTHOUSE',
-    basePrice: 520,
-    capacity: 5,
-    status: 'AVAILABLE',
-    description: 'Sky-level penthouse estate with private rooftop plunge pool, dedicated chef service, and helipad views.',
-    hasBathtub: true,
-    hasBalcony: true,
-    hasMinibar: true,
-  },
-];
 
 const ROOM_TYPES = ['ALL', 'SINGLE', 'DOUBLE', 'SUITE', 'DELUXE', 'PENTHOUSE'];
 
@@ -235,13 +38,27 @@ const getFutureDateStr = (days) => {
   return d.toISOString().slice(0, 10);
 };
 
+const CLIENT_TABS = ['book', 'restaurant', 'spa', 'reservations', 'profile'];
+
 const ClientDashboard = () => {
   const { currentUser } = useAuth();
 
-  // Active navigation tab: 'book' | 'restaurant' | 'reservations' | 'profile'
+  // Active navigation tab: 'book' | 'restaurant' | 'spa' | 'reservations' | 'profile'
   const [activeTab, setActiveTab] = useState('restaurant');
   // Sub-tab within 'reservations': 'all' | 'rooms' | 'tables'
   const [resSubTab, setResSubTab] = useState('all');
+
+  // Deep-link support: /client?tab=book|restaurant|spa|reservations|profile
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab && CLIENT_TABS.includes(tab)) setActiveTab(tab);
+  }, [searchParams]);
+  const [resFilter, setResFilter] = useState('ALL');
+  const [rescheduleTarget, setRescheduleTarget] = useState(null);
+  const [rescheduleValues, setRescheduleValues] = useState({});
+  const [rescheduleError, setRescheduleError] = useState('');
+  const [rescheduleSubmitting, setRescheduleSubmitting] = useState(false);
 
   // Search parameters for availability
   const [searchDates, setSearchDates] = useState({
@@ -259,230 +76,157 @@ const ClientDashboard = () => {
   const [reservations, setReservations] = useState([]);
   const [tableReservations, setTableReservations] = useState([]);
   const [loadingRooms, setLoadingRooms] = useState(true);
+  const [roomsError, setRoomsError] = useState('');
   const [loadingReservations, setLoadingReservations] = useState(false);
+  const [reservationsError, setReservationsError] = useState('');
   const [loadingTableRes, setLoadingTableRes] = useState(false);
+  const [tableResError, setTableResError] = useState('');
+  const [spaReservations, setSpaReservations] = useState([]);
+  const [loadingSpaRes, setLoadingSpaRes] = useState(false);
+  const [spaResError, setSpaResError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  // Calendar + analog clock panel on the room reservation page
+  const [showRoomPicker, setShowRoomPicker] = useState(false);
 
   // Booking modal
   const [selectedRoomForBooking, setSelectedRoomForBooking] = useState(null);
   const [alertNotice, setAlertNotice] = useState(null);
 
-  // Promotional Code & Carousel Reel
+  // Live dining-table and spa-ritual inventory for the booking page
+  const [tableOptions, setTableOptions] = useState([]);
+  const [bookableSpaServices, setBookableSpaServices] = useState([]);
+  const [mixLoading, setMixLoading] = useState(true);
+  const [mixError, setMixError] = useState('');
+
+  // Promotional Code
   const [promoCode, setPromoCode] = useState('AMBASSADOR-CLUB');
   const [promoApplied, setPromoApplied] = useState(true);
-  const carouselRef = React.useRef(null);
-  const [isCarouselHovered, setIsCarouselHovered] = useState(false);
 
-  // Automated Horizontal Auto-Scrolling with Hover Pause
+  // ── Restore a reservation intent captured before login ──────────────────
+  // A visitor who clicked "Reserve" on the public site arrives here after
+  // authenticating; reopen exactly what they were trying to reserve.
+  const [pendingSpaServiceId, setPendingSpaServiceId] = useState(null);
+  const [intentRestored, setIntentRestored] = useState(false);
+
   useEffect(() => {
-    const el = carouselRef.current;
-    if (!el) return;
-    const interval = setInterval(() => {
-      if (!isCarouselHovered && el) {
-        if (el.scrollLeft + el.clientWidth >= el.scrollWidth - 5) {
-          el.scrollLeft = 0;
-        } else {
-          el.scrollLeft += 1.2;
-        }
-      }
-    }, 25);
-    return () => clearInterval(interval);
-  }, [isCarouselHovered]);
+    if (intentRestored) return;
+    const intent = readBookingIntent();
 
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount = direction === 'left' ? -380 : 380;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    if (!intent) {
+      if (!loadingRooms) setIntentRestored(true);
+      return;
     }
-  };
 
-  // Load rooms from backend
+    if (intent.type === 'ROOM') {
+      if (loadingRooms) return;
+      // Pre-fill the stay dates the guest chose on the public site.
+      if (intent.checkInDate || intent.checkOutDate || intent.numberOfGuests) {
+        setSearchDates((current) => ({
+          checkIn: intent.checkInDate || current.checkIn,
+          checkOut: intent.checkOutDate || current.checkOut,
+          guests: intent.numberOfGuests ? String(intent.numberOfGuests) : current.guests,
+        }));
+      }
+      const match = rooms.find(
+        (r) =>
+          (intent.roomId && String(r.id) === String(intent.roomId)) ||
+          (intent.roomNumber && String(r.roomNumber) === String(intent.roomNumber))
+      );
+      if (match) {
+        setActiveTab('book');
+        setSelectedRoomForBooking(match);
+        clearBookingIntent();
+      } else if (rooms.length > 0) {
+        setActiveTab('book');
+        clearBookingIntent();
+      } else {
+        return; // rooms still empty — keep the intent for a later retry
+      }
+      setIntentRestored(true);
+      return;
+    }
+
+    if (intent.type === 'TABLE') {
+      setActiveTab('restaurant');
+      clearBookingIntent();
+      setIntentRestored(true);
+      return;
+    }
+
+    if (intent.type === 'SPA') {
+      setActiveTab('spa');
+      if (intent.spaServiceId) setPendingSpaServiceId(intent.spaServiceId);
+      clearBookingIntent();
+      setIntentRestored(true);
+    }
+  }, [rooms, loadingRooms, intentRestored]);
+
+  // Load rooms from backend (the database is the single source of truth)
   const loadRooms = async () => {
     try {
       setLoadingRooms(true);
+      setRoomsError('');
       const res = await roomAPI.getAll();
       const serverRooms = res.data && Array.isArray(res.data) ? res.data : [];
-      const serverRoomNumbers = new Set(serverRooms.map((r) => r.roomNumber));
-      const missingSeeds = SEED_ROOMS.filter((s) => !serverRoomNumbers.has(s.roomNumber));
-      const combined = [...serverRooms, ...missingSeeds].map((r) => ({
-        ...r,
-        image: ROOM_IMAGES[r.roomType] || ROOM_IMAGES.SINGLE,
-      }));
-      setRooms(combined);
-    } catch (err) {
-      console.warn('Backend rooms fetch failed, utilizing guest seed catalog:', err);
       setRooms(
-        SEED_ROOMS.map((r) => ({
+        serverRooms.map((r) => ({
           ...r,
-          image: ROOM_IMAGES[r.roomType] || ROOM_IMAGES.SINGLE,
+          image: withRoomImage(r).image,
         }))
+      );
+    } catch (err) {
+      setRooms([]);
+      setRoomsError(
+        err?.response?.data?.message ||
+          'We could not load the room list. Please check your connection and retry.'
       );
     } finally {
       setLoadingRooms(false);
     }
   };
 
-  // Load client reservations with comprehensive multi-layer fallback
+  // Load this client's room reservations from the backend.
   const loadReservations = async () => {
     setLoadingReservations(true);
+    setReservationsError('');
     try {
-      let clientBookings = [];
-      const userEmail = currentUser?.email?.toLowerCase().trim();
       const userId = currentUser?.id;
-
-      // 1. Try backend API by guest id
-      if (userId) {
-        try {
-          const res = await reservationAPI.getByGuestId(userId);
-          if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-            clientBookings = [...res.data];
-          }
-        } catch (e) {
-          console.warn('Backend getByGuestId failed:', e);
-        }
+      if (!userId) {
+        setReservations([]);
+        return;
       }
-
-      // 2. Also check backend getAll for any matching records
-      try {
-        const allRes = await reservationAPI.getAll();
-        if (allRes.data && Array.isArray(allRes.data)) {
-          const matched = allRes.data.filter((r) => {
-            const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
-            const rGuestId = r.guest?.id || r.guestId;
-            return (userId && String(rGuestId) === String(userId)) ||
-                   (userEmail && rEmail === userEmail);
-          });
-          const existingIds = new Set(clientBookings.map((r) => String(r.id)));
-          for (const m of matched) {
-            if (!existingIds.has(String(m.id))) {
-              clientBookings.push(m);
-              existingIds.add(String(m.id));
-            }
-          }
-        }
-      } catch (innerErr) {
-        console.warn('Could not load all reservations from backend:', innerErr);
-      }
-
-      // 3. Merge local storage reservations
-      const storageKeys = [
-        `client_res_${currentUser?.email}`,
-        `client_res_${currentUser?.id}`,
-        'client_res_last',
-        'hotel_global_room_reservations',
-      ];
-      const existingIds = new Set(clientBookings.map((r) => String(r.id)));
-
-      for (const key of storageKeys) {
-        try {
-          const stored = localStorage.getItem(key);
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
-              for (const r of parsed) {
-                const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
-                const rGuestId = r.guest?.id || r.guestId;
-                const match = !userEmail ||
-                  rEmail === userEmail ||
-                  (userId && String(rGuestId) === String(userId)) ||
-                  key.includes(userEmail);
-
-                if (match && !existingIds.has(String(r.id))) {
-                  clientBookings.push(r);
-                  existingIds.add(String(r.id));
-                }
-              }
-            }
-          }
-        } catch (_) {}
-      }
-
-      setReservations(clientBookings);
+      // Scoped server-side query: only this guest's own reservations.
+      const res = await reservationAPI.getByGuestId(userId);
+      setReservations(res.data && Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.warn('Reservation load error:', err);
+      setReservations([]);
+      setReservationsError(
+        err?.response?.data?.message ||
+          'We could not load your reservations. Please retry.'
+      );
     } finally {
       setLoadingReservations(false);
     }
   };
 
-  // Load client table reservations with comprehensive multi-layer fallback
+  // Load this client's table reservations from the backend.
   const loadTableReservations = async () => {
     setLoadingTableRes(true);
+    setTableResError('');
     try {
-      let clientTableBookings = [];
-      const userEmail = currentUser?.email?.toLowerCase().trim();
       const userId = currentUser?.id;
-
-      // 1. Try backend by guest id
-      if (userId) {
-        try {
-          const res = await tableReservationAPI.getByGuestId(userId);
-          if (res.data && Array.isArray(res.data) && res.data.length > 0) {
-            clientTableBookings = [...res.data];
-          }
-        } catch (e) {
-          console.warn('Could not load table reservations by guest id:', e);
-        }
+      if (!userId) {
+        setTableReservations([]);
+        return;
       }
-
-      // 2. Try backend getAll
-      try {
-        const all = await tableReservationAPI.getAll();
-        if (all.data && Array.isArray(all.data)) {
-          const matched = all.data.filter((r) => {
-            const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
-            const rGuestId = r.guest?.id || r.guestId;
-            return (userId && String(rGuestId) === String(userId)) ||
-                   (userEmail && rEmail === userEmail);
-          });
-          const existingIds = new Set(clientTableBookings.map((r) => String(r.id)));
-          for (const m of matched) {
-            if (!existingIds.has(String(m.id))) {
-              clientTableBookings.push(m);
-              existingIds.add(String(m.id));
-            }
-          }
-        }
-      } catch (err) {
-        console.warn('Table reservation fetch all error:', err);
-      }
-
-      // 3. Merge local storage table reservations
-      const tableKeys = [
-        `client_table_res_${currentUser?.email || 'guest'}`,
-        'client_table_res_last',
-        'hotel_table_reservations',
-        'hotel_restaurant_table_reservations',
-      ];
-      const existingIds = new Set(clientTableBookings.map((r) => String(r.id)));
-
-      for (const key of tableKeys) {
-        try {
-          const stored = localStorage.getItem(key);
-          if (stored) {
-            const parsed = JSON.parse(stored);
-            if (Array.isArray(parsed)) {
-              for (const r of parsed) {
-                const rEmail = r.guest?.email?.toLowerCase().trim() || r.email?.toLowerCase().trim();
-                const rGuestId = r.guest?.id || r.guestId;
-                const match = !userEmail ||
-                  rEmail === userEmail ||
-                  (userId && String(rGuestId) === String(userId)) ||
-                  key.includes(userEmail);
-
-                if (match && !existingIds.has(String(r.id))) {
-                  clientTableBookings.push(r);
-                  existingIds.add(String(r.id));
-                }
-              }
-            }
-          }
-        } catch (_) {}
-      }
-
-      setTableReservations(clientTableBookings);
+      const res = await tableReservationAPI.getByGuestId(userId);
+      setTableReservations(res.data && Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      console.warn('Could not load table reservations:', err);
+      setTableReservations([]);
+      setTableResError(
+        err?.response?.data?.message ||
+          'We could not load your table reservations. Please retry.'
+      );
     } finally {
       setLoadingTableRes(false);
     }
@@ -492,40 +236,89 @@ const ClientDashboard = () => {
     loadRooms();
     loadReservations();
     loadTableReservations();
+    loadSpaReservations();
+    loadBookableOptions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
-  // Re-fetch whenever user switches to reservations tab
+  // Re-fetch every reservation type whenever the client opens My Reservations
   useEffect(() => {
     if (activeTab === 'reservations') {
       loadReservations();
       loadTableReservations();
+      loadSpaReservations();
     }
   }, [activeTab]);
 
-  // Handle Search Availability button
+  /** Opens the modify-date/time panel pre-filled with the current booking values. */
+  const openReschedule = (item) => {
+    setRescheduleError('');
+    if (item.type === 'ROOM') {
+      setRescheduleValues({
+        checkInDate: item.raw.checkInDate || '',
+        checkOutDate: item.raw.checkOutDate || '',
+        numberOfGuests: item.raw.numberOfGuests || 1,
+      });
+    } else if (item.type === 'TABLE') {
+      setRescheduleValues({
+        reservationDate: item.raw.reservationDate || '',
+        timeSlot: item.raw.timeSlot || '18:00',
+        partySize: item.raw.partySize || 1,
+      });
+    } else {
+      setRescheduleValues({
+        bookingDate: item.raw.bookingDate || '',
+        startTime: item.raw.startTime || '10:30',
+        numberOfGuests: item.raw.numberOfGuests || 1,
+      });
+    }
+    setRescheduleTarget(item);
+  };
+
+  const submitReschedule = async (e) => {
+    e.preventDefault();
+    if (!rescheduleTarget) return;
+    setRescheduleSubmitting(true);
+    setRescheduleError('');
+    const result = await handleReschedule({
+      type: rescheduleTarget.type,
+      id: rescheduleTarget.id,
+      values: rescheduleValues,
+    });
+    setRescheduleSubmitting(false);
+    if (result.ok) {
+      setRescheduleTarget(null);
+      setAlertNotice({ type: 'success', message: result.message });
+      setTimeout(() => setAlertNotice(null), 8000);
+    } else {
+      // Keep the panel open and show the backend's real reason.
+      setRescheduleError(result.message);
+    }
+  };
+
+  // Handle Search Availability button — queries the real backend only.
   const handleSearchAvailability = async (e) => {
     e?.preventDefault();
     setLoadingRooms(true);
+    setRoomsError('');
     try {
       const res = await roomAPI.getAvailable(
         searchDates.checkIn,
         searchDates.checkOut,
         searchDates.guests
       );
-      let matched = res.data && Array.isArray(res.data) ? res.data : [];
-      const matchedNumbers = new Set(matched.map((r) => r.roomNumber));
-      const additional = SEED_ROOMS.filter(
-        (r) =>
-          Number(r.capacity) >= Number(searchDates.guests) &&
-          !matchedNumbers.has(r.roomNumber)
+      const available = res.data && Array.isArray(res.data) ? res.data : [];
+      setRooms(
+        available.map((r) => ({
+          ...r,
+          image: withRoomImage(r).image,
+        }))
       );
-      const fullList = [...matched, ...additional].map((r) => ({
-        ...r,
-        image: ROOM_IMAGES[r.roomType] || ROOM_IMAGES.SINGLE,
-      }));
-      setRooms(fullList);
-    } catch {
-      loadRooms();
+    } catch (err) {
+      setRoomsError(
+        err?.response?.data?.message ||
+          'We could not check availability right now. Please try again.'
+      );
     } finally {
       setLoadingRooms(false);
     }
@@ -554,75 +347,312 @@ const ClientDashboard = () => {
     });
   }, [rooms, selectedType, maxPrice, searchDates.guests, searchQuery]);
 
-  // Handle Confirm Booking
+  // Handle Confirm Booking — submits to the real backend and reports PENDING.
   const handleConfirmBooking = async (bookingData) => {
-    try {
-      let createdRes = null;
-      try {
-        const res = await reservationAPI.create({
-          guestId: currentUser?.id || 1,
-          roomId: bookingData.roomId,
-          checkInDate: bookingData.checkInDate,
-          checkOutDate: bookingData.checkOutDate,
-          numberOfGuests: Number(bookingData.numberOfGuests || 1),
-          specialRequests: bookingData.specialRequests || '',
-        });
-        if (res && res.data) {
-          createdRes = {
-            ...res.data,
-            room: res.data.room || selectedRoomForBooking,
-            guest: res.data.guest || currentUser,
-            status: res.data.status || 'CONFIRMED',
-            totalPrice: res.data.totalPrice || bookingData.totalPrice,
-          };
-        }
-      } catch (err) {
-        console.warn('Backend reservation create skipped or offline, storing record locally:', err);
-      }
+    const res = await reservationAPI.create({
+      guestId: currentUser?.id,
+      roomId: bookingData.roomId,
+      checkInDate: bookingData.checkInDate,
+      checkOutDate: bookingData.checkOutDate,
+      numberOfGuests: Number(bookingData.numberOfGuests || 1),
+      specialRequests: bookingData.specialRequests || '',
+    });
 
-      if (!createdRes) {
-        createdRes = {
-          id: Date.now(),
-          room: selectedRoomForBooking,
-          guest: currentUser,
-          checkInDate: bookingData.checkInDate,
-          checkOutDate: bookingData.checkOutDate,
-          numberOfGuests: Number(bookingData.numberOfGuests || 1),
-          status: 'CONFIRMED',
-          totalPrice: bookingData.totalPrice,
-          specialRequests: bookingData.specialRequests || '',
-        };
-      }
-
-      // Add to client state and client local storage
-      const nextList = [createdRes, ...reservations];
-      setReservations(nextList);
-      localStorage.setItem(`client_res_${currentUser?.email}`, JSON.stringify(nextList));
-
-      // Add to global room reservations store for staff dashboard live fetching
-      try {
-        const existingGlobalData = localStorage.getItem('hotel_global_room_reservations');
-        const existingGlobal = existingGlobalData ? JSON.parse(existingGlobalData) : [];
-        const updatedGlobal = [createdRes, ...existingGlobal.filter((r) => String(r.id) !== String(createdRes.id))];
-        localStorage.setItem('hotel_global_room_reservations', JSON.stringify(updatedGlobal));
-      } catch (_) {}
-
-      // Close modal, show toast, and switch tab
-      setSelectedRoomForBooking(null);
-      setAlertNotice({
-        type: 'success',
-        message: `Reservation confirmed for Room ${selectedRoomForBooking.roomNumber}! Welcome to የ-mom Hotel.`,
-      });
-      setActiveTab('reservations');
-      setTimeout(() => setAlertNotice(null), 5000);
-    } catch (err) {
-      throw new Error(err.message || 'Unable to confirm reservation.');
+    const createdRes = res && res.data ? res.data : null;
+    if (!createdRes) {
+      throw new Error('The server did not return a reservation. Please try again.');
     }
+
+    setSelectedRoomForBooking(null);
+    const reservedRoomNumber =
+      createdRes.room?.roomNumber || selectedRoomForBooking?.roomNumber || '';
+    setAlertNotice({
+      type: 'success',
+      message: `Reservation confirmed for Room ${reservedRoomNumber}. Status: ${
+        createdRes.status || 'PENDING'
+      } — our front desk will review and confirm your stay shortly.`,
+    });
+    setResSubTab('rooms');
+    setActiveTab('reservations');
+    setTimeout(() => setAlertNotice(null), 8000);
   };
 
   // Smart Cancellation rule
   // A "Cancel Reservation" button appears on any reservation whose check-in date is still in the future,
   // regardless of Pending/Confirmed status — it disappears once the check-in date has passed or the guest has checked in.
+  // Load this client's spa reservations from the backend.
+  const loadSpaReservations = async () => {
+    setLoadingSpaRes(true);
+    setSpaResError('');
+    try {
+      const userId = currentUser?.id;
+      if (!userId) {
+        setSpaReservations([]);
+        return;
+      }
+      const res = await spaBookingAPI.getByGuestId(userId);
+      setSpaReservations(res.data && Array.isArray(res.data) ? res.data : []);
+    } catch (err) {
+      setSpaReservations([]);
+      setSpaResError(
+        err?.response?.data?.message ||
+          'We could not load your spa reservations. Please retry.'
+      );
+    } finally {
+      setLoadingSpaRes(false);
+    }
+  };
+
+  const reloadAllReservations = async () => {
+    await Promise.all([
+      loadReservations(),
+      loadTableReservations(),
+      loadSpaReservations(),
+    ]);
+  };
+
+  /**
+   * Live department inventory for the booking page: every dining table and every
+   * active spa ritual, read straight from the backend (no placeholder rows).
+   */
+  const loadBookableOptions = async () => {
+    setMixLoading(true);
+    setMixError('');
+    try {
+      const [tableResponse, spaResponse] = await Promise.all([
+        restaurantTableAPI.getAll(),
+        spaServiceAPI.getActive(),
+      ]);
+      setTableOptions(Array.isArray(tableResponse.data) ? tableResponse.data : []);
+      setBookableSpaServices(Array.isArray(spaResponse.data) ? spaResponse.data : []);
+    } catch (err) {
+      setTableOptions([]);
+      setBookableSpaServices([]);
+      setMixError(
+        err?.response?.data?.message ||
+          'We could not load dining tables and spa rituals. Please retry.'
+      );
+    } finally {
+      setMixLoading(false);
+    }
+  };
+
+  /**
+   * Unified, normalised view of every reservation belonging to the signed-in client.
+   * Statuses are bucketed into PENDING / CONFIRMED / COMPLETED / CANCELLED exactly
+   * as persisted by the backend.
+   */
+  const allReservations = useMemo(() => {
+    const roomItems = reservations.map((r) => ({
+      key: `ROOM-${r.id}`,
+      type: 'ROOM',
+      id: r.id,
+      title: r.room
+        ? `Room ${r.room.roomNumber} · ${r.room.roomType}`
+        : `Room reservation #${r.id}`,
+      date: r.checkInDate,
+      endDate: r.checkOutDate,
+      time: '15:00 check-in · 11:00 check-out',
+      status: r.status,
+      amount: r.totalPrice,
+      created: r.createdDate,
+      guests: r.numberOfGuests,
+      raw: r,
+    }));
+
+    const tableItems = tableReservations.map((r) => ({
+      key: `TABLE-${r.id}`,
+      type: 'TABLE',
+      id: r.id,
+      title: r.restaurantTable
+        ? `Table ${r.restaurantTable.tableNumber}${
+            r.restaurantTable.area ? ` · ${String(r.restaurantTable.area).replace('_', ' ')}` : ''
+          }`
+        : `Table reservation #${r.id}`,
+      date: r.reservationDate,
+      endDate: null,
+      time: r.timeSlot,
+      status: r.status,
+      amount: null,
+      created: r.createdAt,
+      guests: r.partySize,
+      raw: r,
+    }));
+
+    const spaItems = spaReservations.map((r) => ({
+      key: `SPA-${r.id}`,
+      type: 'SPA',
+      id: r.id,
+      title: r.spaService ? r.spaService.name : `Spa booking #${r.id}`,
+      date: r.bookingDate,
+      endDate: null,
+      time: r.startTime,
+      status: r.status,
+      amount: r.totalPrice,
+      created: r.createdAt,
+      guests: r.numberOfGuests,
+      raw: r,
+    }));
+
+    return [...roomItems, ...tableItems, ...spaItems];
+  }, [reservations, tableReservations, spaReservations]);
+
+  /** Buckets a backend status into one of the four sections shown in the UI. */
+  const statusBucket = (status) => {
+    switch (status) {
+      case 'PENDING':
+        return 'PENDING';
+      case 'CONFIRMED':
+      case 'CHECKED_IN':
+      case 'SEATED':
+        return 'CONFIRMED';
+      case 'CHECKED_OUT':
+      case 'COMPLETED':
+        return 'COMPLETED';
+      case 'CANCELLED':
+      case 'NO_SHOW':
+        return 'CANCELLED';
+      default:
+        return 'PENDING';
+    }
+  };
+
+  const filteredReservations = useMemo(() => {
+    if (resFilter === 'ALL') return allReservations;
+    return allReservations.filter((r) => statusBucket(r.status) === resFilter);
+  }, [allReservations, resFilter]);
+
+  /**
+   * Soonest upcoming bookings (rooms, dining tables and spa rituals) exactly as
+   * returned by the backend. Cancelled and completed records are omitted.
+   */
+  const upcomingBookings = useMemo(
+    () =>
+      allReservations
+        .filter((item) => !['CANCELLED', 'COMPLETED'].includes(statusBucket(item.status)))
+        .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')))
+        .slice(0, 6),
+    [allReservations]
+  );
+
+  /**
+   * Free-text search across My Reservations. Every list below is filtered from the
+   * real backend payloads, so the search box always queries actual database rows.
+   */
+  const [resSearchQuery, setResSearchQuery] = useState('');
+
+  const matchesResQuery = (values) => {
+    const q = resSearchQuery.trim().toLowerCase();
+    if (!q) return true;
+    return values.some((v) => String(v ?? '').toLowerCase().includes(q));
+  };
+
+  const searchedRoomReservations = useMemo(
+    () =>
+      reservations.filter((r) =>
+        matchesResQuery([
+          r.room?.roomNumber,
+          r.room?.roomType,
+          r.status,
+          r.specialRequests,
+          r.checkInDate,
+          r.checkOutDate,
+        ])
+      ),
+    [reservations, resSearchQuery]
+  );
+
+  const searchedTableReservations = useMemo(
+    () =>
+      tableReservations.filter((r) =>
+        matchesResQuery([
+          r.restaurantTable?.tableNumber,
+          r.restaurantTable?.area,
+          r.status,
+          r.specialRequests,
+          r.timeSlot,
+          r.reservationDate,
+        ])
+      ),
+    [tableReservations, resSearchQuery]
+  );
+
+  const searchedSpaReservations = useMemo(
+    () =>
+      spaReservations.filter((r) =>
+        matchesResQuery([
+          r.spaService?.name,
+          r.spaService?.category,
+          r.status,
+          r.specialRequests,
+          r.startTime,
+          r.bookingDate,
+        ])
+      ),
+    [spaReservations, resSearchQuery]
+  );
+
+
+  const reservationCounts = useMemo(() => {
+    const counts = { ALL: allReservations.length, PENDING: 0, CONFIRMED: 0, COMPLETED: 0, CANCELLED: 0 };
+    for (const r of allReservations) {
+      counts[statusBucket(r.status)] += 1;
+    }
+    return counts;
+  }, [allReservations]);
+
+  /**
+   * Submits a date/time change for any reservation type to the real backend.
+   * The backend validates ownership, availability and conflicts; its rejection
+   * message is surfaced verbatim and the reservation is NOT shown as changed.
+   */
+  const handleReschedule = async ({ type, id, values }) => {
+    const actingGuestId = currentUser?.id;
+    if (!actingGuestId) {
+      return { ok: false, message: 'You must be signed in to modify a reservation.' };
+    }
+
+    try {
+      if (type === 'ROOM') {
+        await reservationAPI.reschedule(id, {
+          checkInDate: values.checkInDate,
+          checkOutDate: values.checkOutDate,
+          numberOfGuests: Number(values.numberOfGuests || 1),
+          actingGuestId,
+        });
+      } else if (type === 'TABLE') {
+        await tableReservationAPI.reschedule(id, {
+          reservationDate: values.reservationDate,
+          timeSlot: values.timeSlot,
+          partySize: Number(values.partySize || 1),
+          actingGuestId,
+        });
+      } else {
+        await spaBookingAPI.reschedule(id, {
+          bookingDate: values.bookingDate,
+          startTime: values.startTime,
+          numberOfGuests: Number(values.numberOfGuests || 1),
+          actingGuestId,
+        });
+      }
+
+      await reloadAllReservations();
+      return {
+        ok: true,
+        message:
+          'Change submitted. The reservation is now PENDING and awaits staff re-approval.',
+      };
+    } catch (err) {
+      return {
+        ok: false,
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'The server rejected this change. Please review the date and time.',
+      };
+    }
+  };
+
   const isFutureDate = (dateStr) => {
     if (!dateStr) return false;
     const today = new Date();
@@ -641,28 +671,23 @@ const ClientDashboard = () => {
     }
 
     try {
-      try {
-        await reservationAPI.cancel(reservationId);
-      } catch (e) {
-        console.warn('Backend cancel call skipped or offline:', e);
-      }
-
-      const updated = reservations.map((r) =>
-        String(r.id) === String(reservationId) ? { ...r, status: 'CANCELLED' } : r
-      );
-      setReservations(updated);
-      localStorage.setItem(
-        `client_res_${currentUser?.email}`,
-        JSON.stringify(updated)
-      );
-
+      await reservationAPI.cancel(reservationId, currentUser?.id);
+      // Re-read from the server so the UI reflects the persisted status.
+      await loadReservations();
       setAlertNotice({
-        type: 'info',
+        type: 'success',
         message: 'Reservation cancelled. We hope to welcome you again soon.',
       });
-      setTimeout(() => setAlertNotice(null), 4000);
+      setTimeout(() => setAlertNotice(null), 5000);
     } catch (err) {
-      console.error('Failed to cancel reservation:', err);
+      setAlertNotice({
+        type: 'error',
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'We could not cancel this reservation. Please try again.',
+      });
+      setTimeout(() => setAlertNotice(null), 7000);
     }
   };
 
@@ -671,33 +696,47 @@ const ClientDashboard = () => {
       return;
     }
     try {
-      try {
-        await tableReservationAPI.cancel(reservationId);
-      } catch (e) {
-        console.warn('Backend cancel table call skipped or offline:', e);
-      }
-
-      const updated = tableReservations.map((r) =>
-        String(r.id) === String(reservationId) ? { ...r, status: 'CANCELLED' } : r
-      );
-      setTableReservations(updated);
-      const storageKey = `client_table_res_${currentUser?.email || 'guest'}`;
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(updated));
-      } catch (_) {}
-
+      await tableReservationAPI.cancel(reservationId, currentUser?.id);
+      await loadTableReservations();
       setAlertNotice({
-        type: 'info',
+        type: 'success',
         message: 'Table reservation cancelled.',
       });
-      setTimeout(() => setAlertNotice(null), 4000);
+      setTimeout(() => setAlertNotice(null), 5000);
     } catch (err) {
-      console.error('Failed to cancel table reservation:', err);
+      setAlertNotice({
+        type: 'error',
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'We could not cancel this table reservation. Please try again.',
+      });
+      setTimeout(() => setAlertNotice(null), 7000);
+    }
+  };
+
+  const handleCancelSpaReservation = async (reservationId) => {
+    if (!window.confirm('Are you sure you want to cancel this spa reservation?')) {
+      return;
+    }
+    try {
+      await spaBookingAPI.cancel(reservationId, currentUser?.id);
+      await loadSpaReservations();
+      setAlertNotice({ type: 'success', message: 'Spa reservation cancelled.' });
+      setTimeout(() => setAlertNotice(null), 5000);
+    } catch (err) {
+      setAlertNotice({
+        type: 'error',
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'We could not cancel this spa reservation. Please try again.',
+      });
+      setTimeout(() => setAlertNotice(null), 7000);
     }
   };
 
   const activeReservationsCount =
-    reservations.filter((r) => r.status !== 'CANCELLED').length +
     tableReservations.filter((r) => !['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(r.status)).length;
 
   return (
@@ -731,35 +770,43 @@ const ClientDashboard = () => {
       {/* Tab 1: Book a Room (Consumer Booking Flow with Luxury Sanctuary & Slidable Carousel) */}
       {activeTab === 'book' && (
         <main style={{ width: '100%', maxWidth: '100%', margin: 0, padding: '0 0 60px', overflowX: 'hidden' }}>
-          {/* Luxury Full-Screen Hero Banner */}
+          {/* Compact cinematic banner (replaces the former full-screen hero) */}
           <section
+            className="room-reservation-hero"
             style={{
-              width: '100%',
-              background: `linear-gradient(rgba(15, 23, 42, 0.72), rgba(15, 23, 42, 0.88)), url("${TABLE_RESERVATION_IMAGE}") center/cover no-repeat`,
-              color: '#ffffff',
-              minHeight: 'calc(100vh - 76px)',
-              padding: 'clamp(56px, 8vh, 96px) 24px clamp(38px, 7vh, 72px)',
-              textAlign: 'center',
-              borderBottom: '1px solid rgba(255,255,255,0.1)',
-              boxSizing: 'border-box',
-              display: 'flex',
-              alignItems: 'center',
+              background: `linear-gradient(rgba(26, 26, 26, 0.7), rgba(26, 26, 26, 0.88)), url("${ROOM_RESERVATION_IMAGE}") center/cover no-repeat`,
             }}
           >
-            <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+            <div className="room-reservation-hero-inner">
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', padding: '5px 16px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '16px' }}>
-                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#10b981' }} />
+                <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--accent)' }} />
                 THE SANCTUARY COLLECTION &bull; PARIS &bull; 874 BOULEVARD MONTAIGNE
               </div>
-              <h1 style={{ fontSize: '42px', fontWeight: 800, margin: '0 0 14px', letterSpacing: '-0.02em', lineHeight: 1.2, color: '#ffffff' }}>
-                A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
-              </h1>
-              <p style={{ fontSize: '15px', color: '#cbd5e1', maxWidth: '780px', margin: '0 auto 32px', lineHeight: 1.65 }}>
-                Experience quintessential European grace where quiet architecture meets intuitive white-glove service. Welcome to our private hotel, grand residences, and Michelin-accorded culinary salon.
+              <h1>Reserve Your Room</h1>
+              <p>
+                Choose from our signature suites and residences, each appointed with bespoke furnishings,
+                plush Italian bedding and marble baths. Every stay includes artisan breakfast,
+                complimentary thermal spa access and 24/7 floor butler service.
               </p>
+
+              <div className="room-reservation-stat-row">
+                <div className="room-reservation-stat">
+                  <strong>{rooms.length}</strong>
+                  <span>Suites &amp; Rooms</span>
+                </div>
+                <div className="room-reservation-stat">
+                  <strong>{filteredRooms.length}</strong>
+                  <span>Matching Search</span>
+                </div>
+                <div className="room-reservation-stat">
+                  <strong>15:00 / 11:00</strong>
+                  <span>Check-in / Check-out</span>
+                </div>
+              </div>
 
               {/* Active Modern Booking & Search Ribbon */}
               <form
+                className="room-search-ribbon"
                 onSubmit={handleSearchAvailability}
                 style={{
                   background: 'rgba(255, 255, 255, 0.98)',
@@ -767,10 +814,6 @@ const ClientDashboard = () => {
                   borderRadius: '16px',
                   padding: '18px 24px',
                   boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)',
-                  display: 'grid',
-                  gridTemplateColumns: '1.4fr 1fr 1fr 1.1fr 1.1fr 1.1fr auto',
-                  gap: '12px',
-                  alignItems: 'center',
                   textAlign: 'left',
                   maxWidth: '1240px',
                   margin: '0 auto',
@@ -778,23 +821,23 @@ const ClientDashboard = () => {
                 }}
               >
                 <div>
-                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     KEYWORD / SUITE
                   </label>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#64748b' }}>search</span>
+                    <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--muted)' }}>search</span>
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="e.g. Penthouse, Ocean, Balcony, 201..."
-                      style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                      style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none' }}
                     />
                     {searchQuery && (
                       <button
                         type="button"
                         onClick={() => setSearchQuery('')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: '#94a3b8' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: 'var(--muted)' }}
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>close</span>
                       </button>
@@ -802,8 +845,8 @@ const ClientDashboard = () => {
                   </div>
                 </div>
 
-                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
-                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ borderLeft: '1px solid var(--surface-line)', paddingLeft: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     CHECK-IN
                   </label>
                   <input
@@ -811,12 +854,12 @@ const ClientDashboard = () => {
                     required
                     value={searchDates.checkIn}
                     onChange={(e) => setSearchDates({ ...searchDates, checkIn: e.target.value })}
-                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none' }}
                   />
                 </div>
 
-                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
-                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ borderLeft: '1px solid var(--surface-line)', paddingLeft: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     CHECK-OUT
                   </label>
                   <input
@@ -824,18 +867,18 @@ const ClientDashboard = () => {
                     required
                     value={searchDates.checkOut}
                     onChange={(e) => setSearchDates({ ...searchDates, checkOut: e.target.value })}
-                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none' }}
                   />
                 </div>
 
-                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
-                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ borderLeft: '1px solid var(--surface-line)', paddingLeft: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     GUESTS &amp; ROOM
                   </label>
                   <select
                     value={searchDates.guests}
                     onChange={(e) => setSearchDates({ ...searchDates, guests: e.target.value })}
-                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none' }}
                   >
                     <option value="1">1 Adult, 1 Room</option>
                     <option value="2">2 Adults, 1 Room</option>
@@ -844,14 +887,14 @@ const ClientDashboard = () => {
                   </select>
                 </div>
 
-                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
-                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                <div style={{ borderLeft: '1px solid var(--surface-line)', paddingLeft: '12px' }}>
+                  <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                     SUITE TIER
                   </label>
                   <select
                     value={selectedType}
                     onChange={(e) => setSelectedType(e.target.value)}
-                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: '#0f172a', background: 'transparent', outline: 'none' }}
+                    style={{ width: '100%', border: 'none', fontSize: '13px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none' }}
                   >
                     <option value="ALL">All Signature Suites</option>
                     <option value="SINGLE">Classic Single</option>
@@ -862,13 +905,13 @@ const ClientDashboard = () => {
                   </select>
                 </div>
 
-                <div style={{ borderLeft: '1px solid #e2e8f0', paddingLeft: '12px' }}>
+                <div style={{ borderLeft: '1px solid var(--surface-line)', paddingLeft: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', marginBottom: '4px' }}>
+                    <label style={{ display: 'block', fontSize: '10px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase', marginBottom: '4px' }}>
                       PROMO CODE
                     </label>
                     {promoApplied && (
-                      <span style={{ fontSize: '9px', fontWeight: 800, color: '#059669', background: '#d1fae5', padding: '1px 5px', borderRadius: '4px' }}>
+                      <span style={{ fontSize: '9px', fontWeight: 800, color: 'var(--accent)', background: 'var(--surface-line)', padding: '1px 5px', borderRadius: '4px' }}>
                         ✓ 15% APPLIED
                       </span>
                     )}
@@ -881,14 +924,14 @@ const ClientDashboard = () => {
                       setPromoApplied(e.target.value.trim().toUpperCase() === 'AMBASSADOR-CLUB');
                     }}
                     placeholder="AMBASSADOR-CLUB"
-                    style={{ width: '100%', border: 'none', fontSize: '12px', fontWeight: 700, color: '#047857', background: 'transparent', outline: 'none', letterSpacing: '0.04em' }}
+                    style={{ width: '100%', border: 'none', fontSize: '12px', fontWeight: 700, color: 'var(--text)', background: 'transparent', outline: 'none', letterSpacing: '0.04em' }}
                   />
                 </div>
 
                 <button
                   type="submit"
                   style={{
-                    background: '#065f46',
+                    background: 'var(--primary)',
                     color: '#ffffff',
                     border: 'none',
                     borderRadius: '10px',
@@ -899,7 +942,7 @@ const ClientDashboard = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px',
-                    boxShadow: '0 4px 10px rgba(6, 95, 70, 0.3)',
+                    boxShadow: '0 4px 10px rgba(26, 26, 26, 0.3)',
                     whiteSpace: 'nowrap',
                   }}
                 >
@@ -908,381 +951,229 @@ const ClientDashboard = () => {
                 </button>
               </form>
 
+              {/* Calendar + analog clock for choosing the stay dates visually */}
+              <div className="rdt-toggle-row">
+                <button
+                  type="button"
+                  className="public-outline-btn"
+                  onClick={() => setShowRoomPicker((open) => !open)}
+                  aria-expanded={showRoomPicker}
+                >
+                  <span className="material-symbols-outlined">calendar_month</span>
+                  <span>{showRoomPicker ? 'Hide calendar & clock' : 'Pick stay dates visually'}</span>
+                </button>
+              </div>
+
+              {showRoomPicker && (
+                <div style={{ marginTop: '18px', textAlign: 'left' }}>
+                  <div className="rdt-picker">
+                    <div className="rdt-picker-col">
+                      <span className="rdt-col-label">
+                        <span className="material-symbols-outlined">login</span>
+                        Check-in date
+                      </span>
+                      <CalendarGrid
+                        value={searchDates.checkIn}
+                        onChange={(iso) =>
+                          setSearchDates((current) => ({
+                            ...current,
+                            checkIn: iso,
+                            checkOut:
+                              !current.checkOut || current.checkOut <= iso
+                                ? new Date(new Date(iso).getTime() + 86400000).toISOString().slice(0, 10)
+                                : current.checkOut,
+                          }))
+                        }
+                        minDate={getTodayStr()}
+                        idPrefix="room-page-checkin"
+                      />
+                    </div>
+                    <div className="rdt-picker-col">
+                      <span className="rdt-col-label">
+                        <span className="material-symbols-outlined">logout</span>
+                        Check-out date
+                      </span>
+                      <CalendarGrid
+                        value={searchDates.checkOut}
+                        onChange={(iso) => setSearchDates((current) => ({ ...current, checkOut: iso }))}
+                        minDate={searchDates.checkIn || getTodayStr()}
+                        idPrefix="room-page-checkout"
+                      />
+                    </div>
+                    <div className="rdt-picker-col">
+                      <span className="rdt-col-label">
+                        <span className="material-symbols-outlined">schedule</span>
+                        Preferred arrival
+                      </span>
+                      <AnalogClock
+                        value={searchDates.arrivalTime || '15:00'}
+                        onChange={(t) => setSearchDates((current) => ({ ...current, arrivalTime: t }))}
+                        label="Preferred arrival"
+                        idPrefix="room-page-arrival"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Guarantees Bar */}
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '18px', fontSize: '12px', color: '#94a3b8' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', flexWrap: 'wrap', marginTop: '18px', fontSize: '12px', color: 'var(--muted)' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>verified</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--accent)' }}>verified</span>
                   Direct Reservation Privileges (AMBASSADOR-CLUB)
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>spa</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--accent)' }}>spa</span>
                   Complimentary Thermal Spa Access
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>room_service</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'var(--accent)' }}>room_service</span>
                   24/7 Dedicated Floor Butler
                 </span>
               </div>
             </div>
           </section>
 
-          {/* ─── Full-Screen Seamless Auto-Scrolling Showcase Reel (Room & Table Reservations) ─── */}
-          <section style={{ width: '100%', margin: '48px 0 24px', padding: '0 32px', boxSizing: 'border-box' }}>
-            <div style={{ maxWidth: '1380px', margin: '0 auto 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '12px' }}>
+
+          {/* --- Live itinerary: real rows from the database for this guest --- */}
+          <section className="itinerary-list-section">
+            <div className="itinerary-list-head">
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#065f46', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  EXCLUSIVE RESIDENTIAL WINGS &bull; ACCLAIMED DINING
+                <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+                  LIVE FROM YOUR FOLIO
                 </span>
-                <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
-                  Signature Living &amp; Culinary Tables
-                </h2>
+                <h2>Your Upcoming Reservations</h2>
+                <p>
+                  Every row below is read from the hotel database - room stays, dining tables and spa
+                  rituals booked under your account.
+                </p>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <span style={{ fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', background: '#f1f5f9', padding: '4px 10px', borderRadius: '20px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '16px', color: '#10b981' }}>auto_awesome</span>
-                  Auto-scrolling Reel &bull; Hover to pause
-                </span>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
-                    type="button"
-                    onClick={() => scrollCarousel('left')}
-                    title="Previous visual"
-                    style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>chevron_left</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => scrollCarousel('right')}
-                    title="Next visual"
-                    style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid #cbd5e1', background: '#ffffff', color: '#0f172a', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}
-                  >
-                    <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>chevron_right</span>
-                  </button>
-                </div>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="outline-button"
+                  onClick={() => setActiveTab('reservations')}
+                >
+                  <span className="material-symbols-outlined">event_note</span>
+                  <span>My Reservations</span>
+                </button>
+                <button
+                  type="button"
+                  className="primary-button"
+                  onClick={() => setActiveTab('spa')}
+                >
+                  <span className="material-symbols-outlined">spa</span>
+                  <span>Reserve Spa</span>
+                </button>
               </div>
             </div>
 
-            {/* Auto-scrolling Track with Hover Pause */}
-            <div
-              ref={carouselRef}
-              onMouseEnter={() => setIsCarouselHovered(true)}
-              onMouseLeave={() => setIsCarouselHovered(false)}
-              style={{
-                display: 'flex',
-                gap: '20px',
-                overflowX: 'auto',
-                paddingBottom: '14px',
-                scrollSnapType: 'x mandatory',
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'thin',
-              }}
-            >
-              {/* Slidable Card 1: Grand Horizon Bedroom Suite */}
-              <div
-                style={{
-                  minWidth: '380px',
-                  flex: '0 0 auto',
-                  scrollSnapAlign: 'start',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  position: 'relative',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)',
-                  height: '360px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px',
-                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[0].img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#065f46', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
-                    Featured Bedroom
-                  </span>
-                  <span style={{ background: 'rgba(0,0,0,0.5)', color: '#34d399', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(52, 211, 153, 0.4)' }}>
-                    AVAILABLE &bull; OCEAN PANORAMA
-                  </span>
-                </div>
-
+            {loadingReservations || loadingTableRes || loadingSpaRes ? (
+              <div className="catalog-loading">
+                <span className="spinner" />
+                <p>Loading your reservations...</p>
+              </div>
+            ) : reservationsError || tableResError || spaResError ? (
+              <div className="api-error-panel" role="alert">
+                <span className="material-symbols-outlined">error</span>
                 <div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                    Grand Horizon Suite
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: '#cbd5e1', marginBottom: '14px' }}>
-                    <span>88 m²</span>
-                    <span>&bull;</span>
-                    <span>King Bed</span>
-                    <span>&bull;</span>
-                    <span>Soaking Tub</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>FROM</span>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>€780 <span style={{ fontSize: '12px', color: '#cbd5e1' }}>/ Night</span></div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const suiteRoom = rooms.find((r) => r.roomType === 'SUITE' || r.roomType === 'DELUXE') || rooms[0];
-                        setSelectedRoomForBooking(suiteRoom);
-                      }}
-                      style={{ background: '#ffffff', color: '#0f172a', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Explore Quarters
-                    </button>
-                  </div>
+                  <strong>We couldn&apos;t load your reservations.</strong>
+                  <p>{reservationsError || tableResError || spaResError}</p>
+                </div>
+                <button type="button" className="outline-button" onClick={reloadAllReservations}>
+                  Try Again
+                </button>
+              </div>
+            ) : upcomingBookings.length === 0 ? (
+              <div className="empty-card" style={{ padding: '48px 20px', textAlign: 'center' }}>
+                <span
+                  className="material-symbols-outlined"
+                  style={{ fontSize: '44px', color: 'var(--muted)' }}
+                >
+                  event_available
+                </span>
+                <h3 style={{ marginTop: '12px' }}>No reservations on your account yet</h3>
+                <p style={{ color: 'var(--muted)' }}>
+                  Choose a suite below to start a stay, or reserve a dining table or spa ritual.
+                </p>
+              </div>
+            ) : (
+              <div className="itinerary-list-panel">
+                <div className="table-wrap">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Reference</th>
+                        <th>Reservation</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {upcomingBookings.map((item) => {
+                        const bucket = statusBucket(item.status);
+                        const statusClass =
+                          bucket === 'CONFIRMED'
+                            ? 'status-green'
+                            : bucket === 'CANCELLED'
+                            ? 'status-red'
+                            : bucket === 'COMPLETED'
+                            ? 'status-navy'
+                            : 'status-amber';
+                        const amount = Number(item.amount);
+                        return (
+                          <tr key={item.key}>
+                            <td>
+                              <span className="itinerary-type-chip">
+                                {item.type === 'ROOM'
+                                  ? 'Room'
+                                  : item.type === 'TABLE'
+                                  ? 'Dining'
+                                  : 'Spa'}
+                              </span>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+                                #{item.id}
+                              </div>
+                            </td>
+                            <td>
+                              <strong>{item.title}</strong>
+                            </td>
+                            <td>
+                              {item.date}
+                              {item.endDate ? ` - ${item.endDate}` : ''}
+                            </td>
+                            <td>{item.time}</td>
+                            <td>{item.guests || 1} Guests</td>
+                            <td>
+                              <span className={`status-badge ${statusClass}`}>{item.status}</span>
+                            </td>
+                            <td>
+                              {Number.isFinite(amount) && item.amount != null
+                                ? `$${amount.toFixed(2)}`
+                                : '-'}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
                 </div>
               </div>
-
-              {/* Slidable Card 2: Chef Jean-Luc Fine Dining Table */}
-              <div
-                style={{
-                  minWidth: '380px',
-                  flex: '0 0 auto',
-                  scrollSnapAlign: 'start',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  position: 'relative',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)',
-                  height: '360px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px',
-                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[1].img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#b45309', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
-                    Culinary &amp; Tables
-                  </span>
-                  <span style={{ background: 'rgba(0,0,0,0.5)', color: '#fbbf24', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(251, 191, 36, 0.4)' }}>
-                    8 MICHELIN STARS &bull; 2024
-                  </span>
-                </div>
-
-                <div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                    Chef Jean-Luc's Table
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: '#cbd5e1', marginBottom: '14px' }}>
-                    <span>1,200 Cellar Labels</span>
-                    <span>&bull;</span>
-                    <span>7-Course Degustation</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>SEATING</span>
-                      <div style={{ fontSize: '15px', fontWeight: 800, color: '#ffffff' }}>Main Salon &amp; Terrace</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('restaurant')}
-                      style={{ background: '#b45309', color: '#ffffff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Reserve Dining Table
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Slidable Card 3: Presidential Salon & Library */}
-              <div
-                style={{
-                  minWidth: '380px',
-                  flex: '0 0 auto',
-                  scrollSnapAlign: 'start',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  position: 'relative',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)',
-                  height: '360px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px',
-                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[2].img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#6b21a8', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
-                    Penthouse Wing
-                  </span>
-                  <span style={{ background: 'rgba(0,0,0,0.5)', color: '#c084fc', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(192, 132, 252, 0.4)' }}>
-                    TOP FLOOR SUITE
-                  </span>
-                </div>
-
-                <div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                    Presidential Salon &amp; Library
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: '#cbd5e1', marginBottom: '14px' }}>
-                    <span>145 m²</span>
-                    <span>&bull;</span>
-                    <span>Duo-Pillow King</span>
-                    <span>&bull;</span>
-                    <span>Salon 32m²</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>FROM</span>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>€1,450 <span style={{ fontSize: '12px', color: '#cbd5e1' }}>/ Night</span></div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const pent = rooms.find((r) => r.roomType === 'PENTHOUSE') || rooms[0];
-                        setSelectedRoomForBooking(pent);
-                      }}
-                      style={{ background: '#ffffff', color: '#0f172a', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Explore Quarters
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Slidable Card 4: L’Orangerie Garden Quarters */}
-              <div
-                style={{
-                  minWidth: '380px',
-                  flex: '0 0 auto',
-                  scrollSnapAlign: 'start',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  position: 'relative',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)',
-                  height: '360px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px',
-                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[3].img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#047857', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
-                    Garden Wing
-                  </span>
-                  <span style={{ background: 'rgba(0,0,0,0.5)', color: '#6ee7b7', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(110, 231, 183, 0.4)' }}>
-                    BOTANICAL SUITE
-                  </span>
-                </div>
-
-                <div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                    L’Orangerie Garden Quarters
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: '#cbd5e1', marginBottom: '14px' }}>
-                    <span>96 m²</span>
-                    <span>&bull;</span>
-                    <span>King Canopy</span>
-                    <span>&bull;</span>
-                    <span>Private Courtyard</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>FROM</span>
-                      <div style={{ fontSize: '20px', fontWeight: 800, color: '#ffffff' }}>€920 <span style={{ fontSize: '12px', color: '#cbd5e1' }}>/ Night</span></div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const gardenRoom = rooms.find((r) => r.roomType === 'SUITE' || r.roomType === 'DELUXE') || rooms[0];
-                        setSelectedRoomForBooking(gardenRoom);
-                      }}
-                      style={{ background: '#ffffff', color: '#0f172a', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Explore Quarters
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Slidable Card 5: Alabaster Thermal Spa & Sommelier Salon */}
-              <div
-                style={{
-                  minWidth: '380px',
-                  flex: '0 0 auto',
-                  scrollSnapAlign: 'start',
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                  background: '#0f172a',
-                  color: '#ffffff',
-                  position: 'relative',
-                  boxShadow: '0 10px 25px -5px rgba(0,0,0,0.15)',
-                  height: '360px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                  padding: '24px',
-                  backgroundImage: `linear-gradient(180deg, rgba(15,23,42,0.3) 0%, rgba(15,23,42,0.85) 100%), url("${TABLE_RESERVATION_SHOWCASE[4].img}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ background: '#0f766e', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700 }}>
-                    Wellness &amp; Dining
-                  </span>
-                  <span style={{ background: 'rgba(0,0,0,0.5)', color: '#5eead4', padding: '4px 10px', borderRadius: '6px', fontSize: '11px', fontWeight: 700, border: '1px solid rgba(94, 234, 212, 0.4)' }}>
-                    EXCLUSIVE PRIVILEGE
-                  </span>
-                </div>
-
-                <div>
-                  <h3 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 6px', color: '#ffffff' }}>
-                    Alabaster Thermal Spa &amp; Salon
-                  </h3>
-                  <div style={{ display: 'flex', gap: '12px', fontSize: '12px', color: '#cbd5e1', marginBottom: '14px' }}>
-                    <span>Private Mineral Pools</span>
-                    <span>&bull;</span>
-                    <span>Rare Vintage Cellar</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <span style={{ fontSize: '10px', color: '#94a3b8', textTransform: 'uppercase' }}>PRIVILEGE</span>
-                      <div style={{ fontSize: '14px', fontWeight: 800, color: '#ffffff' }}>Complimentary with Suite</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('restaurant')}
-                      style={{ background: '#0f766e', color: '#ffffff', border: 'none', borderRadius: '8px', padding: '8px 16px', fontWeight: 700, fontSize: '12px', cursor: 'pointer' }}
-                    >
-                      Reserve Experience
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            )}
           </section>
+
 
           {/* ─── Curated Residences & Quarters Section ─── */}
           <section style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '14px' }}>
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#065f46', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--accent)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
                   TAILORED ACCOMMODATIONS
                 </span>
-                <h2 style={{ fontSize: '24px', fontWeight: 800, margin: '2px 0 0', color: '#0f172a' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: 800, margin: '2px 0 0', color: 'var(--text)' }}>
                   Curated Residences &amp; Quarters
                 </h2>
               </div>
@@ -1297,9 +1188,9 @@ const ClientDashboard = () => {
                       borderRadius: '20px',
                       fontSize: '12px',
                       fontWeight: 700,
-                      border: selectedType === t ? 'none' : '1px solid #cbd5e1',
-                      background: selectedType === t ? '#065f46' : '#ffffff',
-                      color: selectedType === t ? '#ffffff' : '#475569',
+                      border: selectedType === t ? 'none' : '1px solid var(--surface-line)',
+                      background: selectedType === t ? 'var(--primary)' : '#ffffff',
+                      color: selectedType === t ? '#ffffff' : 'var(--muted)',
                       cursor: 'pointer',
                     }}
                   >
@@ -1311,17 +1202,17 @@ const ClientDashboard = () => {
 
             {/* Active Search & Filter Indicator */}
             {searchQuery && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '20px', background: '#ecfdf5', padding: '10px 16px', borderRadius: '10px', border: '1px solid #a7f3d0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '20px', background: 'var(--surface-line)', padding: '10px 16px', borderRadius: '10px', border: '1px solid var(--surface-line)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '20px', color: '#065f46' }}>search</span>
-                  <span style={{ fontSize: '13px', color: '#065f46', fontWeight: 600 }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '20px', color: 'var(--accent)' }}>search</span>
+                  <span style={{ fontSize: '13px', color: 'var(--accent)', fontWeight: 600 }}>
                     Keyword filter: <strong>"{searchQuery}"</strong> &bull; {filteredRooms.length} {filteredRooms.length === 1 ? 'room' : 'rooms'} matched
                   </span>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  style={{ background: '#065f46', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  style={{ background: 'var(--primary)', color: '#ffffff', border: 'none', borderRadius: '6px', padding: '4px 10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>close</span>
                   Clear Search
@@ -1337,7 +1228,7 @@ const ClientDashboard = () => {
                   style={{
                     background: '#ffffff',
                     borderRadius: '16px',
-                    border: '1px solid #e2e8f0',
+                    border: '1px solid var(--surface-line)',
                     overflow: 'hidden',
                     boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)',
                     display: 'flex',
@@ -1347,42 +1238,42 @@ const ClientDashboard = () => {
                 >
                   <div style={{ position: 'relative', height: '220px', overflow: 'hidden' }}>
                     <img
-                      src={room.image || ROOM_IMAGES[room.roomType] || ROOM_IMAGES.SINGLE}
+                      src={withRoomImage(room).image}
                       alt={room.roomType}
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
-                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: '#0f172a', color: '#ffffff', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                    <div style={{ position: 'absolute', top: '12px', left: '12px', background: 'var(--text)', color: '#ffffff', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
                       Room {room.roomNumber} &bull; {room.roomType}
                     </div>
-                    <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: 'rgba(15,23,42,0.85)', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
-                      ${Number(room.basePrice || 0).toFixed(0)} <span style={{ fontSize: '10px', color: '#cbd5e1' }}>/ night</span>
+                    <div style={{ position: 'absolute', bottom: '12px', right: '12px', background: 'rgba(26, 26, 26,0.85)', color: '#ffffff', padding: '4px 10px', borderRadius: '6px', fontSize: '13px', fontWeight: 800, backdropFilter: 'blur(4px)' }}>
+                      ${Number(room.basePrice || 0).toFixed(0)} <span style={{ fontSize: '10px', color: 'var(--surface-line)' }}>/ night</span>
                     </div>
                   </div>
 
                   <div style={{ padding: '20px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                     <div>
-                      <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px', color: '#0f172a' }}>
+                      <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px', color: 'var(--text)' }}>
                         {room.roomType === 'PENTHOUSE' ? 'Atelier Presidential Penthouse' : room.roomType === 'DELUXE' ? 'Deluxe Ocean King' : room.roomType === 'SUITE' ? 'Executive Boutique Suite' : `${room.roomType} Comfort Quarter`}
                       </h3>
-                      <p style={{ fontSize: '12px', color: '#64748b', margin: '0 0 14px', lineHeight: 1.5 }}>
+                      <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '0 0 14px', lineHeight: 1.5 }}>
                         {room.description}
                       </p>
                     </div>
 
                     <div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-                        <span style={{ fontSize: '11px', background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '11px', background: 'var(--surface-soft)', color: 'var(--muted)', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                           <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>group</span>
                           Sleeps {room.capacity}
                         </span>
                         {room.hasBathtub && (
-                          <span style={{ fontSize: '11px', background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ fontSize: '11px', background: 'var(--surface-soft)', color: 'var(--muted)', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>bathtub</span>
                             Soaking Tub
                           </span>
                         )}
                         {room.hasBalcony && (
-                          <span style={{ fontSize: '11px', background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ fontSize: '11px', background: 'var(--surface-soft)', color: 'var(--muted)', padding: '3px 8px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>balcony</span>
                             Balcony
                           </span>
@@ -1394,7 +1285,7 @@ const ClientDashboard = () => {
                         onClick={() => setSelectedRoomForBooking(room)}
                         style={{
                           width: '100%',
-                          background: '#065f46',
+                          background: 'var(--primary)',
                           color: '#ffffff',
                           border: 'none',
                           borderRadius: '8px',
@@ -1418,116 +1309,122 @@ const ClientDashboard = () => {
             </div>
           </section>
 
-          {/* ─── Sensory Indulgence Section matching Image 5 ─── */}
-          <section style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', alignItems: 'center' }}>
-              <div style={{ position: 'relative', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 20px 40px rgba(0,0,0,0.15)', height: '420px' }}>
-                <img
-                  src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80"
-                  alt="Fine Dining"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(8px)', borderRadius: '12px', padding: '16px' }}>
-                  <span style={{ fontSize: '10px', fontWeight: 800, color: '#b45309', textTransform: 'uppercase' }}>★ SOMMELIER CELLAR</span>
-                  <h4 style={{ margin: '2px 0 4px', fontSize: '14px', color: '#0f172a' }}>Chef de Cave Wine Cellar</h4>
-                  <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>
-                    Cellar-poured bottle tastings at 19:30 with Grand Cru pairings.
-                  </p>
-                </div>
-              </div>
-
+          {/* --- Live dining tables & spa rituals straight from the database --- */}
+          <section className="itinerary-list-section">
+            <div className="itinerary-list-head">
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#065f46', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                  GASTRONOMY &bull; THERMAL WELL-BEING
+                <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+                  LIVE AVAILABILITY
                 </span>
-                <h2 style={{ fontSize: '32px', fontWeight: 800, margin: '6px 0 16px', color: '#0f172a', lineHeight: 1.2 }}>
-                  Sensory Indulgence, Refined Down to the Candle Flame
-                </h2>
-                <p style={{ fontSize: '14px', color: '#64748b', lineHeight: 1.6, margin: '0 0 24px' }}>
-                  Atelier's Michelin-starred restaurant champions heritage French techniques infused with modern biodynamic ingredients. Each table is choreographed as an intimate theatrical setting.
+                <h2>Dining Tables &amp; Spa Rituals</h2>
+                <p>
+                  Real inventory from the restaurant and wellness departments. Select any item to
+                  continue into the reservation flow.
                 </p>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                    <span className="material-symbols-outlined" style={{ color: '#b45309', fontSize: '20px' }}>wine_bar</span>
-                    <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a', margin: '4px 0 2px' }}>Private Sommelier Salon</strong>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Daily cellar reserve tastings paired with raw French artisan cheeses.</span>
-                  </div>
-
-                  <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0' }}>
-                    <span className="material-symbols-outlined" style={{ color: '#065f46', fontSize: '20px' }}>spa</span>
-                    <strong style={{ display: 'block', fontSize: '13px', color: '#0f172a', margin: '4px 0 2px' }}>Alabaster Thermal Spa</strong>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Hammam, magnesium immersion baths, and personalized herbal care.</span>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('restaurant')}
-                    style={{ background: '#065f46', color: '#ffffff', border: 'none', borderRadius: '8px', padding: '10px 20px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
-                  >
-                    Reserve a Table
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAlertNotice({ type: 'info', message: 'Spa concierge catalog sent to your folio inbox.' })}
-                    style={{ background: '#ffffff', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 18px', fontWeight: 700, fontSize: '13px', cursor: 'pointer' }}
-                  >
-                    Explore Spa Menu
-                  </button>
-                </div>
               </div>
             </div>
-          </section>
 
-          {/* ─── Distinguished Praise (Testimonials) matching Image 5 ─── */}
-          <section style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#065f46', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-              PATRON ENDORSEMENTS
-            </span>
-            <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '4px 0 32px', color: '#0f172a' }}>
-              Distinguished Praise
-            </h2>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', textAlign: 'left' }}>
-              {[
-                {
-                  stars: '★★★★★',
-                  quote: 'Waking up in the Grand Horizon Suite with the sun glowing over our balcony unforgettable. The piano salon concert at 10pm is deep thinking.',
-                  author: 'Lady Constance Sterling',
-                  location: 'London • Member since 2017',
-                },
-                {
-                  stars: '★★★★★',
-                  quote: 'Chef Jean-Luc\'s sommelier table exceeded our highest expectations. Universal hospitality and absolute discretion for our board dinner.',
-                  author: 'Henrik Lindqvist',
-                  location: 'Stockholm • Private Residence Guest',
-                },
-                {
-                  stars: '★★★★★',
-                  quote: 'Truly an oasis in Paris. Heated courtyard pool, museum access tickets in minutes, and a flawless concierge team. Truly world-class.',
-                  author: 'Camilla D\'Albis',
-                  location: 'Milan • Ambassador Guild Patron',
-                },
-              ].map((t, idx) => (
-                <div key={idx} style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '24px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.04)' }}>
-                  <div style={{ color: '#f59e0b', fontSize: '16px', marginBottom: '12px' }}>{t.stars}</div>
-                  <p style={{ fontSize: '13px', color: '#334155', lineHeight: 1.6, margin: '0 0 16px', fontStyle: 'italic' }}>
-                    "{t.quote}"
-                  </p>
-                  <div>
-                    <strong style={{ fontSize: '13px', color: '#0f172a', display: 'block' }}>{t.author}</strong>
-                    <span style={{ fontSize: '11px', color: '#94a3b8' }}>{t.location}</span>
-                  </div>
+            {mixError && (
+              <div className="api-error-panel" role="alert">
+                <span className="material-symbols-outlined">error</span>
+                <div>
+                  <strong>We couldn&apos;t load live availability.</strong>
+                  <p>{mixError}</p>
                 </div>
-              ))}
+                <button type="button" className="outline-button" onClick={loadBookableOptions}>
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            <div className="live-availability-grid">
+              <div className="itinerary-list-panel">
+                <div className="live-availability-head">
+                  <span className="material-symbols-outlined">restaurant</span>
+                  <div>
+                    <strong>Restaurant Tables ({tableOptions.length})</strong>
+                    <small>Main hall, terrace and private dining rooms</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="outline-button"
+                    onClick={() => setActiveTab('restaurant')}
+                  >
+                    Reserve
+                  </button>
+                </div>
+                {mixLoading ? (
+                  <div className="catalog-loading">
+                    <span className="spinner" />
+                    <p>Loading tables...</p>
+                  </div>
+                ) : tableOptions.length === 0 ? (
+                  <p className="live-availability-empty">No dining tables are currently listed.</p>
+                ) : (
+                  <ul className="live-availability-list">
+                    {tableOptions.map((table) => (
+                      <li key={table.id}>
+                        <div>
+                          <strong>Table {table.tableNumber}</strong>
+                          <small>
+                            {String(table.area || 'MAIN_HALL').replace(/_/g, ' ')} &bull; seats{' '}
+                            {table.capacity}
+                          </small>
+                        </div>
+                        <span className={`table-status-chip ${String(table.status || '').toLowerCase()}`}>
+                          {String(table.status || 'AVAILABLE').replace(/_/g, ' ')}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="itinerary-list-panel">
+                <div className="live-availability-head">
+                  <span className="material-symbols-outlined">spa</span>
+                  <div>
+                    <strong>Spa Rituals ({bookableSpaServices.length})</strong>
+                    <small>Treatments currently open for reservation</small>
+                  </div>
+                  <button
+                    type="button"
+                    className="outline-button"
+                    onClick={() => setActiveTab('spa')}
+                  >
+                    Reserve
+                  </button>
+                </div>
+                {mixLoading ? (
+                  <div className="catalog-loading">
+                    <span className="spinner" />
+                    <p>Loading rituals...</p>
+                  </div>
+                ) : bookableSpaServices.length === 0 ? (
+                  <p className="live-availability-empty">No spa rituals are currently listed.</p>
+                ) : (
+                  <ul className="live-availability-list">
+                    {bookableSpaServices.map((service) => (
+                      <li key={service.id}>
+                        <div>
+                          <strong>{service.name}</strong>
+                          <small>
+                            {String(service.category || '').replace(/_/g, ' ')} &bull;{' '}
+                            {service.durationMinutes} min
+                          </small>
+                        </div>
+                        <span className="live-availability-price">${service.price}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           </section>
 
           {/* ─── Accreditations Banner matching Image 5 ─── */}
           <section style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
-            <div style={{ background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', padding: '16px 24px', display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '16px', fontSize: '12px', fontWeight: 700, color: '#475569' }}>
+            <div style={{ background: 'var(--surface-soft)', borderRadius: '12px', border: '1px solid var(--surface-line)', padding: '16px 24px', display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap', gap: '16px', fontSize: '12px', fontWeight: 700, color: 'var(--muted)' }}>
               <span>&bull; Michelin Guide 3 Keys 2024</span>
               <span>&bull; Forbes Travel Guide &bull; 5-Star Hotel</span>
               <span>&bull; Wine Spectator &bull; Grand Award</span>
@@ -1537,12 +1434,12 @@ const ClientDashboard = () => {
 
           {/* ─── Private Member Newsletter Banner matching Image 5 ─── */}
           <section style={{ maxWidth: '1200px', margin: '40px auto', padding: '0 20px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #064e3b 0%, #065f46 100%)', borderRadius: '16px', padding: '40px', color: '#ffffff', textAlign: 'center' }}>
-              <span style={{ fontSize: '10px', fontWeight: 800, color: '#a7f3d0', letterSpacing: '0.08em', textTransform: 'uppercase' }}>PRIVATE MEMBERSHIP</span>
+            <div style={{ background: 'linear-gradient(135deg, var(--text) 0%, var(--accent) 100%)', borderRadius: '16px', padding: '40px', color: '#ffffff', textAlign: 'center' }}>
+              <span style={{ fontSize: '10px', fontWeight: 800, color: 'var(--surface-soft)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>PRIVATE MEMBERSHIP</span>
               <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '6px 0 8px', color: '#ffffff' }}>
                 Gain Access to Private Member Allocations &amp; Seasonal Tastings
               </h2>
-              <p style={{ fontSize: '13px', color: '#cbd5e1', maxWidth: '600px', margin: '0 auto 20px' }}>
+              <p style={{ fontSize: '13px', color: 'var(--surface-line)', maxWidth: '600px', margin: '0 auto 20px' }}>
                 Patrons receive invitation-only salon events, guaranteed suite upgrades, and bespoke airport transfers.
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', maxWidth: '480px', margin: '0 auto' }}>
@@ -1554,7 +1451,7 @@ const ClientDashboard = () => {
                 <button
                   type="button"
                   onClick={() => setAlertNotice({ type: 'success', message: 'Invitation requested. Our membership team will contact you shortly.' })}
-                  style={{ background: '#34d399', color: '#064e3b', border: 'none', borderRadius: '8px', padding: '10px 18px', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
+                  style={{ background: 'var(--accent)', color: 'var(--text)', border: 'none', borderRadius: '8px', padding: '10px 18px', fontWeight: 800, fontSize: '13px', cursor: 'pointer' }}
                 >
                   Request Invitation
                 </button>
@@ -1563,14 +1460,14 @@ const ClientDashboard = () => {
           </section>
 
           {/* ─── Luxury Dark Footer matching Image 5 ─── */}
-          <footer style={{ background: '#0f172a', color: '#ffffff', padding: '48px 20px 24px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+          <footer style={{ background: 'var(--text)', color: '#ffffff', padding: '48px 20px 24px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '32px', marginBottom: '36px' }}>
               <div>
                 <strong style={{ fontSize: '16px', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span className="material-symbols-outlined" style={{ color: '#10b981' }}>apartment</span>
+                  <span className="material-symbols-outlined" style={{ color: 'var(--accent)' }}>apartment</span>
                   Atelier Grand Hotel
                 </strong>
-                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '8px 0', lineHeight: 1.5 }}>
+                <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '8px 0', lineHeight: 1.5 }}>
                   874 Avenue Montaigne, 75008 Paris, France.<br />
                   Direct Concierge: +33 (0)1 45 62 40 00<br />
                   reservations@ateliergrand.com
@@ -1578,8 +1475,8 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>SANCTUARY SUITES</span>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: 2 }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase' }}>SANCTUARY SUITES</span>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: 'var(--surface-line)', lineHeight: 2 }}>
                   <li>Grand Horizon Chambers</li>
                   <li>Presidential Study &amp; Salon</li>
                   <li>L'Orangerie Garden Quarters</li>
@@ -1588,8 +1485,8 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>DINING &amp; LEISURE</span>
-                <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: '#cbd5e1', lineHeight: 2 }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase' }}>DINING &amp; LEISURE</span>
+                <ul style={{ listStyle: 'none', padding: 0, margin: '8px 0', fontSize: '12px', color: 'var(--surface-line)', lineHeight: 2 }}>
                   <li>Chef Jean-Luc's Table (3 Star)</li>
                   <li>The Alabaster Thermal Baths</li>
                   <li>Courtyard Sommelier Tastings</li>
@@ -1598,8 +1495,8 @@ const ClientDashboard = () => {
               </div>
 
               <div>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748b', textTransform: 'uppercase' }}>GUEST LEDGER &amp; PMS</span>
-                <p style={{ fontSize: '12px', color: '#94a3b8', margin: '8px 0 14px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--muted)', textTransform: 'uppercase' }}>GUEST LEDGER &amp; PMS</span>
+                <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '8px 0 14px' }}>
                   Already registered as Access Keycard holder or corporate entity? Switch to Staff Operations.
                 </p>
                 <button
@@ -1613,7 +1510,7 @@ const ClientDashboard = () => {
               </div>
             </div>
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#64748b' }}>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '20px', borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--muted)' }}>
               <span>&copy; 2026 ATELIER GRAND HOTEL &amp; RESIDENCES SAS. ALL RIGHTS RESERVED.</span>
               <div style={{ display: 'flex', gap: '16px' }}>
                 <span>PRIVACY POLICY</span>
@@ -1630,7 +1527,7 @@ const ClientDashboard = () => {
         <main className="client-main-content">
           <div className="reservations-page-header">
             <div>
-              <span className="eyebrow" style={{ color: '#064e3b' }}>Guest Itinerary</span>
+              <span className="eyebrow" style={{ color: 'var(--text)' }}>Guest Itinerary</span>
               <h1>My Reservations</h1>
               <p>Review your upcoming retreats, confirmed stays, and restaurant reservations.</p>
             </div>
@@ -1638,11 +1535,8 @@ const ClientDashboard = () => {
               <button
                 type="button"
                 className="outline-button"
-                onClick={() => {
-                  loadReservations();
-                  loadTableReservations();
-                }}
-                disabled={loadingReservations || loadingTableRes}
+                onClick={reloadAllReservations}
+                disabled={loadingReservations || loadingTableRes || loadingSpaRes}
                 style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
                 title="Fetch latest room and table reservations"
               >
@@ -1659,6 +1553,14 @@ const ClientDashboard = () => {
               </button>
               <button
                 type="button"
+                className="outline-button"
+                onClick={() => setActiveTab('spa')}
+              >
+                <span className="material-symbols-outlined">spa</span>
+                <span>Reserve Spa</span>
+              </button>
+              <button
+                type="button"
                 className="primary-button"
                 onClick={() => setActiveTab('book')}
               >
@@ -1668,7 +1570,192 @@ const ClientDashboard = () => {
             </div>
           </div>
 
-          {/* Sub-tabs header */}
+          {/* ─── Unified overview: rooms + tables + spa (real backend data) ─── */}
+          <section className="client-section" style={{ marginBottom: '36px' }}>
+            <div className="section-heading" style={{ marginBottom: '14px' }}>
+              <div>
+                <span className="eyebrow">ALL BOOKINGS</span>
+                <h2>Your Complete Itinerary</h2>
+              </div>
+            </div>
+
+            <div className="res-search-row">
+              <div className="catalog-search">
+                <span className="material-symbols-outlined">search</span>
+                <input
+                  type="search"
+                  value={resSearchQuery}
+                  onChange={(e) => setResSearchQuery(e.target.value)}
+                  placeholder="Search by room, table, ritual, status or date..."
+                  aria-label="Search my reservations"
+                />
+                {resSearchQuery && (
+                  <button
+                    type="button"
+                    className="spa-search-clear"
+                    onClick={() => setResSearchQuery('')}
+                    aria-label="Clear search"
+                  >
+                    <span className="material-symbols-outlined">close</span>
+                  </button>
+                )}
+              </div>
+              <span className="catalog-result-count">
+                {searchedRoomReservations.length +
+                  searchedTableReservations.length +
+                  searchedSpaReservations.length}{' '}
+                matching
+              </span>
+            </div>
+
+            <div className="res-status-filters" role="tablist" aria-label="Filter reservations by status">
+              {[
+                { id: 'ALL', label: 'All' },
+                { id: 'PENDING', label: 'Pending' },
+                { id: 'CONFIRMED', label: 'Confirmed' },
+                { id: 'COMPLETED', label: 'Completed' },
+                { id: 'CANCELLED', label: 'Cancelled' },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={resFilter === f.id}
+                  className={`res-status-filter ${resFilter === f.id ? 'active' : ''}`}
+                  onClick={() => setResFilter(f.id)}
+                >
+                  {f.label}
+                  <span className="res-status-count">{reservationCounts[f.id]}</span>
+                </button>
+              ))}
+            </div>
+
+            {(reservationsError || tableResError || spaResError) && (
+              <div className="api-error-panel" role="alert">
+                <span className="material-symbols-outlined">error</span>
+                <div>
+                  <strong>We couldn&apos;t load some reservations.</strong>
+                  <p>{reservationsError || tableResError || spaResError}</p>
+                </div>
+                <button type="button" className="outline-button" onClick={reloadAllReservations}>
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {loadingReservations || loadingTableRes || loadingSpaRes ? (
+              <div className="catalog-loading">
+                <span className="spinner" />
+                <p>Loading your reservations…</p>
+              </div>
+            ) : filteredReservations.length === 0 ? (
+              <div className="empty-card">
+                <span className="material-symbols-outlined">event_available</span>
+                <h3>
+                  {resFilter === 'ALL'
+                    ? 'You have no reservations yet'
+                    : `No ${resFilter.toLowerCase()} reservations`}
+                </h3>
+                <p>
+                  {resFilter === 'ALL'
+                    ? 'Browse our suites, spa rituals and dining experiences to plan your stay.'
+                    : 'Try selecting a different status filter.'}
+                </p>
+              </div>
+            ) : (
+              <div className="itinerary-list-panel">
+                <div className="table-wrap">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Reservation</th>
+                        <th>Date &amp; Details</th>
+                        <th>Time / Stay</th>
+                        <th>Guests</th>
+                        <th>Status</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredReservations.map((item) => {
+                        const bucket = statusBucket(item.status);
+                        const statusClass =
+                          bucket === 'CONFIRMED'
+                            ? 'status-green'
+                            : bucket === 'CANCELLED'
+                            ? 'status-red'
+                            : bucket === 'COMPLETED'
+                            ? 'status-navy'
+                            : 'status-amber';
+                        const canModify = bucket === 'PENDING' || bucket === 'CONFIRMED';
+                        const amount = Number(item.amount);
+                        return (
+                          <tr key={item.key}>
+                            <td>
+                              <span className="itinerary-type-chip">
+                                {item.type === 'ROOM' ? 'Room' : item.type === 'TABLE' ? 'Dining' : 'Spa'}
+                              </span>
+                              <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px' }}>
+                                #{item.id}
+                              </div>
+                            </td>
+                            <td>
+                              <strong>{item.title}</strong>
+                            </td>
+                            <td>
+                              {item.date}
+                              {item.endDate ? ` → ${item.endDate}` : ''}
+                            </td>
+                            <td>{item.time}</td>
+                            <td>{item.guests} Guests</td>
+                            <td>
+                              <span className={`status-badge ${statusClass}`}>{item.status}</span>
+                            </td>
+                            <td>
+                              {Number.isFinite(amount) ? `$${amount.toFixed(2)}` : '—'}
+                            </td>
+                            <td>
+                              {canModify && (
+                                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                  <button
+                                    type="button"
+                                    className="outline-button"
+                                    onClick={() => openReschedule(item)}
+                                    style={{ padding: '4px 10px', fontSize: '12px' }}
+                                  >
+                                    <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>edit_calendar</span>
+                                    <span>Modify</span>
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="cancel-btn"
+                                    onClick={() =>
+                                      item.type === 'ROOM'
+                                        ? handleCancelReservation(item.id)
+                                        : item.type === 'TABLE'
+                                        ? handleCancelTableReservation(item.id)
+                                        : handleCancelSpaReservation(item.id)
+                                    }
+                                    style={{ padding: '4px 10px', fontSize: '12px' }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </section>
+
+
           <div className="reservation-subtabs">
             <button
               type="button"
@@ -1697,9 +1784,18 @@ const ClientDashboard = () => {
               <span>Dining Reservations</span>
               <span className="subtab-count">{tableReservations.length}</span>
             </button>
+            <button
+              type="button"
+              className={`subtab-btn ${resSubTab === 'spa' ? 'active' : ''}`}
+              onClick={() => setResSubTab('spa')}
+            >
+              <span className="material-symbols-outlined">spa</span>
+              <span>Spa Rituals</span>
+              <span className="subtab-count">{spaReservations.length}</span>
+            </button>
           </div>
 
-          {(loadingReservations || loadingTableRes) && (
+          {(loadingReservations || loadingTableRes || loadingSpaRes) && (
             <div className="catalog-loading-state" style={{ margin: '20px 0' }}>
               <span className="spinner-large" />
               <p>Fetching your reservations...</p>
@@ -1707,16 +1803,17 @@ const ClientDashboard = () => {
           )}
 
           {/* Combined Empty State when viewing All and nothing booked */}
-          {resSubTab === 'all' && !loadingReservations && !loadingTableRes && reservations.length === 0 && tableReservations.length === 0 && (
+          {resSubTab === 'all' && !loadingReservations && !loadingTableRes && !loadingSpaRes && reservations.length === 0 && tableReservations.length === 0 && spaReservations.length === 0 && (
             <div className="empty-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)' }}>
                 event_busy
               </span>
               <h2 style={{ marginTop: '16px' }}>No reservations found</h2>
-              <p style={{ color: '#64748b', maxWidth: '440px', margin: '8px auto 24px' }}>
-                You have no active room stays or restaurant table reservations. Experience our hospitality by booking a room or reserving an artisanal table.
+              <p style={{ color: 'var(--muted)', maxWidth: '440px', margin: '8px auto 24px' }}>
+                You have no active room stays, restaurant table reservations, or spa rituals. Experience our
+                hospitality by booking a suite, reserving an artisanal table, or indulging in a spa treatment.
               </p>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   className="primary-button"
@@ -1731,27 +1828,61 @@ const ClientDashboard = () => {
                 >
                   Reserve a Table
                 </button>
+                <button
+                  type="button"
+                  className="outline-button"
+                  onClick={() => setActiveTab('spa')}
+                >
+                  Reserve a Spa Ritual
+                </button>
               </div>
             </div>
           )}
+
+          {/* Search produced no matches (but reservations do exist) */}
+          {resSearchQuery.trim() &&
+            !loadingReservations &&
+            !loadingTableRes &&
+            !loadingSpaRes &&
+            searchedRoomReservations.length +
+              searchedTableReservations.length +
+              searchedSpaReservations.length === 0 &&
+            reservations.length + tableReservations.length + spaReservations.length > 0 && (
+              <div className="empty-card" style={{ padding: '40px 20px', textAlign: 'center' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '42px', color: 'var(--muted)' }}>
+                  search_off
+                </span>
+                <h3 style={{ marginTop: '12px' }}>No reservations match “{resSearchQuery}”</h3>
+                <p style={{ color: 'var(--muted)' }}>
+                  Try a different room number, table, ritual name, status or date.
+                </p>
+                <button
+                  type="button"
+                  className="outline-button"
+                  onClick={() => setResSearchQuery('')}
+                >
+                  Clear Search
+                </button>
+              </div>
+            )}
 
           {/* Room Bookings Table */}
           {(resSubTab === 'all' || resSubTab === 'rooms') && (
             <div style={{ marginBottom: resSubTab === 'all' ? '32px' : '0' }}>
               {resSubTab === 'all' && reservations.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span className="material-symbols-outlined" style={{ color: '#064e3b' }}>hotel</span>
-                  <h2 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Hotel Room Stays ({reservations.length})</h2>
+                  <span className="material-symbols-outlined" style={{ color: 'var(--text)' }}>hotel</span>
+                  <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Hotel Room Stays ({searchedRoomReservations.length})</h2>
                 </div>
               )}
 
               {resSubTab === 'rooms' && !loadingReservations && reservations.length === 0 ? (
                 <div className="empty-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)' }}>
                     calendar_today
                   </span>
                   <h2 style={{ marginTop: '16px' }}>No room reservations yet</h2>
-                  <p style={{ color: '#64748b', maxWidth: '400px', margin: '8px auto 24px' }}>
+                  <p style={{ color: 'var(--muted)', maxWidth: '400px', margin: '8px auto 24px' }}>
                     You have no active or historical room bookings. Search our rooms and reserve your boutique getaway.
                   </p>
                   <button
@@ -1778,7 +1909,7 @@ const ClientDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {reservations.map((res) => {
+                          {searchedRoomReservations.map((res) => {
                             const canCancel = canCancelReservation(res);
                             const isFuture = isFutureDate(res.checkInDate);
 
@@ -1852,18 +1983,18 @@ const ClientDashboard = () => {
             <div>
               {resSubTab === 'all' && tableReservations.length > 0 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <span className="material-symbols-outlined" style={{ color: '#1a3a5c' }}>restaurant</span>
-                  <h2 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Dining Table Reservations ({tableReservations.length})</h2>
+                  <span className="material-symbols-outlined" style={{ color: 'var(--text)' }}>restaurant</span>
+                  <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Dining Table Reservations ({searchedTableReservations.length})</h2>
                 </div>
               )}
 
               {resSubTab === 'tables' && !loadingTableRes && tableReservations.length === 0 ? (
                 <div className="empty-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: '#94a3b8' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)' }}>
                     restaurant
                   </span>
                   <h2 style={{ marginTop: '16px' }}>No dining reservations yet</h2>
-                  <p style={{ color: '#64748b', maxWidth: '400px', margin: '8px auto 24px' }}>
+                  <p style={{ color: 'var(--muted)', maxWidth: '400px', margin: '8px auto 24px' }}>
                     Enjoy an unforgettable culinary journey at Atelier Restaurant. Reserve a table in the Main Hall, Terrace, or Private Room.
                   </p>
                   <button
@@ -1891,13 +2022,13 @@ const ClientDashboard = () => {
                           </tr>
                         </thead>
                         <tbody>
-                          {tableReservations.map((tr) => {
+                          {searchedTableReservations.map((tr) => {
                             const canCancel = ['PENDING', 'CONFIRMED'].includes(tr?.status);
                             return (
                               <tr key={tr.id}>
                                 <td>
                                   <div className="table-room-cell">
-                                    <span className="room-num-badge" style={{ backgroundColor: '#1a3a5c' }}>
+                                    <span className="room-num-badge" style={{ backgroundColor: 'var(--text)' }}>
                                       {tr.restaurantTable?.tableNumber || 'Table'}
                                     </span>
                                     <div>
@@ -1926,7 +2057,7 @@ const ClientDashboard = () => {
                                   <StatusBadge status={tr.status} />
                                 </td>
                                 <td>
-                                  <span style={{ color: '#6b7280', fontSize: '0.85rem' }}>
+                                  <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
                                     {tr.specialRequests || '—'}
                                   </span>
                                 </td>
@@ -1957,6 +2088,135 @@ const ClientDashboard = () => {
               )}
             </div>
           )}
+          {/* Spa Ritual Reservations Table — real spa_bookings rows for this guest */}
+          {(resSubTab === 'all' || resSubTab === 'spa') && (
+            <div style={{ marginTop: resSubTab === 'all' ? '32px' : '0' }}>
+              {resSubTab === 'all' && spaReservations.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                  <span className="material-symbols-outlined" style={{ color: 'var(--text)' }}>spa</span>
+                  <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Spa Ritual Reservations ({searchedSpaReservations.length})</h2>
+                </div>
+              )}
+
+              {spaResError && (
+                <div className="api-error-panel" role="alert" style={{ marginBottom: '16px' }}>
+                  <span className="material-symbols-outlined">error</span>
+                  <div>
+                    <strong>We couldn&apos;t load your spa reservations.</strong>
+                    <p>{spaResError}</p>
+                  </div>
+                  <button type="button" className="outline-button" onClick={loadSpaReservations}>
+                    Retry
+                  </button>
+                </div>
+              )}
+
+              {resSubTab === 'spa' && loadingSpaRes ? (
+                <div className="catalog-loading-state" style={{ margin: '20px 0' }}>
+                  <span className="spinner-large" />
+                  <p>Fetching your spa rituals...</p>
+                </div>
+              ) : resSubTab === 'spa' && spaReservations.length === 0 ? (
+                <div className="empty-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
+                  <span className="material-symbols-outlined" style={{ fontSize: '48px', color: 'var(--muted)' }}>
+                    spa
+                  </span>
+                  <h2 style={{ marginTop: '16px' }}>No spa rituals reserved yet</h2>
+                  <p style={{ color: 'var(--muted)', maxWidth: '420px', margin: '8px auto 24px' }}>
+                    Indulge in our botanical sanctuary. Browse the treatment menu and secure your
+                    preferred date and arrival time.
+                  </p>
+                  <button
+                    type="button"
+                    className="primary-button"
+                    onClick={() => setActiveTab('spa')}
+                  >
+                    Reserve a Spa Ritual
+                  </button>
+                </div>
+              ) : (
+                spaReservations.length > 0 && (
+                  <div className="reservations-table-panel">
+                    <div className="table-wrap">
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th>Ritual</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Duration</th>
+                            <th>Guests</th>
+                            <th>Price</th>
+                            <th>Status</th>
+                            <th>Special Requests</th>
+                            <th style={{ textAlign: 'right' }}>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {searchedSpaReservations.map((sb) => {
+                            const canCancel = ['PENDING', 'CONFIRMED'].includes(sb?.status);
+                            const durationMinutes = sb?.duration || sb?.spaService?.durationMinutes || 0;
+                            return (
+                              <tr key={sb.id}>
+                                <td>
+                                  <div className="table-room-cell">
+                                    <span className="room-num-badge" style={{ backgroundColor: 'var(--accent)' }}>
+                                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>spa</span>
+                                    </span>
+                                    <div>
+                                      <strong>{sb.spaService?.name || `Spa ritual #${sb.id}`}</strong>
+                                      <span className="text-muted-sm">
+                                        {sb.spaService?.category
+                                          ? String(sb.spaService.category).replace('_', ' ')
+                                          : `#${sb.id}`}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </td>
+                                <td>{sb.bookingDate}</td>
+                                <td>
+                                  <span className="text-muted-sm" style={{ display: 'block' }}>
+                                    {sb.startTime}
+                                  </span>
+                                </td>
+                                <td>{durationMinutes ? `${durationMinutes} min` : '—'}</td>
+                                <td>
+                                  <span>{sb.numberOfGuests} {sb.numberOfGuests === 1 ? 'Guest' : 'Guests'}</span>
+                                </td>
+                                <td>{sb.totalPrice != null ? `$${Number(sb.totalPrice).toFixed(2)}` : '—'}</td>
+                                <td>
+                                  <StatusBadge status={sb.status} />
+                                </td>
+                                <td>
+                                  <span style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>
+                                    {sb.specialRequests || '—'}
+                                  </span>
+                                </td>
+                                <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                  {canCancel && (
+                                    <button
+                                      type="button"
+                                      className="table-cancel-btn"
+                                      onClick={() => handleCancelSpaReservation(sb.id)}
+                                    >
+                                      <span className="material-symbols-outlined">cancel</span>
+                                      <span>Cancel</span>
+                                    </button>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+
+
         </main>
       )}
 
@@ -1980,8 +2240,8 @@ const ClientDashboard = () => {
 
       {/* Tab: Spa Sanctuary */}
       {activeTab === 'spa' && (
-        <main className="client-main-content">
-          <ClientSpaView />
+        <main className="client-main-content spa-main">
+          <ClientSpaView initialServiceId={pendingSpaServiceId} />
         </main>
       )}
 
@@ -1990,7 +2250,7 @@ const ClientDashboard = () => {
         <main className="client-main-content">
           <div className="reservations-page-header">
             <div>
-              <span className="eyebrow" style={{ color: '#064e3b' }}>Guest Account</span>
+              <span className="eyebrow" style={{ color: 'var(--text)' }}>Guest Account</span>
               <h1>Profile & Stay Preferences</h1>
               <p>Manage your contact information and customize your personalized hotel stay preferences.</p>
             </div>
@@ -2010,6 +2270,203 @@ const ClientDashboard = () => {
           onClose={() => setSelectedRoomForBooking(null)}
         />
       )}
+
+      {/* Modify Date / Time panel — submits to the real backend for re-approval */}
+      {rescheduleTarget && (
+        <div className="modal-backdrop">
+          <div className="modal-card" style={{ maxWidth: '520px' }}>
+            <div className="modal-header">
+              <div>
+                <span className="eyebrow" style={{ color: 'var(--accent)' }}>
+                  MODIFY RESERVATION
+                </span>
+                <h2>{rescheduleTarget.title}</h2>
+              </div>
+              <button
+                type="button"
+                className="icon-button"
+                onClick={() => setRescheduleTarget(null)}
+                aria-label="Close"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={submitReschedule} style={{ marginTop: '18px' }}>
+              {rescheduleError && (
+                <div className="api-error-panel" role="alert">
+                  <span className="material-symbols-outlined">error</span>
+                  <div>
+                    <strong>Change rejected</strong>
+                    <p>{rescheduleError}</p>
+                  </div>
+                </div>
+              )}
+
+              {rescheduleTarget.type === 'ROOM' && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="res-checkin">New Check-in Date</label>
+                    <input
+                      id="res-checkin"
+                      type="date"
+                      className="field"
+                      required
+                      value={rescheduleValues.checkInDate || ''}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, checkInDate: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-checkout">New Check-out Date</label>
+                    <input
+                      id="res-checkout"
+                      type="date"
+                      className="field"
+                      required
+                      value={rescheduleValues.checkOutDate || ''}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, checkOutDate: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-guests">Guests</label>
+                    <select
+                      id="res-guests"
+                      className="field"
+                      value={rescheduleValues.numberOfGuests || 1}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, numberOfGuests: e.target.value }))
+                      }
+                    >
+                      {[1, 2, 3, 4, 5, 6].map((n) => (
+                        <option key={n} value={n}>{n} Guest{n > 1 ? 's' : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {rescheduleTarget.type === 'TABLE' && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="res-table-date">New Date</label>
+                    <input
+                      id="res-table-date"
+                      type="date"
+                      className="field"
+                      required
+                      value={rescheduleValues.reservationDate || ''}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, reservationDate: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-table-time">Time Slot</label>
+                    <select
+                      id="res-table-time"
+                      className="field"
+                      value={rescheduleValues.timeSlot || '18:00'}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, timeSlot: e.target.value }))
+                      }
+                    >
+                      {['12:00', '12:30', '13:00', '18:00', '18:30', '19:00', '19:30', '20:00'].map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-table-party">Party Size</label>
+                    <select
+                      id="res-table-party"
+                      className="field"
+                      value={rescheduleValues.partySize || 2}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, partySize: e.target.value }))
+                      }
+                    >
+                      {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                        <option key={n} value={n}>{n} Guest{n > 1 ? 's' : ''}</option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {rescheduleTarget.type === 'SPA' && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="res-spa-date">New Date</label>
+                    <input
+                      id="res-spa-date"
+                      type="date"
+                      className="field"
+                      required
+                      value={rescheduleValues.bookingDate || ''}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, bookingDate: e.target.value }))
+                      }
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-spa-time">Arrival Time</label>
+                    <select
+                      id="res-spa-time"
+                      className="field"
+                      value={rescheduleValues.startTime || '10:30'}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, startTime: e.target.value }))
+                      }
+                    >
+                      {['09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00', '19:30'].map((t) => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="res-spa-guests">Guests</label>
+                    <select
+                      id="res-spa-guests"
+                      className="field"
+                      value={rescheduleValues.numberOfGuests || 1}
+                      onChange={(e) =>
+                        setRescheduleValues((v) => ({ ...v, numberOfGuests: e.target.value }))
+                      }
+                    >
+                      <option value="1">1 Guest</option>
+                      <option value="2">2 Guests</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              <p style={{ fontSize: '12px', color: 'var(--muted)', margin: '4px 0 0' }}>
+                Changing a reservation returns it to <strong>PENDING</strong> so our team can
+                re-confirm availability.
+              </p>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setRescheduleTarget(null)}
+                  disabled={rescheduleSubmitting}
+                >
+                  Keep Original
+                </button>
+                <button type="submit" className="primary-button" disabled={rescheduleSubmitting}>
+                  {rescheduleSubmitting ? 'Submitting…' : 'Submit Change'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };

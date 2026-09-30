@@ -105,65 +105,193 @@ public class SpaBookingService {
 <span class="fc" id="L105">        return spaBookingRepository.save(booking);</span>
     }
 
+    /**
+     * Re-schedules an existing spa booking owned by the acting guest.
+     *
+     * Server-side validation:
+     *  - ownership (mismatch -&gt; AccessDeniedException / 403)
+     *  - only PENDING or CONFIRMED may change
+     *  - date must not be in the past; time must match HH:mm
+     *  - guest count within 1..20 and within the service capacity
+     *  - slot capacity conflict check (excluding this booking)
+     *  - status returns to PENDING so staff re-approve the change
+     */
+    public SpaBooking rescheduleBooking(Long id, LocalDate newDate, String newStartTime,
+                                        Integer newGuests, Long actingGuestId) {
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L122">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+        }
+<span class="nc" id="L124">        SpaBooking booking = spaBookingRepository.findById(id)</span>
+<span class="nc" id="L125">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">        requireOwnership(booking.getGuest() != null ? booking.getGuest().getId() : null,</span>
+<span class="nc" id="L128">            actingGuestId);</span>
+
+<span class="nc bnc" id="L130" title="All 2 branches missed.">        if (!SpaBookingStatus.PENDING.equals(booking.getStatus())</span>
+<span class="nc bnc" id="L131" title="All 2 branches missed.">            &amp;&amp; !SpaBookingStatus.CONFIRMED.equals(booking.getStatus())) {</span>
+<span class="nc" id="L132">            throw new IllegalStateException(</span>
+<span class="nc" id="L133">                &quot;Cannot modify a booking with status: &quot; + booking.getStatus());</span>
+        }
+
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (newDate == null) {</span>
+<span class="nc" id="L137">            throw new IllegalArgumentException(&quot;Booking date is required&quot;);</span>
+        }
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if (newDate.isBefore(LocalDate.now())) {</span>
+<span class="nc" id="L140">            throw new IllegalArgumentException(&quot;Cannot book a spa treatment in the past&quot;);</span>
+        }
+<span class="nc bnc" id="L142" title="All 4 branches missed.">        if (newStartTime == null || !newStartTime.trim().matches(&quot;^([01][0-9]|2[0-3]):[0-5][0-9]$&quot;)) {</span>
+<span class="nc" id="L143">            throw new IllegalArgumentException(&quot;Start time must be in HH:mm format (e.g. 14:00)&quot;);</span>
+        }
+
+<span class="nc" id="L146">        SpaService service = booking.getSpaService();</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">        if (service == null) {</span>
+<span class="nc" id="L148">            throw new IllegalArgumentException(&quot;Spa service is missing on this booking&quot;);</span>
+        }
+
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        int guests = newGuests != null ? newGuests : booking.getNumberOfGuests();</span>
+<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (guests &lt; 1 || guests &gt; 20) {</span>
+<span class="nc" id="L153">            throw new IllegalArgumentException(&quot;Number of guests must be between 1 and 20&quot;);</span>
+        }
+<span class="nc bnc" id="L155" title="All 4 branches missed.">        if (service.getCapacity() != null &amp;&amp; guests &gt; service.getCapacity()) {</span>
+<span class="nc" id="L156">            throw new IllegalArgumentException(&quot;Number of guests (&quot; + guests</span>
+<span class="nc" id="L157">                + &quot;) exceeds maximum service capacity (&quot; + service.getCapacity() + &quot;)&quot;);</span>
+        }
+
+<span class="nc" id="L160">        List&lt;SpaBooking&gt; existing = spaBookingRepository</span>
+<span class="nc" id="L161">            .findBySpaServiceAndBookingDateAndStartTimeAndStatusNot(</span>
+<span class="nc" id="L162">                service, newDate, newStartTime, SpaBookingStatus.CANCELLED);</span>
+
+<span class="nc" id="L164">        int bookedGuests = existing.stream()</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            .filter(b -&gt; !b.getId().equals(booking.getId()))</span>
+<span class="nc" id="L166">            .mapToInt(SpaBooking::getNumberOfGuests)</span>
+<span class="nc" id="L167">            .sum();</span>
+
+<span class="nc" id="L169">        int availableCapacity = service.getCapacity() - bookedGuests;</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">        if (guests &gt; availableCapacity) {</span>
+<span class="nc" id="L171">            throw new IllegalStateException(&quot;Capacity conflict: This time slot only has &quot;</span>
+<span class="nc" id="L172">                + Math.max(0, availableCapacity) + &quot; spot(s) remaining for &quot; + service.getName());</span>
+        }
+
+<span class="nc" id="L175">        booking.setBookingDate(newDate);</span>
+<span class="nc" id="L176">        booking.setStartTime(newStartTime);</span>
+<span class="nc" id="L177">        booking.setNumberOfGuests(guests);</span>
+<span class="nc" id="L178">        booking.setDuration(service.getDurationMinutes());</span>
+<span class="nc" id="L179">        booking.setTotalPrice(service.getPrice().multiply(BigDecimal.valueOf(guests)));</span>
+<span class="nc" id="L180">        booking.setStatus(SpaBookingStatus.PENDING);</span>
+<span class="nc" id="L181">        booking.setUpdatedAt(LocalDateTime.now());</span>
+
+<span class="nc" id="L183">        return spaBookingRepository.save(booking);</span>
+    }
+
+    /**
+     * Cancels a booking on behalf of a specific guest, enforcing ownership.
+     */
+    public SpaBooking cancelBookingAs(Long id, Long actingGuestId) {
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L191">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+        }
+<span class="nc" id="L193">        SpaBooking booking = spaBookingRepository.findById(id)</span>
+<span class="nc" id="L194">            .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        requireOwnership(booking.getGuest() != null ? booking.getGuest().getId() : null,</span>
+<span class="nc" id="L196">            actingGuestId);</span>
+<span class="nc" id="L197">        return cancelBooking(id);</span>
+    }
+
+    /**
+     * Admin queue: spa bookings still awaiting approval.
+     */
+    public List&lt;SpaBooking&gt; getPendingBookings() {
+<span class="nc" id="L204">        return spaBookingRepository.findByStatus(SpaBookingStatus.PENDING);</span>
+    }
+
+    private void requireOwnership(Long ownerGuestId, Long actingGuestId) {
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (actingGuestId == null) {</span>
+<span class="nc" id="L209">            throw new IllegalArgumentException(&quot;actingGuestId is required&quot;);</span>
+        }
+<span class="nc bnc" id="L211" title="All 4 branches missed.">        if (ownerGuestId == null || !ownerGuestId.equals(actingGuestId)) {</span>
+<span class="nc" id="L212">            throw new com.hotelmanagement.exception.AccessDeniedException(</span>
+<span class="nc" id="L213">                &quot;You may only modify your own reservations&quot;);</span>
+        }
+<span class="nc" id="L215">    }</span>
+
+
     public List&lt;SpaBooking&gt; getAllBookings() {
-<span class="nc" id="L109">        return spaBookingRepository.findAll();</span>
+<span class="nc" id="L219">        return spaBookingRepository.findAll();</span>
     }
 
     public Optional&lt;SpaBooking&gt; getBookingById(Long id) {
-<span class="pc bpc" id="L113" title="1 of 2 branches missed.">        if (id == null) {</span>
-<span class="nc" id="L114">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L223" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L224">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
         }
-<span class="fc" id="L116">        return spaBookingRepository.findById(id);</span>
+<span class="fc" id="L226">        return spaBookingRepository.findById(id);</span>
     }
 
     public List&lt;SpaBooking&gt; getBookingsByGuest(Long guestId) {
-<span class="pc bpc" id="L120" title="1 of 2 branches missed.">        if (guestId == null) {</span>
-<span class="nc" id="L121">            throw new IllegalArgumentException(&quot;Guest ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">        if (guestId == null) {</span>
+<span class="nc" id="L231">            throw new IllegalArgumentException(&quot;Guest ID cannot be null&quot;);</span>
         }
-<span class="fc" id="L123">        return spaBookingRepository.findByGuestId(guestId);</span>
+<span class="fc" id="L233">        return spaBookingRepository.findByGuestId(guestId);</span>
     }
 
     public List&lt;SpaBooking&gt; getBookingsByDate(LocalDate date) {
-<span class="nc bnc" id="L127" title="All 2 branches missed.">        if (date == null) {</span>
-<span class="nc" id="L128">            throw new IllegalArgumentException(&quot;Date cannot be null&quot;);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (date == null) {</span>
+<span class="nc" id="L238">            throw new IllegalArgumentException(&quot;Date cannot be null&quot;);</span>
         }
-<span class="nc" id="L130">        return spaBookingRepository.findByBookingDate(date);</span>
+<span class="nc" id="L240">        return spaBookingRepository.findByBookingDate(date);</span>
     }
 
     public SpaBooking confirmBooking(Long id) {
-<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        if (id == null) {</span>
-<span class="nc" id="L135">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L245">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
         }
-<span class="fc" id="L137">        SpaBooking booking = spaBookingRepository.findById(id)</span>
-<span class="pc" id="L138">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
+<span class="fc" id="L247">        SpaBooking booking = spaBookingRepository.findById(id)</span>
+<span class="pc" id="L248">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
 
-<span class="fc" id="L140">        booking.confirm();</span>
-<span class="fc" id="L141">        booking.setUpdatedAt(LocalDateTime.now());</span>
-<span class="fc" id="L142">        return spaBookingRepository.save(booking);</span>
+<span class="fc" id="L250">        booking.confirm();</span>
+<span class="fc" id="L251">        booking.setUpdatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L252">        return spaBookingRepository.save(booking);</span>
     }
 
     public SpaBooking completeBooking(Long id) {
-<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (id == null) {</span>
-<span class="nc" id="L147">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L256" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L257">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
         }
-<span class="fc" id="L149">        SpaBooking booking = spaBookingRepository.findById(id)</span>
-<span class="pc" id="L150">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
+<span class="fc" id="L259">        SpaBooking booking = spaBookingRepository.findById(id)</span>
+<span class="pc" id="L260">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
 
-<span class="fc" id="L152">        booking.complete();</span>
-<span class="fc" id="L153">        booking.setUpdatedAt(LocalDateTime.now());</span>
-<span class="fc" id="L154">        return spaBookingRepository.save(booking);</span>
+<span class="fc" id="L262">        booking.complete();</span>
+<span class="fc" id="L263">        booking.setUpdatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L264">        return spaBookingRepository.save(booking);</span>
     }
 
     public SpaBooking cancelBooking(Long id) {
-<span class="pc bpc" id="L158" title="1 of 2 branches missed.">        if (id == null) {</span>
-<span class="nc" id="L159">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+<span class="pc bpc" id="L268" title="1 of 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L269">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
         }
-<span class="fc" id="L161">        SpaBooking booking = spaBookingRepository.findById(id)</span>
-<span class="pc" id="L162">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
+<span class="fc" id="L271">        SpaBooking booking = spaBookingRepository.findById(id)</span>
+<span class="pc" id="L272">                .orElseThrow(() -&gt; new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id));</span>
 
-<span class="fc" id="L164">        booking.cancel();</span>
-<span class="fc" id="L165">        booking.setUpdatedAt(LocalDateTime.now());</span>
-<span class="fc" id="L166">        return spaBookingRepository.save(booking);</span>
+<span class="fc" id="L274">        booking.cancel();</span>
+<span class="fc" id="L275">        booking.setUpdatedAt(LocalDateTime.now());</span>
+<span class="fc" id="L276">        return spaBookingRepository.save(booking);</span>
     }
+
+    /**
+     * Permanently removes a spa booking record.
+     *
+     * Used by the wellness desk when clearing cancelled or test appointments so the
+     * appointment list only ever shows real, currently-tracked bookings.
+     *
+     * @throws IllegalArgumentException when no booking exists for the id
+     */
+    public void deleteBooking(Long id) {
+<span class="nc bnc" id="L288" title="All 2 branches missed.">        if (id == null) {</span>
+<span class="nc" id="L289">            throw new IllegalArgumentException(&quot;ID cannot be null&quot;);</span>
+        }
+<span class="nc bnc" id="L291" title="All 2 branches missed.">        if (!spaBookingRepository.existsById(id)) {</span>
+<span class="nc" id="L292">            throw new IllegalArgumentException(&quot;Spa booking not found with ID: &quot; + id);</span>
+        }
+<span class="nc" id="L294">        spaBookingRepository.deleteById(id);</span>
+<span class="nc" id="L295">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

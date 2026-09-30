@@ -1,17 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { spaBookingAPI, spaServiceAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getSpaImage } from '../utils/propertyImages';
+import ReservationDateTimePicker from './ReservationDateTimePicker';
+
+const SPA_HERO_IMAGE =
+  'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1920&q=85';
+
+// Service types come from the SpaCategory enum persisted with each treatment.
+const SPA_CATEGORIES = [
+  'ALL',
+  'MASSAGE',
+  'FACIAL',
+  'BODY_TREATMENT',
+  'WELLNESS',
+  'COUPLES',
+  'BEAUTY',
+];
 
 const TIME_SLOTS = [
   '09:00', '10:30', '12:00', '13:30', '15:00', '16:30', '18:00', '19:30'
 ];
 
-const ClientSpaView = () => {
+const ClientSpaView = ({ initialServiceId = null }) => {
   const { currentUser } = useAuth();
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [activeModalService, setActiveModalService] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('ALL');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Form states
   const [bookingDate, setBookingDate] = useState(() => {
@@ -27,6 +46,7 @@ const ClientSpaView = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError('');
     try {
       let clientBookings = [];
       if (currentUser?.id) {
@@ -35,33 +55,35 @@ const ClientSpaView = () => {
           if (res.data && Array.isArray(res.data)) {
             clientBookings = res.data;
           }
-        } catch (_) {}
+        } catch (err) {
+          setLoadError(
+            err?.response?.data?.message ||
+              'We could not load your spa appointments. Please retry.'
+          );
+        }
       }
 
-      // Check local storage for any cached bookings
-      try {
-        const key = `client_spa_bookings_${currentUser?.email}`;
-        const stored = JSON.parse(localStorage.getItem(key) || '[]');
-        if (Array.isArray(stored)) {
-          const existingIds = new Set(clientBookings.map((b) => String(b.id)));
-          for (const s of stored) {
-            if (!existingIds.has(String(s.id))) {
-              clientBookings.push(s);
-              existingIds.add(String(s.id));
-            }
-          }
-        }
-      } catch (_) {}
-
+      // Server is the single source of truth for reservations.
       setAppointments(clientBookings);
 
-      // Load active treatments
-      const servRes = await spaServiceAPI.getActive();
-      if (servRes.data && Array.isArray(servRes.data)) {
-        setServices(servRes.data);
+      // Load active treatments — the catalogue comes from the backend only.
+      try {
+        const servRes = await spaServiceAPI.getActive();
+        setServices(servRes.data && Array.isArray(servRes.data) ? servRes.data : []);
+      } catch (err) {
+        setServices([]);
+        setLoadError(
+          err?.response?.data?.message ||
+            'We could not load the spa treatment catalogue. Please retry.'
+        );
       }
     } catch (err) {
-      console.warn('Spa client data load failed:', err);
+      setLoadError(
+        err?.response?.data?.message ||
+          'The spa service is temporarily unavailable. Please retry.'
+      );
+      setServices([]);
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -69,16 +91,32 @@ const ClientSpaView = () => {
 
   useEffect(() => {
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
+
+  // Open the treatment carried over from a pre-login reservation intent.
+  useEffect(() => {
+    if (!initialServiceId || services.length === 0 || activeModalService) return;
+    const match = services.find((s) => String(s.id) === String(initialServiceId));
+    if (match) setActiveModalService(match);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialServiceId, services]);
 
   const handleBookSubmit = async (e) => {
     e.preventDefault();
     if (!activeModalService) return;
+    if (!currentUser?.id) {
+      setAlertNotice({
+        type: 'error',
+        message: 'Your session has expired. Please sign in again to reserve a treatment.',
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
       const payload = {
-        guestId: currentUser?.id || 1,
+        guestId: currentUser.id,
         spaServiceId: activeModalService.id,
         bookingDate,
         startTime,
@@ -86,77 +124,125 @@ const ClientSpaView = () => {
         specialRequests: specialRequests || 'Relaxation preference',
       };
 
+      // Submit to the real backend. Never fabricate a booking when the call fails.
       let created = null;
       try {
         const res = await spaBookingAPI.create(payload);
-        if (res && res.data) {
-          created = res.data;
-        }
+        created = res && res.data ? res.data : null;
       } catch (err) {
-        console.warn('Backend spa create skipped, saving locally:', err);
+        setAlertNotice({
+          type: 'error',
+          message:
+            err?.response?.data?.message ||
+            err?.message ||
+            'Unable to submit your spa reservation. Please try again.',
+        });
+        return;
       }
 
       if (!created) {
-        created = {
-          id: Date.now(),
-          guest: currentUser,
-          spaService: activeModalService,
-          bookingDate,
-          startTime,
-          numberOfGuests: Number(numberOfGuests || 1),
-          status: 'CONFIRMED',
-          specialRequests,
-        };
+        setAlertNotice({
+          type: 'error',
+          message: 'The server did not return a reservation. Please try again.',
+        });
+        return;
       }
 
-      const updated = [created, ...appointments];
-      setAppointments(updated);
-      try {
-        const key = `client_spa_bookings_${currentUser?.email}`;
-        localStorage.setItem(key, JSON.stringify(updated));
-      } catch (_) {}
-
+      setAppointments((prev) => [created, ...prev]);
       setActiveModalService(null);
       setAlertNotice({
         type: 'success',
-        message: `Spa appointment secured for ${activeModalService.name} on ${bookingDate} at ${startTime}!`,
+        message: `Reservation request received for ${activeModalService.name} on ${bookingDate} at ${startTime}. Status: ${created.status || 'PENDING'} — our spa team will confirm shortly.`,
       });
-      setTimeout(() => setAlertNotice(null), 5000);
+      setTimeout(() => setAlertNotice(null), 7000);
     } catch (err) {
-      alert(err.message || 'Unable to confirm spa appointment.');
+      setAlertNotice({
+        type: 'error',
+        message:
+          err?.response?.data?.message ||
+          err?.message ||
+          'Unable to submit your spa reservation.',
+      });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const handleCancelAppointment = async (id) => {
-    if (!window.confirm('Are you sure you want to cancel this spa appointment?')) return;
-    try {
-      try {
-        await spaBookingAPI.cancel(id);
-      } catch (_) {}
-
-      const updated = appointments.map((a) =>
-        String(a.id) === String(id) ? { ...a, status: 'CANCELLED' } : a
+  const filteredServices = useMemo(() => {
+    const q = (searchQuery || '').trim().toLowerCase();
+    return services.filter((s) => {
+      const matchesCategory = selectedCategory === 'ALL' || s.category === selectedCategory;
+      if (!matchesCategory) return false;
+      if (!q) return true;
+      return (
+        (s.name || '').toLowerCase().includes(q) ||
+        (s.description || '').toLowerCase().includes(q) ||
+        (s.category || '').replace('_', ' ').toLowerCase().includes(q)
       );
-      setAppointments(updated);
-      try {
-        const key = `client_spa_bookings_${currentUser?.email}`;
-        localStorage.setItem(key, JSON.stringify(updated));
-      } catch (_) {}
+    });
+  }, [services, selectedCategory, searchQuery]);
 
-      setAlertNotice({
-        type: 'info',
-        message: 'Spa appointment cancelled successfully.',
-      });
-      setTimeout(() => setAlertNotice(null), 4000);
-    } catch (err) {
-      alert(err.message || 'Unable to cancel appointment.');
-    }
-  };
+  const upcomingCount = useMemo(
+    () => appointments.filter((a) => a.status !== 'CANCELLED').length,
+    [appointments]
+  );
 
   return (
-    <div className="client-spa-view">
+    <div className="client-spa-view spa-reservation-page">
+      {/* ─── Luxury Spa Hero Banner (matches room & table reservation pages) ─── */}
+      <section
+        className="spa-reservation-hero"
+        style={{
+          background: `linear-gradient(rgba(26, 26, 26, 0.72), rgba(26, 26, 26, 0.9)), url("${SPA_HERO_IMAGE}") center/cover no-repeat`,
+        }}
+      >
+        <div className="spa-reservation-hero-inner">
+          <span className="spa-hero-kicker">
+            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>spa</span>
+            WELLNESS &amp; BOTANICAL SANCTUARY
+          </span>
+          <h1>Reserve Your Spa Ritual</h1>
+          <p>
+            Surrender to tranquil serenity. Our bespoke treatments blend ancient botanical
+            wisdom with modern therapeutic care to restore vital energy and rejuvenate body
+            and spirit.
+          </p>
+          <div className="spa-hero-stats">
+            <div className="spa-hero-stat">
+              <strong>{services.length}</strong>
+              <span>Active Rituals</span>
+            </div>
+            <div className="spa-hero-stat">
+              <strong>{upcomingCount}</strong>
+              <span>My Appointments</span>
+            </div>
+            <div className="spa-hero-stat">
+              <strong>09:00 – 19:30</strong>
+              <span>Daily Opening</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Category filter bar */}
+      <div className="spa-reservation-filter">
+        <div className="section-container">
+          <div className="spa-category-nav">
+            {SPA_CATEGORIES.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                className={`spa-category-pill ${selectedCategory === cat ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat.replace('_', ' ')}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 20px 0' }}>
       {alertNotice && (
         <div className={`client-toast client-toast-${alertNotice.type}`} style={{ marginBottom: '20px' }}>
           <span className="material-symbols-outlined">
@@ -166,83 +252,37 @@ const ClientSpaView = () => {
         </div>
       )}
 
-      {/* Appointments History Section */}
-      <section className="client-section" style={{ marginBottom: '40px' }}>
-        <div className="section-heading">
+      {/* Schedule summary — full details & actions live in My Reservations */}
+      <section className="client-section" style={{ marginBottom: '32px' }}>
+        <div className="spa-schedule-strip">
+          <span className="material-symbols-outlined">event_available</span>
           <div>
-            <span className="eyebrow">WELLNESS SCHEDULE</span>
-            <h2>My Spa Appointments</h2>
+            <strong>
+              {loading
+                ? 'Checking your wellness schedule...'
+                : upcomingCount > 0
+                ? `${upcomingCount} spa ${upcomingCount === 1 ? 'ritual' : 'rituals'} on your schedule`
+                : 'No spa rituals booked yet'}
+            </strong>
+            <span>
+              Your spa reservations, their live status and cancellation options are listed with your
+              room stays and dining tables under My Reservations.
+            </span>
           </div>
         </div>
 
-        {loading ? (
-          <div className="catalog-loading">
-            <span className="spinner" />
-            <p>Loading appointments...</p>
-          </div>
-        ) : appointments.length === 0 ? (
-          <div className="empty-card">
-            <span className="material-symbols-outlined">spa</span>
-            <h3>No scheduled spa rituals</h3>
-            <p>Select from our botanical treatments below to indulge in restorative care.</p>
-          </div>
-        ) : (
-          <div className="client-res-grid">
-            {appointments.map((app) => (
-              <div key={app.id} className="client-res-card">
-                <div className="card-top-row">
-                  <span className="badge-type">
-                    {app.spaService?.category?.replace('_', ' ') || 'SPA'}
-                  </span>
-                  <span
-                    className={`status-badge status-${
-                      app.status === 'CONFIRMED'
-                        ? 'green'
-                        : app.status === 'CANCELLED'
-                        ? 'red'
-                        : 'amber'
-                    }`}
-                  >
-                    {app.status}
-                  </span>
-                </div>
-
-                <h3>{app.spaService?.name || 'Spa Ritual'}</h3>
-
-                <div className="details-list">
-                  <div>
-                    <span className="material-symbols-outlined">event</span>
-                    <span>{app.bookingDate}</span>
-                  </div>
-                  <div>
-                    <span className="material-symbols-outlined">schedule</span>
-                    <span>{app.startTime} ({app.spaService?.durationMinutes || 60} mins)</span>
-                  </div>
-                  <div>
-                    <span className="material-symbols-outlined">group</span>
-                    <span>{app.numberOfGuests} Guests</span>
-                  </div>
-                  <div>
-                    <span className="material-symbols-outlined">payments</span>
-                    <strong>${app.spaService?.price || 95}</strong>
-                  </div>
-                </div>
-
-                {app.status !== 'CANCELLED' && (
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => handleCancelAppointment(app.id)}
-                    style={{ marginTop: '14px' }}
-                  >
-                    Cancel Appointment
-                  </button>
-                )}
-              </div>
-            ))}
+        {loadError && (
+          <div className="api-error-state" role="alert" style={{ marginTop: '16px' }}>
+            <span className="material-symbols-outlined">cloud_off</span>
+            <h3>We couldn&apos;t load the spa collection</h3>
+            <p>{loadError}</p>
+            <button type="button" className="public-cta-btn" onClick={loadData}>
+              Try Again
+            </button>
           </div>
         )}
       </section>
+
 
       {/* Available Rituals Catalog */}
       <section className="client-section">
@@ -253,11 +293,58 @@ const ClientSpaView = () => {
           </div>
         </div>
 
+        {/* Search / filter toolbar */}
+        <div className="catalog-toolbar">
+          <div className="catalog-search">
+            <span className="material-symbols-outlined">search</span>
+            <input
+              type="search"
+              placeholder="Search rituals by name, category or benefit..."
+              aria-label="Search spa rituals"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="catalog-result-count">
+            {filteredServices.length} {filteredServices.length === 1 ? 'ritual' : 'rituals'}
+          </div>
+        </div>
+
+        {loadError && (
+          <div className="api-error-state" role="alert">
+            <span className="material-symbols-outlined">cloud_off</span>
+            <h3>We couldn&apos;t load the spa collection</h3>
+            <p>{loadError}</p>
+            <button type="button" className="public-cta-btn" onClick={loadData}>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="catalog-loading">
+            <span className="spinner" />
+            <p>Loading spa rituals...</p>
+          </div>
+        )}
+
+        {!loading && !loadError && (
         <div className="public-spa-grid">
-          {services.map((svc) => (
+          {filteredServices.length === 0 && (
+            <div className="empty-card" style={{ gridColumn: '1 / -1' }}>
+              <span className="material-symbols-outlined">spa</span>
+              <h3>No spa rituals available</h3>
+              <p>
+                {services.length === 0
+                  ? 'No spa services are currently available. Please check back soon.'
+                  : 'No treatments match your search. Try a different keyword or category.'}
+              </p>
+            </div>
+          )}
+          {filteredServices.map((svc) => (
             <div key={svc.id} className="spa-treatment-card">
               <div className="treatment-media">
-                <img src={svc.imageUrl} alt={svc.name} loading="lazy" />
+                <img src={getSpaImage(svc)} alt={svc.name} loading="lazy" />
                 <span className="treatment-duration">
                   <span className="material-symbols-outlined">schedule</span>
                   {svc.durationMinutes} min
@@ -281,7 +368,9 @@ const ClientSpaView = () => {
             </div>
           ))}
         </div>
+        )}
       </section>
+      </div>
 
       {/* Appointment Modal */}
       {activeModalService && (
@@ -314,30 +403,18 @@ const ClientSpaView = () => {
                 </div>
               </div>
 
-              <div className="form-group" style={{ marginTop: '16px' }}>
-                <label htmlFor="modal-spa-date">Preferred Date</label>
-                <input
-                  id="modal-spa-date"
-                  type="date"
-                  required
-                  className="field"
-                  value={bookingDate}
-                  onChange={(e) => setBookingDate(e.target.value)}
+              {/* Calendar + analog clock — identical control to the room & table pages */}
+              <div style={{ marginTop: '18px' }}>
+                <ReservationDateTimePicker
+                  date={bookingDate}
+                  onDateChange={setBookingDate}
+                  time={startTime}
+                  onTimeChange={setStartTime}
+                  dateLabel="Preferred date"
+                  timeLabel="Arrival time"
+                  timeSlots={TIME_SLOTS}
+                  idPrefix="spa-modal"
                 />
-              </div>
-
-              <div className="form-group" style={{ marginTop: '12px' }}>
-                <label htmlFor="modal-spa-time">Arrival Time Slot</label>
-                <select
-                  id="modal-spa-time"
-                  className="field"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                >
-                  {TIME_SLOTS.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
               </div>
 
               <div className="form-group" style={{ marginTop: '12px' }}>

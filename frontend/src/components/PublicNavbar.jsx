@@ -33,9 +33,9 @@ const PublicNavbar = () => {
       <div className="public-nav-container">
         {/* Brand */}
         <Link to="/" className="public-nav-brand">
-          <div className="public-brand-mark">የ</div>
+          <div className="public-brand-mark">A</div>
           <div className="public-brand-text">
-            <span className="public-brand-title">የ-mom Hotel</span>
+            <span className="public-brand-title">Aurelia Grand</span>
             <span className="public-brand-subtitle">Luxury Sanctuary &amp; Spa</span>
           </div>
         </Link>
@@ -48,24 +48,6 @@ const PublicNavbar = () => {
             className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
           >
             Home
-          </NavLink>
-          <NavLink
-            to="/rooms"
-            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
-          >
-            Rooms &amp; Suites
-          </NavLink>
-          <NavLink
-            to="/restaurant"
-            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
-          >
-            Dining
-          </NavLink>
-          <NavLink
-            to="/spa"
-            className={({ isActive }) => `public-nav-link ${isActive ? 'active' : ''}`}
-          >
-            Spa
           </NavLink>
           <NavLink
             to="/services"
@@ -125,8 +107,12 @@ const PublicNavbar = () => {
               <Link to="/login" className="public-nav-login-btn">
                 Sign In
               </Link>
-              <Link to="/rooms" className="public-cta-btn">
-                Reserve Suite
+              <Link 
+                to="/login" 
+                state={{ redirectTo: '/client' }}
+                className="public-cta-btn"
+              >
+                Reserve
               </Link>
             </div>
           )}
@@ -154,27 +140,6 @@ const PublicNavbar = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             Home
-          </Link>
-          <Link
-            to="/rooms"
-            className="public-mobile-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Rooms &amp; Suites
-          </Link>
-          <Link
-            to="/restaurant"
-            className="public-mobile-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Dining Experience
-          </Link>
-          <Link
-            to="/spa"
-            className="public-mobile-link"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Spa Sanctuary
           </Link>
           <Link
             to="/services"
@@ -228,11 +193,12 @@ const PublicNavbar = () => {
                 Sign In
               </Link>
               <Link
-                to="/signup"
+                to="/login"
+                state={{ redirectTo: '/client' }}
                 className="public-cta-btn"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                Create Account
+                Reserve
               </Link>
             </div>
           )}

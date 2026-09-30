@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { restaurantTableAPI, tableReservationAPI } from '../services/api';
+import ReservationDateTimePicker from '../components/ReservationDateTimePicker';
 
 // 30-min slots from 17:00 to 22:30
 const TIME_SLOTS = [
@@ -9,9 +10,9 @@ const TIME_SLOTS = [
 ];
 
 const AREA_LABELS = {
-  MAIN_HALL: { label: 'Main Hall & Window Seating', icon: 'restaurant', color: '#1a3a5c' },
-  TERRACE: { label: 'Balcony & Al Fresco Terrace', icon: 'deck', color: '#166534' },
-  PRIVATE_ROOM: { label: 'Executive Private Dining Suites', icon: 'meeting_room', color: '#7c2d12' },
+  MAIN_HALL: { label: 'Main Hall & Window Seating', icon: 'restaurant', color: 'var(--text)' },
+  TERRACE: { label: 'Balcony & Al Fresco Terrace', icon: 'deck', color: 'var(--text)' },
+  PRIVATE_ROOM: { label: 'Executive Private Dining Suites', icon: 'meeting_room', color: 'var(--amber)' },
 };
 
 // High-resolution curated images for each specific table view
@@ -312,15 +313,15 @@ const RestaurantPage = ({ onReservationSuccess }) => {
       <div className="restaurant-hero">
         <div className="restaurant-hero-overlay">
           <div style={{ maxWidth: '1280px', width: '100%', padding: '0 48px' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.45)', padding: '5px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, color: '#fbbf24', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>
-              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: '#f59e0b' }} />
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.45)', padding: '5px 14px', borderRadius: '20px', fontSize: '11px', fontWeight: 700, color: 'var(--amber)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '20px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: 'var(--amber)' }} />
               Open Now · 17:00 – 22:30
             </div>
             <div>
               <span className="material-symbols-outlined restaurant-hero-icon">restaurant</span>
             </div>
-            <h2 style={{ fontSize: '56px', fontWeight: 900, margin: '0 0 16px', letterSpacing: '-0.03em', lineHeight: 1.05, textShadow: '0 2px 24px rgba(0,0,0,0.45)', color: '#ffffff', maxWidth: '700px' }}>የ-mom Restaurant<br />&amp; Lounge</h2>
-            <p style={{ fontSize: '18px', color: '#cbd5e1', margin: '0 0 32px', lineHeight: 1.6, maxWidth: '560px' }}>Artisanal Ethiopian &amp; Mediterranean fusion · Panoramic balcony &amp; intimate window seating</p>
+            <h2 style={{ fontSize: '56px', fontWeight: 900, margin: '0 0 16px', letterSpacing: '-0.03em', lineHeight: 1.05, textShadow: '0 2px 24px rgba(0,0,0,0.45)', color: '#ffffff', maxWidth: '700px' }}>Aurelia Grand Restaurant<br />&amp; Lounge</h2>
+            <p style={{ fontSize: '18px', color: 'var(--surface-line)', margin: '0 0 32px', lineHeight: 1.6, maxWidth: '560px' }}>Artisanal Ethiopian &amp; Mediterranean fusion · Panoramic balcony &amp; intimate window seating</p>
             <div className="restaurant-cuisine-tags" style={{ marginBottom: '32px' }}>
               <span className="cuisine-tag">Beside Window</span>
               <span className="cuisine-tag">Balcony &amp; Terrace</span>
@@ -330,7 +331,7 @@ const RestaurantPage = ({ onReservationSuccess }) => {
               <span className="cuisine-tag">Wine Cellar</span>
             </div>
             <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
-              <button type="button" className="primary-button" style={{ background: '#f59e0b', color: '#0f172a', fontWeight: 800, fontSize: '15px', padding: '14px 32px', borderRadius: '999px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
+              <button type="button" className="primary-button" style={{ background: 'var(--amber)', color: 'var(--text)', fontWeight: 800, fontSize: '15px', padding: '14px 32px', borderRadius: '999px', display: 'flex', alignItems: 'center', gap: '8px' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
                 <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>event_seat</span>
                 Reserve a Table
               </button>
@@ -343,11 +344,11 @@ const RestaurantPage = ({ onReservationSuccess }) => {
       </div>
 
       {/* ─── Auto-Scrolling Dining Showcase Carousel ─── */}
-      <div style={{ background: '#0f172a', padding: '32px 0 28px', position: 'relative' }}>
+      <div style={{ background: 'var(--text)', padding: '32px 0 28px', position: 'relative' }}>
         <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 48px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h3 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', margin: '0 0 4px' }}>Dining Experiences</h3>
-            <p style={{ fontSize: '13px', color: '#475569', margin: 0 }}>Hover to pause · Click to reserve</p>
+            <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0 }}>Hover to pause · Click to reserve</p>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button type="button" onClick={() => { if(carouselRef.current) carouselRef.current.scrollLeft -= 280; }} style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', color: '#ffffff', cursor: 'pointer', fontSize: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>&#8249;</button>
@@ -356,11 +357,11 @@ const RestaurantPage = ({ onReservationSuccess }) => {
         </div>
         <div ref={carouselRef} onMouseEnter={() => setCarouselPaused(true)} onMouseLeave={() => setCarouselPaused(false)} style={{ display: 'flex', gap: '14px', overflowX: 'auto', scrollBehavior: 'auto', paddingLeft: '48px', paddingRight: '48px', paddingBottom: '4px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {[...CAROUSEL_ITEMS, ...CAROUSEL_ITEMS].map((item, idx) => (
-            <div key={idx} style={{ flexShrink: 0, width: '260px', borderRadius: '14px', overflow: 'hidden', background: '#1e293b', cursor: 'pointer' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
+            <div key={idx} style={{ flexShrink: 0, width: '260px', borderRadius: '14px', overflow: 'hidden', background: 'var(--text-soft)', cursor: 'pointer' }} onClick={() => document.querySelector('.restaurant-search-card')?.scrollIntoView({ behavior: 'smooth' })}>
               <img src={item.img} alt={item.label} style={{ width: '100%', height: '170px', objectFit: 'cover', display: 'block' }} loading="lazy" />
               <div style={{ padding: '10px 12px' }}>
-                <strong style={{ fontSize: '13px', color: '#f1f5f9', display: 'block', marginBottom: '2px' }}>{item.label}</strong>
-                <span style={{ fontSize: '11px', color: '#64748b' }}>{item.sub}</span>
+                <strong style={{ fontSize: '13px', color: 'var(--surface-soft)', display: 'block', marginBottom: '2px' }}>{item.label}</strong>
+                <span style={{ fontSize: '11px', color: 'var(--muted)' }}>{item.sub}</span>
               </div>
             </div>
           ))}
@@ -372,7 +373,7 @@ const RestaurantPage = ({ onReservationSuccess }) => {
         <div className="search-card-title-row">
           <div>
             <h3>Find &amp; Reserve Your Table</h3>
-            <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>
+            <p style={{ color: 'var(--muted)', fontSize: '14px', margin: 0 }}>
               Choose your preferred dining date, time, and table view (beside window, sunset balcony, or private suite)
             </p>
           </div>
@@ -381,23 +382,11 @@ const RestaurantPage = ({ onReservationSuccess }) => {
         <form onSubmit={handleSearch} className="restaurant-search-form" style={{ marginTop: '18px' }}>
           <div className="restaurant-search-fields">
             <div className="form-group">
-              <label><span className="material-symbols-outlined">calendar_today</span> Dining Date</label>
-              <input
-                type="date"
-                className="field"
-                required
-                min={new Date().toISOString().split('T')[0]}
-                value={searchDate}
-                onChange={(e) => setSearchDate(e.target.value)}
-              />
-            </div>
-            <div className="form-group">
-              <label><span className="material-symbols-outlined">schedule</span> Time Slot</label>
-              <select className="field" value={searchTime} onChange={(e) => setSearchTime(e.target.value)}>
-                {TIME_SLOTS.map((t) => (
-                  <option key={t} value={t}>{formatTime(t)}</option>
-                ))}
-              </select>
+              <label><span className="material-symbols-outlined">event_available</span> Selected Dining Slot</label>
+              <div className="rdt-selection-summary">
+                <strong>{formatDate(searchDate)}</strong>
+                <span>{formatTime(searchTime)}</span>
+              </div>
             </div>
             <div className="form-group">
               <label><span className="material-symbols-outlined">group</span> Party Size</label>
@@ -408,6 +397,20 @@ const RestaurantPage = ({ onReservationSuccess }) => {
               </select>
             </div>
           </div>
+          {/* Calendar + analog clock replace the old native date/time inputs */}
+          <div style={{ marginTop: '18px' }}>
+            <ReservationDateTimePicker
+              date={searchDate}
+              onDateChange={setSearchDate}
+              time={searchTime}
+              onTimeChange={setSearchTime}
+              dateLabel="Dining date"
+              timeLabel="Seating time"
+              timeSlots={TIME_SLOTS}
+              idPrefix="table-search"
+            />
+          </div>
+
           <button type="submit" className="primary-button" disabled={searching} style={{ minWidth: '180px' }}>
             {searching ? (
               <><span className="spinner" /><span>Checking...</span></>
@@ -471,7 +474,7 @@ const RestaurantPage = ({ onReservationSuccess }) => {
                 Showing <strong>{displayedTables.length}</strong> available tables for <strong>{partySize} guests</strong> at <strong>{formatTime(searchTime)}</strong> on <strong>{formatDate(searchDate)}</strong>
               </p>
               {Object.entries(grouped).map(([area, tables]) => {
-                const areaInfo = AREA_LABELS[area] || { label: area, icon: 'table_restaurant', color: '#1a3a5c' };
+                const areaInfo = AREA_LABELS[area] || { label: area, icon: 'table_restaurant', color: 'var(--text)' };
                 return (
                   <div key={area} className="restaurant-area-section">
                     <div className="area-heading" style={{ borderColor: areaInfo.color }}>
@@ -534,7 +537,7 @@ const RestaurantPage = ({ onReservationSuccess }) => {
             <div className="modal-header">
               <div>
                 <h3>Confirm Table Reservation</h3>
-                <p className="modal-subtitle">Reserve Table {selectedTable.tableNumber} at የ-mom Hotel</p>
+                <p className="modal-subtitle">Reserve Table {selectedTable.tableNumber} at Aurelia Grand</p>
               </div>
               <button className="modal-close-btn" onClick={closeModal}>
                 <span className="material-symbols-outlined">close</span>
@@ -568,29 +571,17 @@ const RestaurantPage = ({ onReservationSuccess }) => {
                 )}
 
                 {/* Editable Date, Time, Party Size Controls */}
-                <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
-                  <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#1e293b' }}>
+                <div style={{ background: 'var(--surface-soft)', padding: '14px', borderRadius: '10px', border: '1px solid var(--surface-line)', marginBottom: '16px' }}>
+                  <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: 'var(--text-soft)' }}>
                     Adjust Reservation Details
                   </h4>
                   <div className="restaurant-search-fields" style={{ gap: '10px' }}>
                     <div className="form-group" style={{ flex: 1 }}>
-                      <label><span className="material-symbols-outlined" style={{ fontSize: '15px' }}>calendar_today</span> Date</label>
-                      <input
-                        type="date"
-                        className="field"
-                        required
-                        min={new Date().toISOString().split('T')[0]}
-                        value={modalDate}
-                        onChange={(e) => setModalDate(e.target.value)}
-                      />
-                    </div>
-                    <div className="form-group" style={{ flex: 1 }}>
-                      <label><span className="material-symbols-outlined" style={{ fontSize: '15px' }}>schedule</span> Time</label>
-                      <select className="field" value={modalTime} onChange={(e) => setModalTime(e.target.value)}>
-                        {TIME_SLOTS.map((t) => (
-                          <option key={t} value={t}>{formatTime(t)}</option>
-                        ))}
-                      </select>
+                      <label><span className="material-symbols-outlined" style={{ fontSize: '15px' }}>event_available</span> Selected Slot</label>
+                      <div className="rdt-selection-summary">
+                        <strong>{formatDate(modalDate)}</strong>
+                        <span>{formatTime(modalTime)}</span>
+                      </div>
                     </div>
                     <div className="form-group" style={{ flex: 1 }}>
                       <label><span className="material-symbols-outlined" style={{ fontSize: '15px' }}>group</span> Guests</label>
@@ -601,6 +592,20 @@ const RestaurantPage = ({ onReservationSuccess }) => {
                       </select>
                     </div>
                   </div>
+                </div>
+
+                {/* Calendar + analog clock for the final seating date & time */}
+                <div style={{ marginBottom: '16px' }}>
+                  <ReservationDateTimePicker
+                    date={modalDate}
+                    onDateChange={setModalDate}
+                    time={modalTime}
+                    onTimeChange={setModalTime}
+                    dateLabel="Dining date"
+                    timeLabel="Seating time"
+                    timeSlots={TIME_SLOTS}
+                    idPrefix="table-modal"
+                  />
                 </div>
 
                 {/* Guest Contact Summary */}
@@ -616,7 +621,7 @@ const RestaurantPage = ({ onReservationSuccess }) => {
                 </div>
 
                 <div className="form-group">
-                  <label>Special Requests / Occasion <span style={{ color: '#9ca3af' }}>(optional)</span></label>
+                  <label>Special Requests / Occasion <span style={{ color: 'var(--muted)' }}>(optional)</span></label>
                   <textarea
                     className="field"
                     rows={2}

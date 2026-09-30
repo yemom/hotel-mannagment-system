@@ -1,6 +1,7 @@
 package com.hotelmanagement.service;
 
 import com.hotelmanagement.model.Reservation;
+import com.hotelmanagement.model.ReservationStatus;
 import com.hotelmanagement.model.Room;
 import com.hotelmanagement.repository.ReservationRepository;
 import com.hotelmanagement.repository.RoomRepository;
@@ -66,6 +67,88 @@ public class ReservationService {
     }
 
     /**
+     * Re-schedules an existing room reservation.
+     *
+     * Security: the caller must present the id of the guest who owns the reservation.
+     * A mismatch raises AccessDeniedException -> HTTP 403.
+     *
+     * Business rules enforced server-side:
+     *  - only PENDING or CONFIRMED reservations may be changed
+     *  - dates must be valid, in the future, and check-out must be after check-in
+     *  - guest count must be within 1..20 and within the room capacity
+     *  - the room must not be double-booked for the new dates
+     *  - the reservation returns to PENDING so staff re-approve the change
+     */
+    public Reservation rescheduleReservation(Long id, LocalDate newCheckIn, LocalDate newCheckOut,
+                                             Integer newGuests, Long actingGuestId) {
+        Reservation reservation = reservationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        requireOwnership(reservation.getGuest() != null ? reservation.getGuest().getId() : null,
+            actingGuestId);
+
+        if (!ReservationStatus.PENDING.equals(reservation.getStatus())
+            && !ReservationStatus.CONFIRMED.equals(reservation.getStatus())) {
+            throw new IllegalStateException(
+                "Cannot modify a reservation with status: " + reservation.getStatus());
+        }
+
+        if (newCheckIn == null || newCheckOut == null) {
+            throw new IllegalArgumentException("Both check-in and check-out dates are required");
+        }
+        if (!newCheckOut.isAfter(newCheckIn)) {
+            throw new IllegalArgumentException("Check-out date must be after the check-in date");
+        }
+        if (newCheckIn.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Check-in date cannot be in the past");
+        }
+
+        Integer guests = newGuests != null ? newGuests : reservation.getNumberOfGuests();
+        if (guests == null || guests < 1 || guests > 20) {
+            throw new IllegalArgumentException("Number of guests must be between 1 and 20");
+        }
+        if (!reservation.getRoom().canAccommodate(guests)) {
+            throw new IllegalArgumentException("Room cannot accommodate " + guests + " guests");
+        }
+
+        Room room = reservation.getRoom();
+        List<Reservation> conflicts = reservationRepository.findConflictingReservationsExcluding(
+            room, ReservationStatus.CANCELLED, newCheckIn, newCheckOut, reservation.getId());
+        if (!conflicts.isEmpty()) {
+            throw new IllegalStateException(
+                "Room " + room.getRoomNumber() + " is not available for the requested dates");
+        }
+
+        reservation.setCheckInDate(newCheckIn);
+        reservation.setCheckOutDate(newCheckOut);
+        reservation.setNumberOfGuests(guests);
+
+        BigDecimal baseTotal = calculateBaseTotal(reservation);
+        BigDecimal discount = calculateDiscount(reservation);
+        reservation.setTotalPrice(baseTotal.subtract(discount));
+        reservation.setDiscountAmount(discount);
+
+        // A changed reservation must be re-approved by staff.
+        reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setModifiedDate(LocalDate.now());
+
+        return reservationRepository.save(reservation);
+    }
+
+    /**
+     * Verifies that the acting guest owns the given resource.
+     */
+    private void requireOwnership(Long ownerGuestId, Long actingGuestId) {
+        if (actingGuestId == null) {
+            throw new IllegalArgumentException("actingGuestId is required");
+        }
+        if (ownerGuestId == null || !ownerGuestId.equals(actingGuestId)) {
+            throw new com.hotelmanagement.exception.AccessDeniedException(
+                "You may only modify your own reservations");
+        }
+    }
+
+    /**
      * Checks in a confirmed reservation.
      */
     public Reservation checkIn(Long id) {
@@ -98,6 +181,41 @@ public class ReservationService {
         reservation.cancel();
         return reservationRepository.save(reservation);
     }
+
+    /**
+     * Cancels a reservation on behalf of a specific guest, enforcing ownership.
+     * Raises AccessDeniedException -> HTTP 403 when the caller is not the owner.
+     */
+    public Reservation cancelReservationAs(Long id, Long actingGuestId) {
+        Reservation reservation = reservationRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        requireOwnership(reservation.getGuest() != null ? reservation.getGuest().getId() : null,
+            actingGuestId);
+
+        reservation.cancel();
+        return reservationRepository.save(reservation);
+    }
+
+    /**
+     * Admin queue: reservations still awaiting approval.
+     */
+    public List<Reservation> getPendingReservations() {
+        return reservationRepository.findByStatus(ReservationStatus.PENDING);
+    }
+
+    /**
+     * Returns true when the given guest is the owner of the reservation.
+     */
+    public boolean isOwner(Long reservationId, Long guestId) {
+        if (reservationId == null || guestId == null) {
+            return false;
+        }
+        return reservationRepository.findById(reservationId)
+            .map(r -> r.getGuest() != null && guestId.equals(r.getGuest().getId()))
+            .orElse(false);
+    }
+
 
     /**
      * Decision Table Logic: Calculate discount based on multiple conditions
@@ -193,5 +311,24 @@ public class ReservationService {
 
     public List<Reservation> getReservationsByRoom(Long roomId) {
         return reservationRepository.findByRoomId(roomId);
+    }
+
+    /**
+     * Permanently removes a reservation record.
+     *
+     * Used by the booking desk when clearing cancelled or test bookings; the row
+     * is removed from the database so the reservation list only ever shows real,
+     * currently-tracked stays.
+     *
+     * @throws IllegalArgumentException when no reservation exists for the id
+     */
+    public void deleteReservation(Long id) {
+        if (id == null) {
+            throw new IllegalArgumentException("Reservation id is required");
+        }
+        if (!reservationRepository.existsById(id)) {
+            throw new IllegalArgumentException("Reservation not found with ID: " + id);
+        }
+        reservationRepository.deleteById(id);
     }
 }

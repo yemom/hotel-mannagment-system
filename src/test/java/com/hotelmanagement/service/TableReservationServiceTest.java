@@ -92,21 +92,50 @@ class TableReservationServiceTest {
     @Test
     @DisplayName("BVA: Should create table reservation with valid maximum party size (20)")
     void testCreateReservationMaxPartySize() {
+        // A party of 20 must sit at a table that can actually seat 20 guests —
+        // the service validates table capacity server-side.
+        RestaurantTable grandBanquet = RestaurantTable.builder()
+                .id(11L)
+                .tableNumber("PR-02")
+                .capacity(20)
+                .status(TableStatus.AVAILABLE)
+                .build();
+
         TableReservation res = TableReservation.builder()
                 .reservationDate(LocalDate.now().plusDays(1))
                 .timeSlot("19:00 - 21:00")
                 .partySize(20)
+                .guest(testGuest)
+                .restaurantTable(grandBanquet)
+                .build();
+
+        when(guestRepository.findById(1L)).thenReturn(Optional.of(testGuest));
+        when(tableRepository.findById(11L)).thenReturn(Optional.of(grandBanquet));
+        when(reservationRepository.save(any(TableReservation.class))).thenAnswer(i -> i.getArgument(0));
+
+        TableReservation created = service.create(res);
+
+        assertThat(created.getPartySize()).isEqualTo(20);
+        assertThat(created.getStatus()).isEqualTo(TableReservationStatus.PENDING);
+    }
+
+    @Test
+    @DisplayName("Equivalence partitioning: Should reject a party larger than the table capacity")
+    void testCreateReservationPartyExceedsTableCapacity() {
+        TableReservation res = TableReservation.builder()
+                .reservationDate(LocalDate.now().plusDays(1))
+                .timeSlot("19:00 - 21:00")
+                .partySize(8)
                 .guest(testGuest)
                 .restaurantTable(testTable)
                 .build();
 
         when(guestRepository.findById(1L)).thenReturn(Optional.of(testGuest));
         when(tableRepository.findById(10L)).thenReturn(Optional.of(testTable));
-        when(reservationRepository.save(any(TableReservation.class))).thenAnswer(i -> i.getArgument(0));
 
-        TableReservation created = service.create(res);
-
-        assertThat(created.getPartySize()).isEqualTo(20);
+        assertThatThrownBy(() -> service.create(res))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("seats at most");
     }
 
     @ParameterizedTest

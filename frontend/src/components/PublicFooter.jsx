@@ -9,9 +9,9 @@ const PublicFooter = () => {
           {/* Brand Column */}
           <div className="public-footer-col brand-col">
             <div className="footer-brand">
-              <span className="footer-brand-mark">የ</span>
+              <span className="footer-brand-mark">A</span>
               <div>
-                <h3 className="footer-brand-name">የ-mom Hotel</h3>
+                <h3 className="footer-brand-name">Aurelia Grand</h3>
                 <span className="footer-brand-sub">Luxury Sanctuary &amp; Spa</span>
               </div>
             </div>
@@ -71,7 +71,7 @@ const PublicFooter = () => {
               </li>
               <li>
                 <span className="material-symbols-outlined">mail</span>
-                <span>concierge@yemom-hotel.com</span>
+                <span>concierge@aureliagrand.com</span>
               </li>
               <li>
                 <span className="material-symbols-outlined">schedule</span>
@@ -82,7 +82,7 @@ const PublicFooter = () => {
         </div>
 
         <div className="public-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} የ-mom Hotel Management System. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Aurelia Grand Hotel Management System. All rights reserved.</p>
           <div className="footer-bottom-links">
             <a href="#privacy" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
             <span>&bull;</span>

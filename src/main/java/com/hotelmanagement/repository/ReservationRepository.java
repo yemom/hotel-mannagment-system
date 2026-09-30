@@ -27,4 +27,21 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         @Param("checkIn") LocalDate checkIn,
         @Param("checkOut") LocalDate checkOut
     );
+
+    /**
+     * Same as above but excludes one reservation id, so a reservation being
+     * re-scheduled does not conflict with its own previous dates.
+     */
+    @Query("SELECT r FROM Reservation r WHERE r.room = :room " +
+           "AND r.status != :status " +
+           "AND r.checkOutDate > :checkIn " +
+           "AND r.checkInDate < :checkOut " +
+           "AND r.id != :excludeId")
+    List<Reservation> findConflictingReservationsExcluding(
+        @Param("room") Room room,
+        @Param("status") ReservationStatus status,
+        @Param("checkIn") LocalDate checkIn,
+        @Param("checkOut") LocalDate checkOut,
+        @Param("excludeId") Long excludeId
+    );
 }

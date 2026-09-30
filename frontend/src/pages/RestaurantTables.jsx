@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { restaurantTableAPI } from '../services/api';
 
 const STATUS_CONFIG = {
-  AVAILABLE: { label: 'Available', color: '#16a34a', bg: '#dcfce7', icon: 'check_circle' },
-  RESERVED: { label: 'Reserved', color: '#b45309', bg: '#fef3c7', icon: 'event_seat' },
-  OCCUPIED: { label: 'Occupied', color: '#dc2626', bg: '#fee2e2', icon: 'person' },
-  CLEANING: { label: 'Cleaning', color: '#d97706', bg: '#fef9c3', icon: 'cleaning_services' },
+  AVAILABLE: { label: 'Available', color: 'var(--jade)', bg: 'var(--surface-soft)', icon: 'check_circle' },
+  RESERVED: { label: 'Reserved', color: 'var(--amber)', bg: 'var(--surface-soft)', icon: 'event_seat' },
+  OCCUPIED: { label: 'Occupied', color: 'var(--rose)', bg: '#fee2e2', icon: 'person' },
+  CLEANING: { label: 'Cleaning', color: 'var(--amber)', bg: 'var(--surface-soft)', icon: 'cleaning_services' },
 };
 
 const AREA_LABELS = {
@@ -253,9 +253,9 @@ const RestaurantTables = () => {
       {/* Header with Add Table Action */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <span className="eyebrow" style={{ color: '#0284c7' }}>Atelier Dining Floor</span>
-          <h1 style={{ margin: '2px 0 0', fontSize: '24px', color: '#0f172a' }}>Restaurant Tables & Floor Plan</h1>
-          <p style={{ margin: 0, fontSize: '14px', color: '#64748b' }}>
+          <span className="eyebrow" style={{ color: 'var(--accent)' }}>Atelier Dining Floor</span>
+          <h1 style={{ margin: '2px 0 0', fontSize: '24px', color: 'var(--text)' }}>Restaurant Tables & Floor Plan</h1>
+          <p style={{ margin: 0, fontSize: '14px', color: 'var(--muted)' }}>
             Manage dining seating, active table statuses, and provision new restaurant tables.
           </p>
         </div>
@@ -265,7 +265,7 @@ const RestaurantTables = () => {
             className="outline-button"
             onClick={handleInitDefaultTables}
             title="Initialize Default 18 Tables"
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: '#0284c7', color: '#ffffff', borderColor: '#0284c7', fontWeight: 600 }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: 'var(--accent)', color: '#ffffff', borderColor: 'var(--accent)', fontWeight: 600 }}
           >
             <span className="material-symbols-outlined">restart_alt</span>
             <span>Initialize Default Tables (18)</span>
@@ -278,7 +278,7 @@ const RestaurantTables = () => {
               setFormError('');
               setShowAddModal(true);
             }}
-            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: '#065f46' }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: 'var(--jade)' }}
           >
             <span className="material-symbols-outlined">add_circle</span>
             <span>Add New Table</span>
@@ -309,9 +309,9 @@ const RestaurantTables = () => {
         return (
           <div key={area} className="floor-plan-section" style={{ marginBottom: '32px' }}>
             <div className="floor-plan-area-heading" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <span className="material-symbols-outlined" style={{ color: '#0284c7' }}>{areaInfo.icon}</span>
-              <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>{areaInfo.label}</h3>
-              <span className="table-count" style={{ backgroundColor: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
+              <span className="material-symbols-outlined" style={{ color: 'var(--accent)' }}>{areaInfo.icon}</span>
+              <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>{areaInfo.label}</h3>
+              <span className="table-count" style={{ backgroundColor: 'var(--surface-line)', color: 'var(--accent)', padding: '2px 8px', borderRadius: '12px', fontSize: '12px', fontWeight: 600 }}>
                 {grouped[area].length} table{grouped[area].length !== 1 ? 's' : ''}
               </span>
             </div>
@@ -332,7 +332,7 @@ const RestaurantTables = () => {
                     }}
                   >
                     <div className="floor-table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                      <span className="floor-table-number" style={{ fontSize: '16px', fontWeight: 700, color: '#0f172a' }}>
+                      <span className="floor-table-number" style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text)' }}>
                         {table.tableNumber}
                       </span>
                       <span
@@ -344,13 +344,13 @@ const RestaurantTables = () => {
                       </span>
                     </div>
 
-                    <div className="floor-table-capacity" style={{ fontSize: '13px', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
+                    <div className="floor-table-capacity" style={{ fontSize: '13px', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '8px' }}>
                       <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>group</span>
                       Seats {table.capacity}
                     </div>
 
                     {table.description && (
-                      <p className="floor-table-desc" style={{ fontSize: '12px', color: '#64748b', margin: '0 0 12px' }}>
+                      <p className="floor-table-desc" style={{ fontSize: '12px', color: 'var(--muted)', margin: '0 0 12px' }}>
                         {table.description}
                       </p>
                     )}
@@ -362,7 +362,7 @@ const RestaurantTables = () => {
                         value={table.status}
                         disabled={updatingId === table.id}
                         onChange={(e) => handleStatusChange(table.id, e.target.value)}
-                        style={{ flex: 1, padding: '6px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                        style={{ flex: 1, padding: '6px 8px', fontSize: '12px', borderRadius: '6px', border: '1px solid var(--surface-line)' }}
                       >
                         {Object.entries(STATUS_CONFIG).map(([s, c]) => (
                           <option key={s} value={s}>{c.label}</option>
@@ -372,7 +372,7 @@ const RestaurantTables = () => {
                         type="button"
                         onClick={() => handleDeleteTable(table.id, table.tableNumber)}
                         title="Delete Table"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ef4444', padding: '4px', display: 'flex', alignItems: 'center' }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--rose)', padding: '4px', display: 'flex', alignItems: 'center' }}
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
                       </button>
@@ -387,9 +387,9 @@ const RestaurantTables = () => {
 
       {tables.length === 0 && (
         <div className="empty-state-card" style={{ padding: '60px 20px', textAlign: 'center' }}>
-          <span className="material-symbols-outlined empty-state-icon" style={{ fontSize: '48px', color: '#94a3b8' }}>table_restaurant</span>
+          <span className="material-symbols-outlined empty-state-icon" style={{ fontSize: '48px', color: 'var(--muted)' }}>table_restaurant</span>
           <h3 style={{ marginTop: '16px' }}>No Tables Found</h3>
-          <p style={{ color: '#64748b', maxWidth: '400px', margin: '8px auto 24px' }}>
+          <p style={{ color: 'var(--muted)', maxWidth: '400px', margin: '8px auto 24px' }}>
             Click "Add New Table" above to provision restaurant tables for your dining floor plan.
           </p>
           <button
@@ -404,31 +404,31 @@ const RestaurantTables = () => {
 
       {/* Add New Table Modal Dialog */}
       {showAddModal && (
-        <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+        <div className="modal-backdrop" style={{ position: 'fixed', inset: 0, background: 'rgba(26, 26, 26,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div className="modal-card" style={{ background: '#ffffff', borderRadius: '16px', width: '100%', maxWidth: '460px', padding: '24px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span className="material-symbols-outlined" style={{ color: '#065f46' }}>table_restaurant</span>
-                <h2 style={{ margin: 0, fontSize: '18px', color: '#0f172a' }}>Add New Restaurant Table</h2>
+                <span className="material-symbols-outlined" style={{ color: 'var(--jade)' }}>table_restaurant</span>
+                <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--text)' }}>Add New Restaurant Table</h2>
               </div>
               <button
                 type="button"
                 onClick={() => setShowAddModal(false)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)' }}
               >
                 <span className="material-symbols-outlined">close</span>
               </button>
             </div>
 
             {formError && (
-              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: '#991b1b', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', color: 'var(--rose)', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginBottom: '16px' }}>
                 {formError}
               </div>
             )}
 
             <form onSubmit={handleCreateTable}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-soft)', marginBottom: '4px' }}>
                   Table Number / Identifier *
                 </label>
                 <input
@@ -437,19 +437,19 @@ const RestaurantTables = () => {
                   placeholder="e.g. MH-07, TR-05, Table 19"
                   value={formData.tableNumber}
                   onChange={(e) => setFormData({ ...formData, tableNumber: e.target.value })}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--surface-line)', fontSize: '14px' }}
                 />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-soft)', marginBottom: '4px' }}>
                     Seating Capacity *
                   </label>
                   <select
                     value={formData.capacity}
                     onChange={(e) => setFormData({ ...formData, capacity: e.target.value })}
-                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--surface-line)', fontSize: '14px' }}
                   >
                     <option value="2">2 Seats</option>
                     <option value="4">4 Seats</option>
@@ -459,13 +459,13 @@ const RestaurantTables = () => {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-soft)', marginBottom: '4px' }}>
                     Dining Area *
                   </label>
                   <select
                     value={formData.area}
                     onChange={(e) => setFormData({ ...formData, area: e.target.value })}
-                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                    style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--surface-line)', fontSize: '14px' }}
                   >
                     <option value="MAIN_HALL">Main Hall</option>
                     <option value="TERRACE">Terrace</option>
@@ -475,13 +475,13 @@ const RestaurantTables = () => {
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-soft)', marginBottom: '4px' }}>
                   Initial Status
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px' }}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--surface-line)', fontSize: '14px' }}
                 >
                   <option value="AVAILABLE">Available</option>
                   <option value="RESERVED">Reserved</option>
@@ -491,7 +491,7 @@ const RestaurantTables = () => {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#334155', marginBottom: '4px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: 'var(--text-soft)', marginBottom: '4px' }}>
                   Description / Location Notes
                 </label>
                 <textarea
@@ -499,7 +499,7 @@ const RestaurantTables = () => {
                   placeholder="Optional description e.g. Window booth with garden views"
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '14px', resize: 'vertical' }}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--surface-line)', fontSize: '14px', resize: 'vertical' }}
                 />
               </div>
 
@@ -507,14 +507,14 @@ const RestaurantTables = () => {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#f8fafc', color: '#475569', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--surface-line)', background: 'var(--surface-soft)', color: 'var(--muted)', cursor: 'pointer', fontWeight: 600 }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  style={{ padding: '8px 18px', borderRadius: '8px', border: 'none', background: '#065f46', color: '#ffffff', cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  style={{ padding: '8px 18px', borderRadius: '8px', border: 'none', background: 'var(--jade)', color: '#ffffff', cursor: 'pointer', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check</span>
                   <span>{submitting ? 'Adding...' : 'Create Table'}</span>

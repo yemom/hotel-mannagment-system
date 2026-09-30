@@ -7,30 +7,30 @@ const CONTACT_METHODS = [
   {
     icon: 'phone',
     title: 'Reservations',
-    detail: '+251 11 551 5050',
+    detail: '+251 934 046 279',
     sub: 'Mon – Sun, 7 AM – 10 PM',
-    color: '#064e3b',
+    color: 'var(--accent)',
   },
   {
     icon: 'mail',
     title: 'Email Us',
-    detail: 'reservations@yemom.hotel',
+    detail: 'concierge@aureliagrand.com',
     sub: 'We reply within 2 hours',
-    color: '#0284c7',
+    color: 'var(--accent)',
   },
   {
     icon: 'support_agent',
     title: 'Concierge Desk',
-    detail: '+251 11 551 5060',
+    detail: '+251 934 046 279',
     sub: 'Available 24 hours, 7 days',
-    color: '#7c3aed',
+    color: 'var(--primary)',
   },
   {
     icon: 'location_on',
     title: 'Our Address',
-    detail: 'Bole Road, Addis Ababa',
-    sub: 'Ethiopia — 1000 m from Airport',
-    color: '#b45309',
+    detail: 'Bole Medhanialem, Atlas Boulevard',
+    sub: 'Addis Ababa, Ethiopia',
+    color: 'var(--accent)',
   },
 ];
 
@@ -103,14 +103,14 @@ const ContactPage = () => {
             {/* Form */}
             <div className="contact-form-wrap">
               <h2>Send Us a Message</h2>
-              <p style={{ color: '#64748b', marginBottom: 28 }}>
+              <p style={{ color: 'var(--muted)', marginBottom: 28 }}>
                 Use the form below for enquiries, special requests, or event planning. We'll
                 respond within 2 business hours.
               </p>
 
               {submitted ? (
                 <div className="booking-confirmation-banner">
-                  <span className="material-symbols-outlined" style={{ fontSize: 32, color: '#059669' }}>check_circle</span>
+                  <span className="material-symbols-outlined" style={{ fontSize: 32, color: 'var(--jade)' }}>check_circle</span>
                   <div>
                     <h3>Message Received</h3>
                     <p>
@@ -119,7 +119,7 @@ const ContactPage = () => {
                     <button
                       type="button"
                       className="public-outline-btn"
-                      style={{ marginTop: 14, color: '#064e3b', borderColor: '#064e3b', fontSize: 13 }}
+                      style={{ marginTop: 14, color: 'var(--text)', borderColor: 'var(--text)', fontSize: 13 }}
                       onClick={() => { setSubmitted(false); setForm({ name: '', email: '', phone: '', subject: '', message: '' }); }}
                     >
                       Send Another Message
@@ -238,7 +238,7 @@ const ContactPage = () => {
       </section>
 
       {/* FAQ */}
-      <section style={{ background: '#f8fafc', padding: '64px 0' }}>
+      <section style={{ background: 'var(--surface-soft)', padding: '64px 0' }}>
         <div className="section-container">
           <div className="landing-section-header">
             <span className="section-eyebrow">COMMON QUESTIONS</span>

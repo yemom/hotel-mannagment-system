@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { tableReservationAPI } from '../services/api';
 
 const STATUS_CONFIG = {
-  PENDING:   { label: 'Pending',   color: '#b45309', bg: '#fef3c7' },
-  CONFIRMED: { label: 'Confirmed', color: '#047857', bg: '#d1fae5' },
-  SEATED:    { label: 'Seated',    color: '#15803d', bg: '#dcfce7' },
-  COMPLETED: { label: 'Completed', color: '#6b7280', bg: '#f3f4f6' },
-  CANCELLED: { label: 'Cancelled', color: '#dc2626', bg: '#fee2e2' },
-  NO_SHOW:   { label: 'No-show',   color: '#7c2d12', bg: '#fef2f2' },
+  PENDING:   { label: 'Pending',   color: 'var(--amber)', bg: 'var(--surface-soft)' },
+  CONFIRMED: { label: 'Confirmed', color: 'var(--text)', bg: 'var(--surface-soft)' },
+  SEATED:    { label: 'Seated',    color: 'var(--text)', bg: 'var(--surface-soft)' },
+  COMPLETED: { label: 'Completed', color: 'var(--muted)', bg: 'var(--surface-line)' },
+  CANCELLED: { label: 'Cancelled', color: 'var(--rose)', bg: '#fee2e2' },
+  NO_SHOW:   { label: 'No-show',   color: 'var(--amber)', bg: '#fef2f2' },
 };
 
 const AREA_LABELS = { MAIN_HALL: 'Main Hall', TERRACE: 'Terrace', PRIVATE_ROOM: 'Private Room' };
@@ -198,10 +198,10 @@ const TableReservations = () => {
 
       <div className="table-reservation-summary">
         {[
-          { label: 'All Reservations', value: reservations.length, icon: 'event_seat', color: '#064e3b', bg: '#ecfdf5' },
-          { label: 'Pending Review', value: counts.PENDING || 0, icon: 'notifications_active', color: '#b45309', bg: '#fffbeb' },
-          { label: 'Confirmed Tables', value: counts.CONFIRMED || 0, icon: 'check_circle', color: '#047857', bg: '#d1fae5' },
-          { label: 'Seated Now', value: counts.SEATED || 0, icon: 'chair', color: '#15803d', bg: '#dcfce7' },
+          { label: 'All Reservations', value: reservations.length, icon: 'event_seat', color: 'var(--text)', bg: 'var(--surface-soft)' },
+          { label: 'Pending Review', value: counts.PENDING || 0, icon: 'notifications_active', color: 'var(--amber)', bg: 'var(--surface-soft)' },
+          { label: 'Confirmed Tables', value: counts.CONFIRMED || 0, icon: 'check_circle', color: 'var(--text)', bg: 'var(--surface-soft)' },
+          { label: 'Seated Now', value: counts.SEATED || 0, icon: 'chair', color: 'var(--text)', bg: 'var(--surface-soft)' },
         ].map((item) => (
           <div key={item.label} className="table-reservation-stat">
             <span className="material-symbols-outlined" style={{ background: item.bg, color: item.color }}>
@@ -286,7 +286,7 @@ const TableReservations = () => {
                         <small>{r.guest?.email || `Reservation #${r.id}`}</small>
                       </div>
                     </td>
-                    <td>{r.restaurantTable?.tableNumber || <span style={{ color: '#9ca3af' }}>Unassigned</span>}</td>
+                    <td>{r.restaurantTable?.tableNumber || <span style={{ color: 'var(--muted)' }}>Unassigned</span>}</td>
                     <td>{formatDate(r.reservationDate)}</td>
                     <td>{formatTime(r.timeSlot)}</td>
                     <td>{r.partySize} guest{r.partySize !== 1 ? 's' : ''}</td>
@@ -300,7 +300,7 @@ const TableReservations = () => {
                       </span>
                     </td>
                     <td>
-                      <span style={{ color: '#6b7280', fontSize: '0.82rem' }}>
+                      <span style={{ color: 'var(--muted)', fontSize: '0.82rem' }}>
                         {r.specialRequests || '—'}
                       </span>
                     </td>

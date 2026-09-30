@@ -227,7 +227,7 @@ const StaffTopBar = ({
                 maxHeight: '480px',
                 overflowY: 'auto',
                 background: '#ffffff',
-                border: '1px solid #e2e8f0',
+                border: '1px solid var(--surface-line)',
                 borderRadius: '12px',
                 boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
                 zIndex: 1000,
@@ -236,10 +236,10 @@ const StaffTopBar = ({
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                 <div>
-                  <h4 style={{ margin: 0, fontSize: '15px', color: '#0f172a' }}>
+                  <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--text)' }}>
                     Live Reservation Alerts
                   </h4>
-                  <small style={{ color: '#64748b' }}>
+                  <small style={{ color: 'var(--muted)' }}>
                     {unreadCount} pending review
                   </small>
                 </div>
@@ -250,7 +250,7 @@ const StaffTopBar = ({
                     style={{
                       border: 'none',
                       background: 'none',
-                      color: '#0284c7',
+                      color: 'var(--accent)',
                       fontSize: '12px',
                       cursor: 'pointer',
                       fontWeight: 600,
@@ -290,7 +290,7 @@ const StaffTopBar = ({
               </div>
 
               {displayedNotifications.length === 0 ? (
-                <div style={{ padding: '24px 12px', textAlign: 'center', color: '#94a3b8' }}>
+                <div style={{ padding: '24px 12px', textAlign: 'center', color: 'var(--muted)' }}>
                   <span className="material-symbols-outlined" style={{ fontSize: '32px' }}>
                     notifications_off
                   </span>
@@ -307,8 +307,8 @@ const StaffTopBar = ({
                         gap: '10px',
                         padding: '8px 10px',
                         borderRadius: '8px',
-                        background: n.status === 'PENDING' ? '#fef3c7' : '#f8fafc',
-                        borderLeft: `4px solid ${n.type === 'ROOM' ? '#059669' : '#0284c7'}`,
+                        background: n.status === 'PENDING' ? 'var(--surface-soft)' : 'var(--surface-soft)',
+                        borderLeft: `4px solid ${n.type === 'ROOM' ? 'var(--jade)' : 'var(--accent)'}`,
                         cursor: 'pointer',
                         transition: 'background 0.2s',
                       }}
@@ -316,7 +316,7 @@ const StaffTopBar = ({
                       <span
                         className="material-symbols-outlined"
                         style={{
-                          color: n.type === 'ROOM' ? '#059669' : '#0284c7',
+                          color: n.type === 'ROOM' ? 'var(--jade)' : 'var(--accent)',
                           fontSize: '20px',
                           marginTop: '2px',
                         }}
@@ -325,24 +325,24 @@ const StaffTopBar = ({
                       </span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <strong style={{ fontSize: '13px', color: '#0f172a' }}>{n.title}</strong>
+                          <strong style={{ fontSize: '13px', color: 'var(--text)' }}>{n.title}</strong>
                           <span
                             style={{
                               fontSize: '10px',
                               fontWeight: 700,
                               padding: '2px 6px',
                               borderRadius: '999px',
-                              background: n.status === 'PENDING' ? '#fde68a' : '#e2e8f0',
-                              color: n.status === 'PENDING' ? '#92400e' : '#475569',
+                              background: n.status === 'PENDING' ? 'var(--surface-soft)' : 'var(--surface-line)',
+                              color: n.status === 'PENDING' ? 'var(--amber)' : 'var(--muted)',
                             }}
                           >
                             {n.status}
                           </span>
                         </div>
-                        <p style={{ margin: '2px 0', fontSize: '12px', color: '#334155' }}>
+                        <p style={{ margin: '2px 0', fontSize: '12px', color: 'var(--text-soft)' }}>
                           Guest: <strong>{n.guestName}</strong>
                         </p>
-                        <small style={{ color: '#64748b', fontSize: '11px', display: 'block' }}>
+                        <small style={{ color: 'var(--muted)', fontSize: '11px', display: 'block' }}>
                           {n.details}
                         </small>
                       </div>
@@ -351,14 +351,14 @@ const StaffTopBar = ({
                 </div>
               )}
 
-              <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ marginTop: '10px', paddingTop: '8px', borderTop: '1px solid var(--surface-soft)', display: 'flex', justifyContent: 'space-between' }}>
                 <button
                   type="button"
                   onClick={() => {
                     setShowNotifications(false);
                     navigate('/staff/reservations');
                   }}
-                  style={{ border: 'none', background: 'none', color: '#059669', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ border: 'none', background: 'none', color: 'var(--accent)', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
                 >
                   Manage Rooms →
                 </button>
@@ -368,7 +368,7 @@ const StaffTopBar = ({
                     setShowNotifications(false);
                     navigate('/staff/table-reservations');
                   }}
-                  style={{ border: 'none', background: 'none', color: '#0284c7', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
+                  style={{ border: 'none', background: 'none', color: 'var(--accent)', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
                 >
                   Manage Tables →
                 </button>
@@ -421,7 +421,7 @@ const StaffTopBar = ({
           </div>
           <div>
             <strong>{currentUser?.firstName} {currentUser?.lastName || 'Admin'}</strong>
-            <span style={{ color: is12Yemom ? '#059669' : '' }}>
+            <span style={{ color: is12Yemom ? 'var(--accent)' : '' }}>
               {is12Yemom ? 'Super Admin / Staff' : 'Receptionist'}
             </span>
           </div>
@@ -545,9 +545,9 @@ const StaffDashboard = () => {
       <aside className="sidebar">
         <div>
           <div className="brand">
-            <div className="brand-mark">የ</div>
+            <div className="brand-mark">A</div>
             <div>
-              <strong>የ-mom Hotel</strong>
+              <strong>Aurelia Grand</strong>
               <span>Front-Desk PMS (Staff)</span>
             </div>
           </div>
@@ -569,7 +569,7 @@ const StaffDashboard = () => {
                 {item.badge && (
                   <span
                     style={{
-                      background: '#ef4444',
+                      background: 'var(--rose)',
                       color: '#ffffff',
                       borderRadius: '999px',
                       fontSize: '11px',

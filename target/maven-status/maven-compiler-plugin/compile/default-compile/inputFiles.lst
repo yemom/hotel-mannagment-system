@@ -8,6 +8,7 @@ D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\control
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\SpaBookingController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\SpaServiceController.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\controller\TableReservationController.java
+D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\exception\AccessDeniedException.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\HotelManagementApplication.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\DiningArea.java
 D:\AAiT PROJECTS\QA TEST\final project\src\main\java\com\hotelmanagement\model\Guest.java

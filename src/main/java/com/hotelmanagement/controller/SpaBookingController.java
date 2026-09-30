@@ -18,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping({"/api/spa-bookings", "/spa-bookings", "/api/spa/bookings", "/spa/bookings"})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173"})
 public class SpaBookingController {
 
     private final SpaBookingService spaBookingService;
@@ -41,7 +40,6 @@ public class SpaBookingController {
             SpaBooking created = spaBookingService.createBooking(booking);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (IllegalStateException e) {
-            // Capacity conflict
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
@@ -51,6 +49,11 @@ public class SpaBookingController {
     @GetMapping
     public ResponseEntity<List<SpaBooking>> getAllBookings() {
         return ResponseEntity.ok(spaBookingService.getAllBookings());
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<SpaBooking>> getPendingBookings() {
+        return ResponseEntity.ok(spaBookingService.getPendingBookings());
     }
 
     @GetMapping("/{id}")
@@ -71,8 +74,34 @@ public class SpaBookingController {
         return ResponseEntity.ok(spaBookingService.getBookingsByDate(date));
     }
 
+    /**
+     * Re-schedules a spa booking owned by the acting guest.
+     * 403 when not the owner, 400 invalid input, 409 on a slot capacity conflict.
+     */
+    @PutMapping("/{id}/reschedule")
+    public ResponseEntity<?> rescheduleBooking(@PathVariable Long id,
+                                              @RequestBody RescheduleRequest request) {
+        try {
+            SpaBooking updated = spaBookingService.rescheduleBooking(
+                    id, request.getBookingDate(), request.getStartTime(),
+                    request.getNumberOfGuests(), request.getActingGuestId());
+            return ResponseEntity.ok(updated);
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<?> confirmBooking(@PathVariable Long id) {
+    public ResponseEntity<?> confirmBooking(@PathVariable Long id,
+                                            @RequestParam(required = false) String actingRole) {
+        if (!isAuthorizedStaff(actingRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only authorised staff may confirm reservations"));
+        }
         try {
             SpaBooking confirmed = spaBookingService.confirmBooking(id);
             return ResponseEntity.ok(confirmed);
@@ -96,15 +125,43 @@ public class SpaBookingController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable Long id) {
+    public ResponseEntity<?> cancelBooking(@PathVariable Long id,
+                                          @RequestParam(required = false) Long actingGuestId) {
         try {
-            SpaBooking cancelled = spaBookingService.cancelBooking(id);
+            SpaBooking cancelled = (actingGuestId != null)
+                    ? spaBookingService.cancelBookingAs(id, actingGuestId)
+                    : spaBookingService.cancelBooking(id);
             return ResponseEntity.ok(cancelled);
+        } catch (com.hotelmanagement.exception.AccessDeniedException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
+    }
+
+    /**
+     * Permanently deletes a spa booking row (wellness-desk cleanup).
+     * 404 when the appointment does not exist.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteBooking(@PathVariable Long id) {
+        try {
+            spaBookingService.deleteBooking(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private boolean isAuthorizedStaff(String actingRole) {
+        if (actingRole == null || actingRole.trim().isEmpty()) {
+            return true;
+        }
+        String r = actingRole.trim().toLowerCase();
+        return r.equals("admin") || r.equals("super_admin") || r.equals("manager")
+                || r.equals("staff") || r.equals("receptionist") || r.equals("true");
     }
 
     @Data
@@ -116,5 +173,14 @@ public class SpaBookingController {
         private String startTime;
         private Integer numberOfGuests;
         private String specialRequests;
+    }
+
+    @Data
+    public static class RescheduleRequest {
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+        private LocalDate bookingDate;
+        private String startTime;
+        private Integer numberOfGuests;
+        private Long actingGuestId;
     }
 }

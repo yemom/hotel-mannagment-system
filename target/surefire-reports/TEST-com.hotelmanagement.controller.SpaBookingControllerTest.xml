@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.258" tests="9" errors="0" skipped="0" failures="0">
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.18" tests="9" errors="0" skipped="0" failures="0">
   <properties>
     <property name="java.specification.version" value="21"/>
     <property name="sun.cpu.isalist" value="amd64"/>
@@ -15,9 +15,8 @@
     <property name="sun.java.launcher" value="SUN_STANDARD"/>
     <property name="user.country" value="US"/>
     <property name="sun.boot.library.path" value="C:\Program Files\Java\jdk-21\bin"/>
-    <property name="sun.java.command" value="C:\Users\12yem\AppData\Local\Temp\surefire12267987607358478735\surefirebooter-20260929191953017_3.jar C:\Users\12yem\AppData\Local\Temp\surefire12267987607358478735 2026-09-29T19-19-52_790-jvmRun1 surefire-20260929191953017_1tmp surefire_0-20260929191953017_2tmp"/>
+    <property name="sun.java.command" value="C:\Users\12yem\AppData\Local\Temp\surefire549178026712183048\surefirebooter-20260930200732197_3.jar C:\Users\12yem\AppData\Local\Temp\surefire549178026712183048 2026-09-30T20-07-32_039-jvmRun1 surefire-20260930200732197_1tmp surefire_0-20260930200732197_2tmp"/>
     <property name="jdk.debug" value="release"/>
-    <property name="test" value="*Test"/>
     <property name="surefire.test.class.path" value="D:\AAiT PROJECTS\QA TEST\final project\target\test-classes;D:\AAiT PROJECTS\QA TEST\final project\target\classes;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-web\2.7.14\spring-boot-starter-web-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter\2.7.14\spring-boot-starter-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot\2.7.14\spring-boot-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-autoconfigure\2.7.14\spring-boot-autoconfigure-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-logging\2.7.14\spring-boot-starter-logging-2.7.14.jar;C:\Users\12yem\.m2\repository\ch\qos\logback\logback-classic\1.2.12\logback-classic-1.2.12.jar;C:\Users\12yem\.m2\repository\ch\qos\logback\logback-core\1.2.12\logback-core-1.2.12.jar;C:\Users\12yem\.m2\repository\org\apache\logging\log4j\log4j-to-slf4j\2.17.2\log4j-to-slf4j-2.17.2.jar;C:\Users\12yem\.m2\repository\org\apache\logging\log4j\log4j-api\2.17.2\log4j-api-2.17.2.jar;C:\Users\12yem\.m2\repository\org\slf4j\jul-to-slf4j\1.7.36\jul-to-slf4j-1.7.36.jar;C:\Users\12yem\.m2\repository\jakarta\annotation\jakarta.annotation-api\1.3.5\jakarta.annotation-api-1.3.5.jar;C:\Users\12yem\.m2\repository\org\yaml\snakeyaml\1.30\snakeyaml-1.30.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-json\2.7.14\spring-boot-starter-json-2.7.14.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\core\jackson-databind\2.13.5\jackson-databind-2.13.5.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\core\jackson-annotations\2.13.5\jackson-annotations-2.13.5.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\core\jackson-core\2.13.5\jackson-core-2.13.5.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jdk8\2.13.5\jackson-datatype-jdk8-2.13.5.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\datatype\jackson-datatype-jsr310\2.13.5\jackson-datatype-jsr310-2.13.5.jar;C:\Users\12yem\.m2\repository\com\fasterxml\jackson\module\jackson-module-parameter-names\2.13.5\jackson-module-parameter-names-2.13.5.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-tomcat\2.7.14\spring-boot-starter-tomcat-2.7.14.jar;C:\Users\12yem\.m2\repository\org\apache\tomcat\embed\tomcat-embed-core\9.0.78\tomcat-embed-core-9.0.78.jar;C:\Users\12yem\.m2\repository\org\apache\tomcat\embed\tomcat-embed-websocket\9.0.78\tomcat-embed-websocket-9.0.78.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-web\5.3.29\spring-web-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-beans\5.3.29\spring-beans-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-webmvc\5.3.29\spring-webmvc-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-context\5.3.29\spring-context-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-expression\5.3.29\spring-expression-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-security\2.7.14\spring-boot-starter-security-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-aop\5.3.29\spring-aop-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\security\spring-security-config\5.7.10\spring-security-config-5.7.10.jar;C:\Users\12yem\.m2\repository\org\springframework\security\spring-security-core\5.7.10\spring-security-core-5.7.10.jar;C:\Users\12yem\.m2\repository\org\springframework\security\spring-security-crypto\5.7.10\spring-security-crypto-5.7.10.jar;C:\Users\12yem\.m2\repository\org\springframework\security\spring-security-web\5.7.10\spring-security-web-5.7.10.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-validation\2.7.14\spring-boot-starter-validation-2.7.14.jar;C:\Users\12yem\.m2\repository\org\apache\tomcat\embed\tomcat-embed-el\9.0.78\tomcat-embed-el-9.0.78.jar;C:\Users\12yem\.m2\repository\org\hibernate\validator\hibernate-validator\6.2.5.Final\hibernate-validator-6.2.5.Final.jar;C:\Users\12yem\.m2\repository\jakarta\validation\jakarta.validation-api\2.0.2\jakarta.validation-api-2.0.2.jar;C:\Users\12yem\.m2\repository\org\jboss\logging\jboss-logging\3.4.3.Final\jboss-logging-3.4.3.Final.jar;C:\Users\12yem\.m2\repository\com\fasterxml\classmate\1.5.1\classmate-1.5.1.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-data-jpa\2.7.14\spring-boot-starter-data-jpa-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-aop\2.7.14\spring-boot-starter-aop-2.7.14.jar;C:\Users\12yem\.m2\repository\org\aspectj\aspectjweaver\1.9.7\aspectjweaver-1.9.7.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-jdbc\2.7.14\spring-boot-starter-jdbc-2.7.14.jar;C:\Users\12yem\.m2\repository\com\zaxxer\HikariCP\4.0.3\HikariCP-4.0.3.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-jdbc\5.3.29\spring-jdbc-5.3.29.jar;C:\Users\12yem\.m2\repository\jakarta\transaction\jakarta.transaction-api\1.3.3\jakarta.transaction-api-1.3.3.jar;C:\Users\12yem\.m2\repository\jakarta\persistence\jakarta.persistence-api\2.2.3\jakarta.persistence-api-2.2.3.jar;C:\Users\12yem\.m2\repository\org\hibernate\hibernate-core\5.6.15.Final\hibernate-core-5.6.15.Final.jar;C:\Users\12yem\.m2\repository\antlr\antlr\2.7.7\antlr-2.7.7.jar;C:\Users\12yem\.m2\repository\org\jboss\jandex\2.4.2.Final\jandex-2.4.2.Final.jar;C:\Users\12yem\.m2\repository\org\hibernate\common\hibernate-commons-annotations\5.1.2.Final\hibernate-commons-annotations-5.1.2.Final.jar;C:\Users\12yem\.m2\repository\org\glassfish\jaxb\jaxb-runtime\2.3.8\jaxb-runtime-2.3.8.jar;C:\Users\12yem\.m2\repository\org\glassfish\jaxb\txw2\2.3.8\txw2-2.3.8.jar;C:\Users\12yem\.m2\repository\com\sun\istack\istack-commons-runtime\3.0.12\istack-commons-runtime-3.0.12.jar;C:\Users\12yem\.m2\repository\com\sun\activation\jakarta.activation\1.2.2\jakarta.activation-1.2.2.jar;C:\Users\12yem\.m2\repository\org\springframework\data\spring-data-jpa\2.7.14\spring-data-jpa-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\data\spring-data-commons\2.7.14\spring-data-commons-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-orm\5.3.29\spring-orm-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-tx\5.3.29\spring-tx-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-aspects\5.3.29\spring-aspects-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-actuator\2.7.14\spring-boot-starter-actuator-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-actuator-autoconfigure\2.7.14\spring-boot-actuator-autoconfigure-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-actuator\2.7.14\spring-boot-actuator-2.7.14.jar;C:\Users\12yem\.m2\repository\io\micrometer\micrometer-core\1.9.13\micrometer-core-1.9.13.jar;C:\Users\12yem\.m2\repository\org\hdrhistogram\HdrHistogram\2.1.12\HdrHistogram-2.1.12.jar;C:\Users\12yem\.m2\repository\org\latencyutils\LatencyUtils\2.0.3\LatencyUtils-2.0.3.jar;C:\Users\12yem\.m2\repository\com\h2database\h2\2.1.214\h2-2.1.214.jar;C:\Users\12yem\.m2\repository\com\mysql\mysql-connector-j\8.0.33\mysql-connector-j-8.0.33.jar;C:\Users\12yem\.m2\repository\org\projectlombok\lombok\1.18.46\lombok-1.18.46.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-starter-test\2.7.14\spring-boot-starter-test-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-test\2.7.14\spring-boot-test-2.7.14.jar;C:\Users\12yem\.m2\repository\org\springframework\boot\spring-boot-test-autoconfigure\2.7.14\spring-boot-test-autoconfigure-2.7.14.jar;C:\Users\12yem\.m2\repository\com\jayway\jsonpath\json-path\2.7.0\json-path-2.7.0.jar;C:\Users\12yem\.m2\repository\net\minidev\json-smart\2.4.11\json-smart-2.4.11.jar;C:\Users\12yem\.m2\repository\net\minidev\accessors-smart\2.4.11\accessors-smart-2.4.11.jar;C:\Users\12yem\.m2\repository\org\ow2\asm\asm\9.3\asm-9.3.jar;C:\Users\12yem\.m2\repository\jakarta\xml\bind\jakarta.xml.bind-api\2.3.3\jakarta.xml.bind-api-2.3.3.jar;C:\Users\12yem\.m2\repository\jakarta\activation\jakarta.activation-api\1.2.2\jakarta.activation-api-1.2.2.jar;C:\Users\12yem\.m2\repository\org\hamcrest\hamcrest\2.2\hamcrest-2.2.jar;C:\Users\12yem\.m2\repository\org\skyscreamer\jsonassert\1.5.1\jsonassert-1.5.1.jar;C:\Users\12yem\.m2\repository\com\vaadin\external\google\android-json\0.0.20131108.vaadin1\android-json-0.0.20131108.vaadin1.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-core\5.3.29\spring-core-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-jcl\5.3.29\spring-jcl-5.3.29.jar;C:\Users\12yem\.m2\repository\org\springframework\spring-test\5.3.29\spring-test-5.3.29.jar;C:\Users\12yem\.m2\repository\org\xmlunit\xmlunit-core\2.9.1\xmlunit-core-2.9.1.jar;C:\Users\12yem\.m2\repository\org\junit\jupiter\junit-jupiter\5.9.2\junit-jupiter-5.9.2.jar;C:\Users\12yem\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.8.2\junit-jupiter-api-5.8.2.jar;C:\Users\12yem\.m2\repository\org\opentest4j\opentest4j\1.2.0\opentest4j-1.2.0.jar;C:\Users\12yem\.m2\repository\org\junit\platform\junit-platform-commons\1.8.2\junit-platform-commons-1.8.2.jar;C:\Users\12yem\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\12yem\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.8.2\junit-jupiter-params-5.8.2.jar;C:\Users\12yem\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.8.2\junit-jupiter-engine-5.8.2.jar;C:\Users\12yem\.m2\repository\org\junit\platform\junit-platform-engine\1.8.2\junit-platform-engine-1.8.2.jar;C:\Users\12yem\.m2\repository\org\mockito\mockito-core\4.11.0\mockito-core-4.11.0.jar;C:\Users\12yem\.m2\repository\net\bytebuddy\byte-buddy\1.12.23\byte-buddy-1.12.23.jar;C:\Users\12yem\.m2\repository\net\bytebuddy\byte-buddy-agent\1.12.23\byte-buddy-agent-1.12.23.jar;C:\Users\12yem\.m2\repository\org\objenesis\objenesis\3.3\objenesis-3.3.jar;C:\Users\12yem\.m2\repository\org\mockito\mockito-junit-jupiter\4.11.0\mockito-junit-jupiter-4.11.0.jar;C:\Users\12yem\.m2\repository\org\assertj\assertj-core\3.24.1\assertj-core-3.24.1.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-java\4.35.0\selenium-java-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-api\4.35.0\selenium-api-4.35.0.jar;C:\Users\12yem\.m2\repository\org\jspecify\jspecify\1.0.0\jspecify-1.0.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-chrome-driver\4.35.0\selenium-chrome-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\com\google\auto\service\auto-service-annotations\1.1.1\auto-service-annotations-1.1.1.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-chromium-driver\4.35.0\selenium-chromium-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-json\4.35.0\selenium-json-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-manager\4.35.0\selenium-manager-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-devtools-v137\4.35.0\selenium-devtools-v137-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-devtools-v138\4.35.0\selenium-devtools-v138-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-devtools-v139\4.35.0\selenium-devtools-v139-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-edge-driver\4.35.0\selenium-edge-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-firefox-driver\4.35.0\selenium-firefox-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-http\4.35.0\selenium-http-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-ie-driver\4.35.0\selenium-ie-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-remote-driver\4.35.0\selenium-remote-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\com\google\guava\guava\33.4.8-jre\guava-33.4.8-jre.jar;C:\Users\12yem\.m2\repository\com\google\guava\failureaccess\1.0.3\failureaccess-1.0.3.jar;C:\Users\12yem\.m2\repository\com\google\guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar;C:\Users\12yem\.m2\repository\com\google\errorprone\error_prone_annotations\2.36.0\error_prone_annotations-2.36.0.jar;C:\Users\12yem\.m2\repository\com\google\j2objc\j2objc-annotations\3.0.0\j2objc-annotations-3.0.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-api\1.53.0\opentelemetry-api-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-context\1.53.0\opentelemetry-context-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-common\1.53.0\opentelemetry-common-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-exporter-logging\1.53.0\opentelemetry-exporter-logging-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-common\1.53.0\opentelemetry-sdk-common-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-extension-autoconfigure-spi\1.53.0\opentelemetry-sdk-extension-autoconfigure-spi-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-extension-autoconfigure\1.53.0\opentelemetry-sdk-extension-autoconfigure-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-trace\1.53.0\opentelemetry-sdk-trace-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk\1.53.0\opentelemetry-sdk-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-metrics\1.53.0\opentelemetry-sdk-metrics-1.53.0.jar;C:\Users\12yem\.m2\repository\io\opentelemetry\opentelemetry-sdk-logs\1.53.0\opentelemetry-sdk-logs-1.53.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-os\4.35.0\selenium-os-4.35.0.jar;C:\Users\12yem\.m2\repository\org\apache\commons\commons-exec\1.5.0\commons-exec-1.5.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-safari-driver\4.35.0\selenium-safari-driver-4.35.0.jar;C:\Users\12yem\.m2\repository\org\seleniumhq\selenium\selenium-support\4.35.0\selenium-support-4.35.0.jar;C:\Users\12yem\.m2\repository\io\github\bonigarcia\webdrivermanager\6.3.4\webdrivermanager-6.3.4.jar;C:\Users\12yem\.m2\repository\org\slf4j\slf4j-api\1.7.36\slf4j-api-1.7.36.jar;C:\Users\12yem\.m2\repository\com\google\code\gson\gson\2.9.1\gson-2.9.1.jar;C:\Users\12yem\.m2\repository\com\github\docker-java\docker-java\3.7.1\docker-java-3.7.1.jar;C:\Users\12yem\.m2\repository\com\github\docker-java\docker-java-core\3.7.1\docker-java-core-3.7.1.jar;C:\Users\12yem\.m2\repository\com\github\docker-java\docker-java-api\3.7.1\docker-java-api-3.7.1.jar;C:\Users\12yem\.m2\repository\org\slf4j\jcl-over-slf4j\1.7.36\jcl-over-slf4j-1.7.36.jar;C:\Users\12yem\.m2\repository\com\github\docker-java\docker-java-transport-httpclient5\3.7.1\docker-java-transport-httpclient5-3.7.1.jar;C:\Users\12yem\.m2\repository\com\github\docker-java\docker-java-transport\3.7.1\docker-java-transport-3.7.1.jar;C:\Users\12yem\.m2\repository\net\java\dev\jna\jna\5.18.1\jna-5.18.1.jar;C:\Users\12yem\.m2\repository\org\brotli\dec\0.1.2\dec-0.1.2.jar;C:\Users\12yem\.m2\repository\org\apache\commons\commons-lang3\3.12.0\commons-lang3-3.12.0.jar;C:\Users\12yem\.m2\repository\org\apache\commons\commons-compress\1.28.0\commons-compress-1.28.0.jar;C:\Users\12yem\.m2\repository\commons-codec\commons-codec\1.15\commons-codec-1.15.jar;C:\Users\12yem\.m2\repository\commons-io\commons-io\2.20.0\commons-io-2.20.0.jar;C:\Users\12yem\.m2\repository\org\apache\httpcomponents\client5\httpclient5\5.6.4\httpclient5-5.6.4.jar;C:\Users\12yem\.m2\repository\org\apache\httpcomponents\core5\httpcore5-h2\5.4.3\httpcore5-h2-5.4.3.jar;C:\Users\12yem\.m2\repository\org\apache\httpcomponents\core5\httpcore5\5.4.3\httpcore5-5.4.3.jar;C:\Users\12yem\.m2\repository\org\jacoco\org.jacoco.agent\0.8.11\org.jacoco.agent-0.8.11-runtime.jar;"/>
     <property name="sun.cpu.endian" value="little"/>
     <property name="user.home" value="C:\Users\12yem"/>
@@ -31,7 +30,7 @@
     <property name="line.separator" value="&#10;"/>
     <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
     <property name="java.specification.name" value="Java Platform API Specification"/>
-    <property name="surefire.real.class.path" value="C:\Users\12yem\AppData\Local\Temp\surefire12267987607358478735\surefirebooter-20260929191953017_3.jar"/>
+    <property name="surefire.real.class.path" value="C:\Users\12yem\AppData\Local\Temp\surefire549178026712183048\surefirebooter-20260930200732197_3.jar"/>
     <property name="user.script" value=""/>
     <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
     <property name="java.runtime.version" value="21.0.9+7-LTS-338"/>
@@ -51,7 +50,7 @@
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
     <property name="sun.os.patch.level" value=""/>
     <property name="native.encoding" value="Cp1252"/>
-    <property name="java.library.path" value="C:\Program Files\Java\jdk-21\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:/Users/12yem/.gemini/antigravity/bin;C:\Users\12yem\AppData\Roaming\Antigravity\bin;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Java\jdk-21\bin;C:\Program Files\PostgreSQL\18\bin;D:\flutter\bin;C:\Users\12yem\AppData\Local\Temp\dart-sdk\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;c:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;c:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;C:\Python313;C:\Program Files\MySQL\MySQL Server 9.3\bin;C:\Users\12yem\AppData\Local\Programs\Python\Launcher\;C:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator\lib;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\.android;C:\Users\12yem\AppData\Roaming\Python\Python313\Scripts;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\cursor\resources\app\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\AppData\Local\Android\Sdk\platform-tools;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.14\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.14\bin;D:\flutter\bin;C:\Users\12yem\AppData\Local\Temp\dart-sdk\bin;C:\Users\12yem\AppData\Local\Programs\Python\Launcher\;C:\Users\12yem\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\AppData\Local\Android\Sdk\platform-tools;C:\Users\12yem\AppData\Roaming\npm;C:\Users\12yem\AppData\Local\Pub\Cache\bin;C:\Users\12yem\.android;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;D:\PyCharm 2025.2.3\bin;C:\Users\12yem\AppData\Local\Programs\Antigravity\bin;C:\Program Files\PostgreSQL\18\bin;C:\Users\12yem\AppData\Local\Kingsoft\WPS Office\12.1.0.27458\clitool;C:\Users\12yem\.refact\bin;."/>
+    <property name="java.library.path" value="C:\Program Files\Java\jdk-21\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\Java\jdk-21\bin;C:\Program Files\PostgreSQL\18\bin;D:\flutter\bin;C:\Users\12yem\AppData\Local\Temp\dart-sdk\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\ProgramData\chocolatey\bin;C:\Program Files\nodejs\;c:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;c:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;C:\Python313;C:\Program Files\MySQL\MySQL Server 9.3\bin;C:\Users\12yem\AppData\Local\Programs\Python\Launcher\;C:\Users\12yem\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator\lib;C:\Program Files\MySQL\MySQL Server 8.0\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\.android;C:\Users\12yem\AppData\Roaming\Python\Python313\Scripts;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\cursor\resources\app\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\AppData\Local\Android\Sdk\platform-tools;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.14\bin;C:\ProgramData\chocolatey\lib\maven\apache-maven-3.9.14\bin;D:\flutter\bin;C:\Users\12yem\AppData\Local\Temp\dart-sdk\bin;C:\Users\12yem\AppData\Local\Programs\Python\Launcher\;C:\Users\12yem\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;C:\Users\12yem\AppData\Local\Android\Sdk\platform-tools;C:\Users\12yem\AppData\Roaming\npm;C:\Users\12yem\AppData\Local\Pub\Cache\bin;C:\Users\12yem\.android;C:\Users\12yem\AppData\Local\Android\Sdk\emulator;D:\PyCharm 2025.2.3\bin;C:\Users\12yem\AppData\Local\Programs\Antigravity\bin;C:\Program Files\PostgreSQL\18\bin;C:\Users\12yem\AppData\Local\Kingsoft\WPS Office\12.1.0.27458\clitool;C:\Users\12yem\.refact\bin;."/>
     <property name="java.vm.info" value="mixed mode, sharing"/>
     <property name="stderr.encoding" value="Cp1252"/>
     <property name="java.vendor" value="Oracle Corporation"/>
@@ -59,414 +58,441 @@
     <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
     <property name="java.class.version" value="65.0"/>
   </properties>
-  <testcase name="testCreateBookingConflict" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.058">
-    <system-out><![CDATA[19:20:03.758 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.758 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.758 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.759 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.762 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testCreateBookingConflict" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.046">
+    <system-out><![CDATA[20:07:37.070 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.070 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.071 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.075 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.763 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.767 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.769 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.769 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.769 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.769 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.769 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.770 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@72499396
-19:20:03.770 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@65145fb7
-19:20:03.770 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.770 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.773 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
-19:20:03.774 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
-19:20:03.778 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2026-10-01, startTime (truncated)...]
-19:20:03.782 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.783 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Capacity conflict: This time slot only has 0 spot(s) remaining}]
-19:20:03.784 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 409 CONFLICT
-19:20:03.784 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.076 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.079 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.080 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.080 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.080 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.080 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.080 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.080 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@2f95ce11
+20:07:37.080 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@2f349170
+20:07:37.080 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.080 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.082 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
+20:07:37.082 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
+20:07:37.084 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2026-10-01, startTime (truncated)...]
+20:07:37.085 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.086 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Capacity conflict: This time slot only has 0 spot(s) remaining}]
+20:07:37.086 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 409 CONFLICT
+20:07:37.086 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
 ]]></system-out>
   </testcase>
-  <testcase name="testCancelBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.028">
-    <system-out><![CDATA[19:20:03.787 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.787 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.789 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.790 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.790 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.790 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.790 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.790 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.792 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testCancelBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.029">
+    <system-out><![CDATA[20:07:37.089 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.089 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.090 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.091 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.793 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.794 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.795 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.795 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.795 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.795 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.795 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.795 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@48a32c4f
-19:20:03.795 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@25af2afe
-19:20:03.795 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.795 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
-19:20:03.797 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/cancel", parameters={}
-19:20:03.797 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#cancelBooking(Long)
-19:20:03.803 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.808 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
-19:20:03.813 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
-19:20:03.813 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.092 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.095 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.096 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.096 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.096 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.096 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.096 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.096 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@300b839c
+20:07:37.096 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@352288bc
+20:07:37.096 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.096 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.097 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/cancel", parameters={}
+20:07:37.098 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#cancelBooking(Long, Long)
+20:07:37.105 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.111 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
+20:07:37.115 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
+20:07:37.116 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
 ]]></system-out>
   </testcase>
-  <testcase name="testConfirmBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.037">
-    <system-out><![CDATA[19:20:03.817 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.817 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.817 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.817 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.817 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.818 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.818 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.818 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.818 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.819 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.820 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.820 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.820 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.821 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.821 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.826 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testConfirmBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.014">
+    <system-out><![CDATA[20:07:37.117 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.118 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.119 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.119 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.119 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.119 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.119 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.121 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.829 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.836 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.838 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.839 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.839 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.840 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.840 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.840 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@557abb68
-19:20:03.840 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@1cb4cad0
-19:20:03.840 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.840 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.843 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/confirm", parameters={}
-19:20:03.843 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#confirmBooking(Long)
-19:20:03.846 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.847 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
-19:20:03.851 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
-19:20:03.851 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.121 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.122 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.123 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.123 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.123 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.123 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.123 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.123 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@13c36d48
+20:07:37.123 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@7e93e396
+20:07:37.123 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.123 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.124 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/confirm", parameters={}
+20:07:37.124 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#confirmBooking(Long, String)
+20:07:37.127 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.127 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
+20:07:37.129 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
+20:07:37.129 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
 ]]></system-out>
   </testcase>
-  <testcase name="testGetBookingByIdFound" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.022">
-    <system-out><![CDATA[19:20:03.855 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.855 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.855 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.855 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.856 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.857 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.857 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.857 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.857 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.857 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.859 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testGetBookingByIdFound" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.014">
+    <system-out><![CDATA[20:07:37.131 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.131 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.131 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.132 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.133 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.134 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.860 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.862 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.863 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.863 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.863 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.863 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.863 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.863 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@3ce60feb
-19:20:03.864 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@61f2bf3a
-19:20:03.864 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.864 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.865 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/100", parameters={}
-19:20:03.866 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingById(Long)
-19:20:03.869 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.869 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
-19:20:03.874 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
-19:20:03.874 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['id']
-19:20:03.875 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.135 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.137 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.137 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.137 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.137 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.137 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.137 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.137 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@6461c673
+20:07:37.137 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@1e11d73c
+20:07:37.137 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.137 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.138 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/100", parameters={}
+20:07:37.138 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingById(Long)
+20:07:37.141 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.141 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
+20:07:37.143 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
+20:07:37.143 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['id']
+20:07:37.144 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
 ]]></system-out>
   </testcase>
-  <testcase name="testGetBookingByIdNotFound" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.02">
-    <system-out><![CDATA[19:20:03.878 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.878 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.878 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.879 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.880 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.882 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testGetBookingByIdNotFound" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.009">
+    <system-out><![CDATA[20:07:37.146 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.146 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.147 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.147 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.147 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.147 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.147 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.148 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.884 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.886 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.887 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.889 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.889 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.890 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.890 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.890 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@3d056418
-19:20:03.890 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@769d0ef2
-19:20:03.890 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.890 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.891 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/999", parameters={}
-19:20:03.892 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingById(Long)
-19:20:03.895 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.895 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Nothing to write: null body
-19:20:03.896 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 404 NOT_FOUND
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.149 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.150 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.151 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.151 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.151 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@2f32fe68
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@1007954a
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.151 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.151 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/999", parameters={}
+20:07:37.152 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingById(Long)
+20:07:37.153 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.153 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Nothing to write: null body
+20:07:37.153 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 404 NOT_FOUND
 ]]></system-out>
   </testcase>
-  <testcase name="testCancelBookingInvalidTransition" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.018">
-    <system-out><![CDATA[19:20:03.899 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.899 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.899 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.899 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.899 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.900 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.900 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.900 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.900 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.901 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.903 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testCancelBookingInvalidTransition" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.014">
+    <system-out><![CDATA[20:07:37.155 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.155 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.155 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.155 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.155 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.155 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.156 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.158 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.905 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.908 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.909 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.909 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.909 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.909 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.909 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.909 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@1131fcfd
-19:20:03.909 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@46d2be66
-19:20:03.909 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.909 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
-19:20:03.910 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/cancel", parameters={}
-19:20:03.910 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#cancelBooking(Long)
-19:20:03.913 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.913 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Cannot cancel spa booking with status: COMPLETED}]
-19:20:03.914 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 400 BAD_REQUEST
-19:20:03.915 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.160 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.162 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.165 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.165 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.165 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.165 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.165 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.165 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@172f2717
+20:07:37.165 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@bda4cbe
+20:07:37.165 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.165 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.166 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings/100/cancel", parameters={}
+20:07:37.166 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#cancelBooking(Long, Long)
+20:07:37.167 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.167 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Cannot cancel spa booking with status: COMPLETED}]
+20:07:37.167 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 400 BAD_REQUEST
+20:07:37.168 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
 ]]></system-out>
   </testcase>
-  <testcase name="testGetBookingsByGuest" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.023">
-    <system-out><![CDATA[19:20:03.918 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.918 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.918 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.918 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.918 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.918 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.919 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.919 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.919 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.919 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.920 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.920 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.920 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.920 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.920 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.922 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testGetBookingsByGuest" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.02">
+    <system-out><![CDATA[20:07:37.170 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.170 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.171 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.173 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.924 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.927 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.927 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.927 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.927 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.927 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.927 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.927 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@729a98e9
-19:20:03.927 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@51c7d472
-19:20:03.927 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.927 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
-19:20:03.929 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/guest/1", parameters={}
-19:20:03.929 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingsByGuest(Long)
-19:20:03.930 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.932 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [[SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, passwor (truncated)...]
-19:20:03.938 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
-19:20:03.939 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $[0]['id']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.174 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.180 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.181 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.181 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.181 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.181 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.181 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.181 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@2acbbee4
+20:07:37.181 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@3446ab40
+20:07:37.181 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.181 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.182 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - GET "/api/spa-bookings/guest/1", parameters={}
+20:07:37.183 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#getBookingsByGuest(Long)
+20:07:37.184 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.185 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [[SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, passwor (truncated)...]
+20:07:37.188 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 200 OK
+20:07:37.188 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $[0]['id']
 ]]></system-out>
   </testcase>
-  <testcase name="testCreateBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.022">
-    <system-out><![CDATA[19:20:03.942 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.942 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.942 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.942 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.942 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.943 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.946 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testCreateBookingSuccess" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.015">
+    <system-out><![CDATA[20:07:37.190 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.190 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.190 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.191 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.193 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.194 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.194 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.194 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.194 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.194 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.195 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.947 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.949 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.951 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.951 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.951 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.951 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.951 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.951 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@7c8537e9
-19:20:03.952 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@42d4de20
-19:20:03.952 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.952 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.952 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
-19:20:03.953 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
-19:20:03.954 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2026-10-01, startTime (truncated)...]
-19:20:03.957 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.957 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
-19:20:03.961 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 201 CREATED
-19:20:03.961 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['id']
-19:20:03.961 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
-19:20:03.962 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['totalPrice']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.196 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.197 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.198 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.198 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.198 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.198 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.198 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.198 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@618d2191
+20:07:37.198 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@4b1ef6a
+20:07:37.198 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.198 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.199 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
+20:07:37.199 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
+20:07:37.200 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2026-10-01, startTime (truncated)...]
+20:07:37.201 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.201 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [SpaBooking(id=100, guest=Guest(id=1, role=CLIENT, firstName=John, lastName=Doe, email=null, password (truncated)...]
+20:07:37.203 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 201 CREATED
+20:07:37.204 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['id']
+20:07:37.204 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['status']
+20:07:37.204 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['totalPrice']
 ]]></system-out>
   </testcase>
-  <testcase name="testCreateBookingBadRequest" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.021">
-    <system-out><![CDATA[19:20:03.964 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
-19:20:03.964 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
-19:20:03.964 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
-19:20:03.964 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
-19:20:03.964 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
-19:20:03.966 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
-19:20:03.969 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
+  <testcase name="testCreateBookingBadRequest" classname="com.hotelmanagement.controller.SpaBookingControllerTest" time="0.014">
+    <system-out><![CDATA[20:07:37.206 [main] DEBUG org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator - Loaded expression factory via original TCCL
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom MessageInterpolator of type org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.AbstractConfigurationImpl - Setting custom ParameterNameProvider of type org.springframework.validation.beanvalidation.LocalValidatorFactoryBean$1
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - Trying to load META-INF/validation.xml for XML based Validator configuration.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via TCCL
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.xml.config.ResourceLoaderHelper - Trying to load META-INF/validation.xml via Hibernate Validator's class loader
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.xml.config.ValidationXmlParser - No META-INF/validation.xml found. Using annotation based configuration only.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Found javax.persistence.Persistence on classpath containing 'getPersistenceUtil'. Assuming JPA 2 environment. Trying to instantiate JPA aware TraversableResolver
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.resolver.TraversableResolvers - Instantiated JPA aware TraversableResolver of type org.hibernate.validator.internal.engine.resolver.JPATraversableResolver.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000252: Using org.hibernate.validator.internal.engine.DefaultPropertyNodeNameProvider as property node name provider.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.springframework.validation.beanvalidation.LocaleContextMessageInterpolator as ValidatorFactory-scoped message interpolator.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.resolver.JPATraversableResolver as ValidatorFactory-scoped traversable resolver.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.util.ExecutableParameterNameProvider as ValidatorFactory-scoped parameter name provider.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.DefaultClockProvider as ValidatorFactory-scoped clock provider.
+20:07:37.206 [main] DEBUG org.hibernate.validator.internal.engine.ValidatorFactoryConfigurationHelper - HV000234: Using org.hibernate.validator.internal.engine.scripting.DefaultScriptEvaluatorFactory as ValidatorFactory-scoped script evaluator factory.
+20:07:37.209 [main] DEBUG _org.springframework.web.servlet.HandlerMapping.Mappings - 
 	c.h.c.SpaBookingController:
-	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long)
-	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
-	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
-	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
-	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long)
 	{POST [/api/spa-bookings/{id}/complete || /spa-bookings/{id}/complete || /api/spa/bookings/{id}/complete || /spa/bookings/{id}/complete]}: completeBooking(Long)
-	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+	{GET [/api/spa-bookings/guest/{guestId} || /spa-bookings/guest/{guestId} || /api/spa/bookings/guest/{guestId} || /spa/bookings/guest/{guestId}]}: getBookingsByGuest(Long)
+	{GET [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: getBookingById(Long)
+	{POST [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: createBooking(SpaBookingRequest)
+	{POST [/api/spa-bookings/{id}/confirm || /spa-bookings/{id}/confirm || /api/spa/bookings/{id}/confirm || /spa/bookings/{id}/confirm]}: confirmBooking(Long,String)
+	{POST [/api/spa-bookings/{id}/cancel || /spa-bookings/{id}/cancel || /api/spa/bookings/{id}/cancel || /spa/bookings/{id}/cancel]}: cancelBooking(Long,Long)
 	{GET [/api/spa-bookings/date/{date} || /spa-bookings/date/{date} || /api/spa/bookings/date/{date} || /spa/bookings/date/{date}]}: getBookingsByDate(LocalDate)
-19:20:03.969 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 8 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-19:20:03.973 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
-19:20:03.975 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-19:20:03.975 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
-19:20:03.975 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
-19:20:03.976 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
-19:20:03.976 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
-19:20:03.976 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@5ed6a36a
-19:20:03.976 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@200cbb63
-19:20:03.976 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-19:20:03.976 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 1 ms
-19:20:03.977 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
-19:20:03.977 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
-19:20:03.980 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2020-01-01, startTime (truncated)...]
-19:20:03.982 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-19:20:03.982 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Cannot book spa treatment in the past}]
-19:20:03.983 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 400 BAD_REQUEST
-19:20:03.983 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
+	{GET [/api/spa-bookings/pending || /spa-bookings/pending || /api/spa/bookings/pending || /spa/bookings/pending]}: getPendingBookings()
+	{DELETE [/api/spa-bookings/{id} || /spa-bookings/{id} || /api/spa/bookings/{id} || /spa/bookings/{id}]}: deleteBooking(Long)
+	{PUT [/api/spa-bookings/{id}/reschedule || /spa-bookings/{id}/reschedule || /api/spa/bookings/{id}/reschedule || /spa/bookings/{id}/reschedule]}: rescheduleBooking(Long,RescheduleRequest)
+	{GET [/api/spa-bookings || /spa-bookings || /api/spa/bookings || /spa/bookings]}: getAllBookings()
+20:07:37.212 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - 11 mappings in org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+20:07:37.214 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+20:07:37.215 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+20:07:37.215 [main] INFO org.springframework.mock.web.MockServletContext - Initializing Spring TestDispatcherServlet ''
+20:07:37.215 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Initializing Servlet ''
+20:07:37.215 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected AcceptHeaderLocaleResolver
+20:07:37.215 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected FixedThemeResolver
+20:07:37.215 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@6e157f48
+20:07:37.215 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@37e9d191
+20:07:37.215 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+20:07:37.215 [main] INFO org.springframework.test.web.servlet.TestDispatcherServlet - Completed initialization in 0 ms
+20:07:37.216 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - POST "/api/spa-bookings", parameters={}
+20:07:37.216 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping - Mapped to com.hotelmanagement.controller.SpaBookingController#createBooking(SpaBookingRequest)
+20:07:37.217 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor - Read "application/json" to [SpaBookingController.SpaBookingRequest(guestId=1, spaServiceId=10, bookingDate=2020-01-01, startTime (truncated)...]
+20:07:37.218 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+20:07:37.218 [main] DEBUG org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor - Writing [{message=Cannot book spa treatment in the past}]
+20:07:37.218 [main] DEBUG org.springframework.test.web.servlet.TestDispatcherServlet - Completed 400 BAD_REQUEST
+20:07:37.219 [main] DEBUG com.jayway.jsonpath.internal.path.CompiledPath - Evaluating path: $['message']
 ]]></system-out>
   </testcase>
 </testsuite>

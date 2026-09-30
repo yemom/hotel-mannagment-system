@@ -48,7 +48,7 @@ const AboutPage = () => {
       <header className="rooms-header-banner">
         <div className="section-container banner-content">
           <span className="banner-kicker">OUR STORY</span>
-          <h1>About የ-mom Hotel</h1>
+          <h1>About Aurelia Grand</h1>
           <p>
             A boutique sanctuary where timeless Ethiopian hospitality meets world-class luxury.
             Founded with a single vision: to make every guest feel completely at home.
@@ -64,7 +64,7 @@ const AboutPage = () => {
               <span className="section-eyebrow">OUR PHILOSOPHY</span>
               <h2>Luxury with Soul</h2>
               <p>
-                At የ-mom Hotel, we believe luxury is not defined by marble floors or thread counts alone —
+                At Aurelia Grand, we believe luxury is not defined by marble floors or thread counts alone —
                 it is the invisible art of making a person feel seen, valued, and entirely cared for from
                 the moment they arrive until long after they depart.
               </p>
@@ -93,7 +93,7 @@ const AboutPage = () => {
       </section>
 
       {/* Timeline */}
-      <section style={{ background: '#f8fafc', padding: '80px 0' }}>
+      <section style={{ background: 'var(--surface-soft)', padding: '80px 0' }}>
         <div className="section-container">
           <div className="landing-section-header">
             <span className="section-eyebrow">OUR JOURNEY</span>
@@ -137,23 +137,23 @@ const AboutPage = () => {
       </section>
 
       {/* Awards */}
-      <section style={{ background: '#0f172a', padding: '64px 0' }}>
+      <section style={{ background: 'var(--text)', padding: '64px 0' }}>
         <div className="section-container" style={{ textAlign: 'center' }}>
-          <span className="section-eyebrow" style={{ color: '#6ee7b7' }}>RECOGNITION</span>
+          <span className="section-eyebrow" style={{ color: 'var(--accent)' }}>AT YOUR SERVICE</span>
           <h2 style={{ color: '#ffffff', fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 800, margin: '12px 0 40px' }}>
-            Awards & Accolades
+            Signature Facilities
           </h2>
           <div className="about-awards">
             {[
-              'Condé Nast Traveller — Best Boutique Hotel 2019',
-              'Forbes Travel Guide — 5-Star Rated 2021–2024',
-              'TripAdvisor Travellers\' Choice — Top 1% Worldwide',
-              'World Luxury Hotel Awards — Africa Winner 2023',
-              'Sustainable Luxury Certification — EarthCheck Gold 2022',
-            ].map((award) => (
-              <div key={award} className="about-award-badge">
-                <span className="material-symbols-outlined">emoji_events</span>
-                <span>{award}</span>
+              'Atelier Spa & Hydrotherapy Sanctuary',
+              'Rooftop Fine Dining & Terrace Lounge',
+              '24-Hour White-Glove Concierge',
+              'Complimentary Fiber Wi-Fi Throughout',
+              'Executive Airport Transfer Service',
+            ].map((facility) => (
+              <div key={facility} className="about-award-badge">
+                <span className="material-symbols-outlined">stars</span>
+                <span>{facility}</span>
               </div>
             ))}
           </div>
@@ -167,7 +167,7 @@ const AboutPage = () => {
           <h2>Experience It for Yourself</h2>
           <p>
             Words can only convey so much. We invite you to visit, stay, and discover what
-            makes የ-mom Hotel unlike anywhere else.
+            makes Aurelia Grand unlike anywhere else.
           </p>
           <div className="invitation-actions">
             <Link to="/rooms" className="public-cta-btn">

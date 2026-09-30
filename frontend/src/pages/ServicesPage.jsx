@@ -11,7 +11,7 @@ const SERVICES = [
     link: '/spa',
     linkLabel: 'Explore Spa',
     highlights: ['12 Private Treatment Rooms', 'Couples Sanctuary', 'Hydrotherapy Pool', 'Steam & Sauna Suite'],
-    color: '#064e3b',
+    color: 'var(--accent)',
   },
   {
     icon: 'restaurant',
@@ -20,7 +20,7 @@ const SERVICES = [
     link: '/restaurant',
     linkLabel: 'View Menus',
     highlights: ['Rooftop Farm-to-Table', 'Wine Cellar Events', 'Poolside Terrace Dining', 'All-Day Artisan Bistro'],
-    color: '#7c3aed',
+    color: 'var(--accent)',
   },
   {
     icon: 'pool',
@@ -29,7 +29,7 @@ const SERVICES = [
     link: '/',
     linkLabel: 'Learn More',
     highlights: ['Rooftop Infinity Pool', 'Heated Indoor Pool', 'Private Cabanas', 'Poolside F&B Service'],
-    color: '#0284c7',
+    color: 'var(--accent)',
   },
   {
     icon: 'fitness_center',
@@ -38,7 +38,7 @@ const SERVICES = [
     link: '/',
     linkLabel: 'Learn More',
     highlights: ['24-Hour Access', 'Personal Training', 'Daily Yoga Classes', 'Technogym Equipment'],
-    color: '#dc2626',
+    color: 'var(--accent)',
   },
   {
     icon: 'meeting_room',
@@ -47,7 +47,7 @@ const SERVICES = [
     link: '/contact',
     linkLabel: 'Enquire Now',
     highlights: ['8 Event Venues', 'Up to 400 Guests', 'Full AV & Catering', 'Event Coordinator'],
-    color: '#b45309',
+    color: 'var(--accent)',
   },
   {
     icon: 'local_parking',
@@ -56,7 +56,7 @@ const SERVICES = [
     link: '/contact',
     linkLabel: 'Contact Concierge',
     highlights: ['24/7 Concierge', 'Valet Parking', 'Luxury Fleet', 'Private Charters'],
-    color: '#0f172a',
+    color: 'var(--text)',
   },
 ];
 
@@ -87,7 +87,7 @@ const ServicesPage = () => {
           <h1>Everything You Need</h1>
           <p>
             From world-class wellness to curated dining, discover the full breadth of services
-            available during your stay at የ-mom Hotel.
+            available during your stay at Aurelia Grand.
           </p>
         </div>
       </header>
@@ -123,7 +123,7 @@ const ServicesPage = () => {
       </section>
 
       {/* Facilities Grid */}
-      <section style={{ background: '#f8fafc', padding: '80px 0' }}>
+      <section style={{ background: 'var(--surface-soft)', padding: '80px 0' }}>
         <div className="section-container">
           <div className="landing-section-header">
             <span className="section-eyebrow">STANDARD INCLUSIONS</span>
