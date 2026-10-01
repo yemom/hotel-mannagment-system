@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping({&quot;/api/spa-services&quot;, &quot;/spa-services&quot;, &quot;/api/spa/services&quot;, &quot;/spa/services&quot;})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {&quot;http://localhost:3000&quot;, &quot;http://localhost:5173&quot;})
 public class SpaServiceController {
 
     private final SpaServiceService spaServiceService;
@@ -21,83 +20,83 @@ public class SpaServiceController {
     @GetMapping
     public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getAllServices(
             @RequestParam(required = false) Boolean activeOnly) {
-<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        if (Boolean.TRUE.equals(activeOnly)) {</span>
-<span class="nc" id="L25">            return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
+<span class="pc bpc" id="L23" title="1 of 2 branches missed.">        if (Boolean.TRUE.equals(activeOnly)) {</span>
+<span class="nc" id="L24">            return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
         }
-<span class="fc" id="L27">        return ResponseEntity.ok(spaServiceService.getAllServices());</span>
+<span class="fc" id="L26">        return ResponseEntity.ok(spaServiceService.getAllServices());</span>
     }
 
     @GetMapping(&quot;/active&quot;)
     public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getActiveServices() {
-<span class="fc" id="L32">        return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
+<span class="fc" id="L31">        return ResponseEntity.ok(spaServiceService.getActiveServices());</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;SpaService&gt; getServiceById(@PathVariable Long id) {
-<span class="fc" id="L37">        return spaServiceService.getServiceById(id)</span>
-<span class="fc" id="L38">                .map(ResponseEntity::ok)</span>
-<span class="fc" id="L39">                .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
+<span class="fc" id="L36">        return spaServiceService.getServiceById(id)</span>
+<span class="fc" id="L37">                .map(ResponseEntity::ok)</span>
+<span class="fc" id="L38">                .orElseGet(() -&gt; ResponseEntity.notFound().build());</span>
     }
 
     @GetMapping(&quot;/category/{category}&quot;)
     public ResponseEntity&lt;List&lt;SpaService&gt;&gt; getServicesByCategory(@PathVariable SpaCategory category) {
         try {
-<span class="nc" id="L45">            return ResponseEntity.ok(spaServiceService.getServicesByCategory(category));</span>
-<span class="nc" id="L46">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L47">            return ResponseEntity.badRequest().build();</span>
+<span class="nc" id="L44">            return ResponseEntity.ok(spaServiceService.getServicesByCategory(category));</span>
+<span class="nc" id="L45">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L46">            return ResponseEntity.badRequest().build();</span>
         }
     }
 
     @PostMapping
     public ResponseEntity&lt;?&gt; createService(@RequestBody SpaService service) {
         try {
-<span class="fc" id="L54">            SpaService created = spaServiceService.createService(service);</span>
-<span class="fc" id="L55">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
-<span class="fc" id="L56">        } catch (IllegalArgumentException e) {</span>
-<span class="fc" id="L57">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
+<span class="fc" id="L53">            SpaService created = spaServiceService.createService(service);</span>
+<span class="fc" id="L54">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="fc" id="L55">        } catch (IllegalArgumentException e) {</span>
+<span class="fc" id="L56">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
         }
     }
 
     @PutMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;?&gt; updateService(@PathVariable Long id, @RequestBody SpaService service) {
         try {
-<span class="fc" id="L64">            SpaService updated = spaServiceService.updateService(id, service);</span>
-<span class="fc" id="L65">            return ResponseEntity.ok(updated);</span>
-<span class="fc" id="L66">        } catch (IllegalArgumentException e) {</span>
-<span class="pc bpc" id="L67" title="2 of 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
-<span class="fc" id="L68">                return ResponseEntity.notFound().build();</span>
+<span class="fc" id="L63">            SpaService updated = spaServiceService.updateService(id, service);</span>
+<span class="fc" id="L64">            return ResponseEntity.ok(updated);</span>
+<span class="fc" id="L65">        } catch (IllegalArgumentException e) {</span>
+<span class="pc bpc" id="L66" title="2 of 4 branches missed.">            if (e.getMessage() != null &amp;&amp; e.getMessage().contains(&quot;not found&quot;)) {</span>
+<span class="fc" id="L67">                return ResponseEntity.notFound().build();</span>
             }
-<span class="nc" id="L70">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
+<span class="nc" id="L69">            return ResponseEntity.badRequest().body(java.util.Map.of(&quot;message&quot;, e.getMessage()));</span>
         }
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; deleteService(@PathVariable Long id) {
         try {
-<span class="fc" id="L77">            spaServiceService.deleteService(id);</span>
-<span class="fc" id="L78">            return ResponseEntity.noContent().build();</span>
-<span class="nc" id="L79">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L80">            return ResponseEntity.notFound().build();</span>
+<span class="fc" id="L76">            spaServiceService.deleteService(id);</span>
+<span class="fc" id="L77">            return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L78">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L79">            return ResponseEntity.notFound().build();</span>
         }
     }
 
     @PostMapping(&quot;/{id}/deactivate&quot;)
     public ResponseEntity&lt;?&gt; deactivateService(@PathVariable Long id) {
         try {
-<span class="nc" id="L87">            SpaService updated = spaServiceService.deactivateService(id);</span>
-<span class="nc" id="L88">            return ResponseEntity.ok(updated);</span>
-<span class="nc" id="L89">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L90">            return ResponseEntity.notFound().build();</span>
+<span class="nc" id="L86">            SpaService updated = spaServiceService.deactivateService(id);</span>
+<span class="nc" id="L87">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L88">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L89">            return ResponseEntity.notFound().build();</span>
         }
     }
 
     @PostMapping(&quot;/{id}/activate&quot;)
     public ResponseEntity&lt;?&gt; activateService(@PathVariable Long id) {
         try {
-<span class="nc" id="L97">            SpaService updated = spaServiceService.activateService(id);</span>
-<span class="nc" id="L98">            return ResponseEntity.ok(updated);</span>
-<span class="nc" id="L99">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L100">            return ResponseEntity.notFound().build();</span>
+<span class="nc" id="L96">            SpaService updated = spaServiceService.activateService(id);</span>
+<span class="nc" id="L97">            return ResponseEntity.ok(updated);</span>
+<span class="nc" id="L98">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L99">            return ResponseEntity.notFound().build();</span>
         }
     }
 }

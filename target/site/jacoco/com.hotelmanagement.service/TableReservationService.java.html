@@ -115,7 +115,7 @@ public class TableReservationService {
 <span class="nc" id="L115">                    table.getId(), newDate, newTimeSlot, TableReservationStatus.CANCELLED, res.getId());</span>
 <span class="nc bnc" id="L116" title="All 2 branches missed.">            if (!conflicts.isEmpty()) {</span>
 <span class="nc" id="L117">                throw new IllegalStateException(&quot;Table &quot; + table.getTableNumber()</span>
-                    + &quot; is already reserved for &quot; + newTimeSlot + &quot; on &quot; + newDate);
+<span class="nc" id="L118">                    + &quot; is already reserved for &quot; + newTimeSlot + &quot; on &quot; + newDate);</span>
             }
         }
 
@@ -148,7 +148,7 @@ public class TableReservationService {
         }
 <span class="nc bnc" id="L149" title="All 4 branches missed.">        if (ownerGuestId == null || !ownerGuestId.equals(actingGuestId)) {</span>
 <span class="nc" id="L150">            throw new com.hotelmanagement.exception.AccessDeniedException(</span>
-                &quot;You may only modify your own reservations&quot;);
+<span class="nc" id="L151">                &quot;You may only modify your own reservations&quot;);</span>
         }
 <span class="nc" id="L153">    }</span>
 
@@ -162,17 +162,17 @@ public class TableReservationService {
         List&lt;TableReservation&gt; conflicts;
 <span class="pc bpc" id="L163" title="1 of 2 branches missed.">        if (excludeId == null) {</span>
 <span class="fc" id="L164">            conflicts = repository.findByRestaurantTableIdAndReservationDateAndTimeSlot(</span>
-                tableId, date, timeSlot);
+<span class="fc" id="L165">                tableId, date, timeSlot);</span>
 <span class="fc" id="L166">            conflicts = conflicts.stream()</span>
 <span class="pc bnc" id="L167" title="All 2 branches missed.">                .filter(r -&gt; !TableReservationStatus.CANCELLED.equals(r.getStatus()))</span>
 <span class="fc" id="L168">                .collect(java.util.stream.Collectors.toList());</span>
-        } else {
+<span class="fc" id="L169">        } else {</span>
 <span class="nc" id="L170">            conflicts = repository.findByRestaurantTableIdAndReservationDateAndTimeSlotAndStatusNotAndIdNot(</span>
-                tableId, date, timeSlot, TableReservationStatus.CANCELLED, excludeId);
+<span class="nc" id="L171">                tableId, date, timeSlot, TableReservationStatus.CANCELLED, excludeId);</span>
         }
 <span class="pc bpc" id="L173" title="1 of 2 branches missed.">        if (!conflicts.isEmpty()) {</span>
 <span class="nc" id="L174">            throw new IllegalStateException(&quot;That table is already reserved for &quot;</span>
-                + timeSlot + &quot; on &quot; + date);
+<span class="nc" id="L175">                + timeSlot + &quot; on &quot; + date);</span>
         }
 <span class="fc" id="L177">    }</span>
 
@@ -206,7 +206,7 @@ public class TableReservationService {
         // Mark the physical table as OCCUPIED
 <span class="pc bpc" id="L207" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
 <span class="fc" id="L208">            res.getRestaurantTable().setStatus(</span>
-                com.hotelmanagement.model.TableStatus.OCCUPIED);
+<span class="fc" id="L209">                com.hotelmanagement.model.TableStatus.OCCUPIED);</span>
         }
 <span class="fc" id="L211">        return repository.save(res);</span>
     }
@@ -217,7 +217,7 @@ public class TableReservationService {
         // Free up the physical table
 <span class="pc bpc" id="L218" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
 <span class="fc" id="L219">            res.getRestaurantTable().setStatus(</span>
-                com.hotelmanagement.model.TableStatus.AVAILABLE);
+<span class="fc" id="L220">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
         }
 <span class="fc" id="L222">        return repository.save(res);</span>
     }
@@ -227,7 +227,7 @@ public class TableReservationService {
 <span class="fc" id="L227">        res.cancel();</span>
 <span class="pc bpc" id="L228" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
 <span class="fc" id="L229">            res.getRestaurantTable().setStatus(</span>
-                com.hotelmanagement.model.TableStatus.AVAILABLE);
+<span class="fc" id="L230">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
         }
 <span class="fc" id="L232">        return repository.save(res);</span>
     }
@@ -237,7 +237,7 @@ public class TableReservationService {
 <span class="fc" id="L237">        res.markNoShow();</span>
 <span class="pc bpc" id="L238" title="1 of 2 branches missed.">        if (res.getRestaurantTable() != null) {</span>
 <span class="fc" id="L239">            res.getRestaurantTable().setStatus(</span>
-                com.hotelmanagement.model.TableStatus.AVAILABLE);
+<span class="fc" id="L240">                com.hotelmanagement.model.TableStatus.AVAILABLE);</span>
         }
 <span class="fc" id="L242">        return repository.save(res);</span>
     }

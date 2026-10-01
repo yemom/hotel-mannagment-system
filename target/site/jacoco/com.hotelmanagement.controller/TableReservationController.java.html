@@ -14,7 +14,6 @@ import java.util.List;
 @RestController
 @RequestMapping({&quot;/api/restaurant/reservations&quot;, &quot;/restaurant/reservations&quot;})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {&quot;http://localhost:3000&quot;, &quot;http://localhost:5173&quot;})
 public class TableReservationController {
 
     private final TableReservationService service;
@@ -22,42 +21,42 @@ public class TableReservationController {
     @PostMapping
     public ResponseEntity&lt;?&gt; create(@RequestBody TableReservation reservation) {
         try {
-<span class="fc" id="L25">            return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));</span>
-<span class="nc" id="L26">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L27">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
-<span class="nc" id="L28">        } catch (IllegalStateException e) {</span>
-<span class="nc" id="L29">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
+<span class="fc" id="L24">            return ResponseEntity.status(HttpStatus.CREATED).body(service.create(reservation));</span>
+<span class="nc" id="L25">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L26">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L27">        } catch (IllegalStateException e) {</span>
+<span class="nc" id="L28">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @GetMapping
     public ResponseEntity&lt;List&lt;TableReservation&gt;&gt; getAll() {
-<span class="fc" id="L35">        return ResponseEntity.ok(service.getAll());</span>
+<span class="fc" id="L34">        return ResponseEntity.ok(service.getAll());</span>
     }
 
     @GetMapping(&quot;/pending&quot;)
     public ResponseEntity&lt;List&lt;TableReservation&gt;&gt; getPending() {
-<span class="nc" id="L40">        return ResponseEntity.ok(service.getPending());</span>
+<span class="nc" id="L39">        return ResponseEntity.ok(service.getPending());</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;TableReservation&gt; getById(@PathVariable Long id) {
         try {
-<span class="fc" id="L46">            return ResponseEntity.ok(service.getById(id));</span>
-<span class="nc" id="L47">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L48">            return ResponseEntity.notFound().build();</span>
+<span class="fc" id="L45">            return ResponseEntity.ok(service.getById(id));</span>
+<span class="nc" id="L46">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L47">            return ResponseEntity.notFound().build();</span>
         }
     }
 
     @GetMapping(&quot;/guest/{guestId}&quot;)
     public ResponseEntity&lt;List&lt;TableReservation&gt;&gt; getByGuest(@PathVariable Long guestId) {
-<span class="nc" id="L54">        return ResponseEntity.ok(service.getByGuestId(guestId));</span>
+<span class="nc" id="L53">        return ResponseEntity.ok(service.getByGuestId(guestId));</span>
     }
 
     @GetMapping(&quot;/date/{date}&quot;)
     public ResponseEntity&lt;List&lt;TableReservation&gt;&gt; getByDate(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-<span class="nc" id="L60">        return ResponseEntity.ok(service.getByDate(date));</span>
+<span class="nc" id="L59">        return ResponseEntity.ok(service.getByDate(date));</span>
     }
 
     /**
@@ -67,48 +66,48 @@ public class TableReservationController {
     @PutMapping(&quot;/{id}/reschedule&quot;)
     public ResponseEntity&lt;?&gt; reschedule(@PathVariable Long id, @RequestBody RescheduleRequest request) {
         try {
-<span class="nc" id="L70">            return ResponseEntity.ok(service.reschedule(id, request.getReservationDate(),</span>
-<span class="nc" id="L71">                request.getTimeSlot(), request.getPartySize(), request.getActingGuestId()));</span>
-<span class="nc" id="L72">        } catch (com.hotelmanagement.exception.AccessDeniedException e) {</span>
-<span class="nc" id="L73">            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));</span>
-<span class="nc" id="L74">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L75">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
-<span class="nc" id="L76">        } catch (IllegalStateException e) {</span>
-<span class="nc" id="L77">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L69">            return ResponseEntity.ok(service.reschedule(id, request.getReservationDate(),</span>
+<span class="nc" id="L70">                request.getTimeSlot(), request.getPartySize(), request.getActingGuestId()));</span>
+<span class="nc" id="L71">        } catch (com.hotelmanagement.exception.AccessDeniedException e) {</span>
+<span class="nc" id="L72">            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L73">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L74">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L75">        } catch (IllegalStateException e) {</span>
+<span class="nc" id="L76">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @PostMapping(&quot;/{id}/confirm&quot;)
     public ResponseEntity&lt;?&gt; confirm(@PathVariable Long id,
                                      @RequestParam(required = false) String actingRole) {
-<span class="pc bpc" id="L84" title="1 of 2 branches missed.">        if (!isAuthorizedStaff(actingRole)) {</span>
-<span class="nc" id="L85">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
-<span class="nc" id="L86">                .body(errorBody(&quot;Only authorised staff may confirm reservations&quot;));</span>
+<span class="pc bpc" id="L83" title="1 of 2 branches missed.">        if (!isAuthorizedStaff(actingRole)) {</span>
+<span class="nc" id="L84">            return ResponseEntity.status(HttpStatus.FORBIDDEN)</span>
+<span class="nc" id="L85">                .body(errorBody(&quot;Only authorised staff may confirm reservations&quot;));</span>
         }
         try {
-<span class="fc" id="L89">            return ResponseEntity.ok(service.confirm(id));</span>
-<span class="nc" id="L90">        } catch (IllegalStateException e) {</span>
-<span class="nc" id="L91">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
-<span class="nc" id="L92">        } catch (Exception e) {</span>
-<span class="nc" id="L93">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="fc" id="L88">            return ResponseEntity.ok(service.confirm(id));</span>
+<span class="nc" id="L89">        } catch (IllegalStateException e) {</span>
+<span class="nc" id="L90">            return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L91">        } catch (Exception e) {</span>
+<span class="nc" id="L92">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @PostMapping(&quot;/{id}/seat&quot;)
     public ResponseEntity&lt;?&gt; seat(@PathVariable Long id) {
         try {
-<span class="nc" id="L100">            return ResponseEntity.ok(service.seat(id));</span>
-<span class="nc" id="L101">        } catch (Exception e) {</span>
-<span class="nc" id="L102">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L99">            return ResponseEntity.ok(service.seat(id));</span>
+<span class="nc" id="L100">        } catch (Exception e) {</span>
+<span class="nc" id="L101">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @PostMapping(&quot;/{id}/complete&quot;)
     public ResponseEntity&lt;?&gt; complete(@PathVariable Long id) {
         try {
-<span class="nc" id="L109">            return ResponseEntity.ok(service.complete(id));</span>
-<span class="nc" id="L110">        } catch (Exception e) {</span>
-<span class="nc" id="L111">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L108">            return ResponseEntity.ok(service.complete(id));</span>
+<span class="nc" id="L109">        } catch (Exception e) {</span>
+<span class="nc" id="L110">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
         }
     }
 
@@ -116,49 +115,49 @@ public class TableReservationController {
     public ResponseEntity&lt;?&gt; cancel(@PathVariable Long id,
                                     @RequestParam(required = false) Long actingGuestId) {
         try {
-<span class="pc bpc" id="L119" title="1 of 2 branches missed.">            TableReservation cancelled = (actingGuestId != null)</span>
-<span class="nc" id="L120">                ? service.cancelAs(id, actingGuestId)</span>
-<span class="fc" id="L121">                : service.cancel(id);</span>
-<span class="fc" id="L122">            return ResponseEntity.ok(cancelled);</span>
-<span class="nc" id="L123">        } catch (com.hotelmanagement.exception.AccessDeniedException e) {</span>
-<span class="nc" id="L124">            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));</span>
-<span class="nc" id="L125">        } catch (Exception e) {</span>
-<span class="nc" id="L126">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            TableReservation cancelled = (actingGuestId != null)</span>
+<span class="nc" id="L119">                ? service.cancelAs(id, actingGuestId)</span>
+<span class="fc" id="L120">                : service.cancel(id);</span>
+<span class="fc" id="L121">            return ResponseEntity.ok(cancelled);</span>
+<span class="nc" id="L122">        } catch (com.hotelmanagement.exception.AccessDeniedException e) {</span>
+<span class="nc" id="L123">            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L124">        } catch (Exception e) {</span>
+<span class="nc" id="L125">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @PostMapping(&quot;/{id}/no-show&quot;)
     public ResponseEntity&lt;?&gt; noShow(@PathVariable Long id) {
         try {
-<span class="nc" id="L133">            return ResponseEntity.ok(service.markNoShow(id));</span>
-<span class="nc" id="L134">        } catch (Exception e) {</span>
-<span class="nc" id="L135">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
+<span class="nc" id="L132">            return ResponseEntity.ok(service.markNoShow(id));</span>
+<span class="nc" id="L133">        } catch (Exception e) {</span>
+<span class="nc" id="L134">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorBody(e.getMessage()));</span>
         }
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; delete(@PathVariable Long id) {
         try {
-<span class="nc" id="L142">            service.delete(id);</span>
-<span class="nc" id="L143">            return ResponseEntity.noContent().build();</span>
-<span class="nc" id="L144">        } catch (Exception e) {</span>
-<span class="nc" id="L145">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+<span class="nc" id="L141">            service.delete(id);</span>
+<span class="nc" id="L142">            return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L143">        } catch (Exception e) {</span>
+<span class="nc" id="L144">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
     }
 
     private boolean isAuthorizedStaff(String actingRole) {
-<span class="pc bpc" id="L150" title="3 of 4 branches missed.">        if (actingRole == null || actingRole.trim().isEmpty()) {</span>
-<span class="fc" id="L151">            return true;</span>
+<span class="pc bpc" id="L149" title="3 of 4 branches missed.">        if (actingRole == null || actingRole.trim().isEmpty()) {</span>
+<span class="fc" id="L150">            return true;</span>
         }
-<span class="nc" id="L153">        String r = actingRole.trim().toLowerCase();</span>
-<span class="nc bnc" id="L154" title="All 6 branches missed.">        return r.equals(&quot;admin&quot;) || r.equals(&quot;super_admin&quot;) || r.equals(&quot;manager&quot;)</span>
-<span class="nc bnc" id="L155" title="All 6 branches missed.">            || r.equals(&quot;staff&quot;) || r.equals(&quot;receptionist&quot;) || r.equals(&quot;true&quot;);</span>
+<span class="nc" id="L152">        String r = actingRole.trim().toLowerCase();</span>
+<span class="nc bnc" id="L153" title="All 6 branches missed.">        return r.equals(&quot;admin&quot;) || r.equals(&quot;super_admin&quot;) || r.equals(&quot;manager&quot;)</span>
+<span class="nc bnc" id="L154" title="All 6 branches missed.">            || r.equals(&quot;staff&quot;) || r.equals(&quot;receptionist&quot;) || r.equals(&quot;true&quot;);</span>
     }
 
     private java.util.Map&lt;String, Object&gt; errorBody(String message) {
-<span class="nc" id="L159">        java.util.Map&lt;String, Object&gt; body = new java.util.LinkedHashMap&lt;&gt;();</span>
-<span class="nc bnc" id="L160" title="All 2 branches missed.">        body.put(&quot;message&quot;, message != null ? message : &quot;Request could not be processed&quot;);</span>
-<span class="nc" id="L161">        return body;</span>
+<span class="nc" id="L158">        java.util.Map&lt;String, Object&gt; body = new java.util.LinkedHashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        body.put(&quot;message&quot;, message != null ? message : &quot;Request could not be processed&quot;);</span>
+<span class="nc" id="L160">        return body;</span>
     }
 
     @lombok.Data

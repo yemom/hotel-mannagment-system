@@ -74,21 +74,21 @@ public class SpaService {
 
     // Domain validation methods
     public boolean isValidPrice() {
-<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        return price != null</span>
+<span class="pc bpc" id="L77" title="1 of 4 branches missed.">        return price != null</span>
 <span class="fc bfc" id="L78" title="All 2 branches covered.">                &amp;&amp; price.compareTo(BigDecimal.ZERO) &gt; 0</span>
-<span class="fc bfc" id="L79" title="All 2 branches covered.">                &amp;&amp; price.compareTo(new BigDecimal(&quot;5000.00&quot;)) &lt;= 0;</span>
+<span class="fc" id="L79">                &amp;&amp; price.compareTo(new BigDecimal(&quot;5000.00&quot;)) &lt;= 0;</span>
     }
 
     public boolean isValidDuration() {
-<span class="fc bfc" id="L83" title="All 2 branches covered.">        return durationMinutes != null</span>
+<span class="fc bfc" id="L83" title="All 4 branches covered.">        return durationMinutes != null</span>
 <span class="fc bfc" id="L84" title="All 2 branches covered.">                &amp;&amp; durationMinutes &gt;= 15</span>
-<span class="fc bfc" id="L85" title="All 2 branches covered.">                &amp;&amp; durationMinutes &lt;= 480;</span>
+<span class="fc" id="L85">                &amp;&amp; durationMinutes &lt;= 480;</span>
     }
 
     public boolean isValidCapacity() {
-<span class="fc bfc" id="L89" title="All 2 branches covered.">        return capacity != null</span>
+<span class="fc bfc" id="L89" title="All 4 branches covered.">        return capacity != null</span>
 <span class="fc bfc" id="L90" title="All 2 branches covered.">                &amp;&amp; capacity &gt;= 1</span>
-<span class="fc bfc" id="L91" title="All 2 branches covered.">                &amp;&amp; capacity &lt;= 20;</span>
+<span class="fc" id="L91">                &amp;&amp; capacity &lt;= 20;</span>
     }
 
     public boolean isAvailable() {

@@ -14,22 +14,21 @@ import java.util.List;
 @RestController
 @RequestMapping({&quot;/api/restaurant/tables&quot;, &quot;/restaurant/tables&quot;})
 @RequiredArgsConstructor
-@CrossOrigin(origins = {&quot;http://localhost:3000&quot;, &quot;http://localhost:5173&quot;})
 public class RestaurantTableController {
 
     private final RestaurantTableService tableService;
 
     @GetMapping
     public ResponseEntity&lt;List&lt;RestaurantTable&gt;&gt; getAll() {
-<span class="fc" id="L24">        return ResponseEntity.ok(tableService.getAll());</span>
+<span class="fc" id="L23">        return ResponseEntity.ok(tableService.getAll());</span>
     }
 
     @GetMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;RestaurantTable&gt; getById(@PathVariable Long id) {
         try {
-<span class="fc" id="L30">            return ResponseEntity.ok(tableService.getById(id));</span>
-<span class="nc" id="L31">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L32">            return ResponseEntity.notFound().build();</span>
+<span class="fc" id="L29">            return ResponseEntity.ok(tableService.getById(id));</span>
+<span class="nc" id="L30">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L31">            return ResponseEntity.notFound().build();</span>
         }
     }
 
@@ -42,7 +41,7 @@ public class RestaurantTableController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam String timeSlot,
             @RequestParam(defaultValue = &quot;1&quot;) int partySize) {
-<span class="nc" id="L45">        return ResponseEntity.ok(tableService.getAvailable(date, timeSlot, partySize));</span>
+<span class="nc" id="L44">        return ResponseEntity.ok(tableService.getAvailable(date, timeSlot, partySize));</span>
     }
 
     @PutMapping(&quot;/{id}/status&quot;)
@@ -50,29 +49,29 @@ public class RestaurantTableController {
             @PathVariable Long id,
             @RequestParam String status) {
         try {
-<span class="fc" id="L53">            return ResponseEntity.ok(tableService.updateStatus(id, status));</span>
-<span class="nc" id="L54">        } catch (IllegalArgumentException e) {</span>
-<span class="nc" id="L55">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+<span class="fc" id="L52">            return ResponseEntity.ok(tableService.updateStatus(id, status));</span>
+<span class="nc" id="L53">        } catch (IllegalArgumentException e) {</span>
+<span class="nc" id="L54">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
     }
 
     @PostMapping
     public ResponseEntity&lt;RestaurantTable&gt; createTable(@RequestBody RestaurantTable table) {
         try {
-<span class="fc" id="L62">            RestaurantTable created = tableService.createTable(table);</span>
-<span class="fc" id="L63">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
-<span class="nc" id="L64">        } catch (Exception e) {</span>
-<span class="nc" id="L65">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
+<span class="fc" id="L61">            RestaurantTable created = tableService.createTable(table);</span>
+<span class="fc" id="L62">            return ResponseEntity.status(HttpStatus.CREATED).body(created);</span>
+<span class="nc" id="L63">        } catch (Exception e) {</span>
+<span class="nc" id="L64">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();</span>
         }
     }
 
     @DeleteMapping(&quot;/{id}&quot;)
     public ResponseEntity&lt;Void&gt; deleteTable(@PathVariable Long id) {
         try {
-<span class="fc" id="L72">            tableService.deleteTable(id);</span>
-<span class="fc" id="L73">            return ResponseEntity.noContent().build();</span>
-<span class="nc" id="L74">        } catch (Exception e) {</span>
-<span class="nc" id="L75">            return ResponseEntity.notFound().build();</span>
+<span class="fc" id="L71">            tableService.deleteTable(id);</span>
+<span class="fc" id="L72">            return ResponseEntity.noContent().build();</span>
+<span class="nc" id="L73">        } catch (Exception e) {</span>
+<span class="nc" id="L74">            return ResponseEntity.notFound().build();</span>
         }
     }
 }
