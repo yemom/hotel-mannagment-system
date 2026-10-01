@@ -3,7 +3,9 @@ package com.hotelmanagement.system;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.TestInstance;
 
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -12,11 +14,16 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.File;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 
+import org.junit.jupiter.api.Assumptions;
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseSystemTest {
 
         protected WebDriver driver;
@@ -26,13 +33,35 @@ public abstract class BaseSystemTest {
                         "http://localhost:5173");
 
         /**
-         * REST base of the running Spring Boot backend. The application is deployed
-         * with {@code server.servlet.context-path=/api} and every controller is
-         * mapped under {@code /api/**}, so the effective prefix is {@code /api/api}.
+         * REST base of the running Spring Boot backend.
+         * The application is deployed with {@code server.servlet.context-path=/api}
+         * and every controller is mapped under {@code /api/**}, so the full
+         * effective URL prefix for REST calls is {@code /api/api} (context + mapping).
          */
         protected static final String BACKEND_URL = System.getProperty(
                         "backend.url",
                         "http://localhost:8085/api/api");
+
+        /**
+         * Skip the entire test class if the frontend is not reachable.
+         * This prevents Selenium system tests from failing in unit-only CI
+         * runs where no browser stack has been started.
+         */
+        @BeforeAll
+        void requireFrontend() {
+                boolean reachable = false;
+                try {
+                        HttpURLConnection conn = (HttpURLConnection)
+                                new URL(FRONTEND_URL).openConnection();
+                        conn.setConnectTimeout(3000);
+                        conn.setReadTimeout(3000);
+                        conn.connect();
+                        reachable = (conn.getResponseCode() > 0);
+                        conn.disconnect();
+                } catch (Exception ignored) { /* server not running */ }
+                Assumptions.assumeTrue(reachable,
+                        "Skipping Selenium system tests: frontend not reachable at " + FRONTEND_URL);
+        }
 
         private final long visualPauseMs = Long.parseLong(
                         System.getProperty(

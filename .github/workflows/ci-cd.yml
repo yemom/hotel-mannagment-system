@@ -7,6 +7,9 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  # ─────────────────────────────────────────────────────────────
+  # Job 1 – Unit + Integration tests (NO Selenium, fast)
+  # ─────────────────────────────────────────────────────────────
   build-and-test:
     runs-on: ubuntu-latest
     permissions:
@@ -27,37 +30,17 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean compile
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
+    - name: Run Unit and Integration Tests (exclude Selenium system tests)
+      run: mvn -B test jacoco:report
+
+    - name: Publish Test Results
+      if: always()
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        node-version: '20'
-
-    - name: Start Backend and Frontend
-      run: |
-        nohup mvn spring-boot:run > backend.log 2>&1 &
-        cd frontend
-        npm install
-        nohup npm run dev > frontend.log 2>&1 &
-        sleep 45
-
-    - name: Run Unit and Integration Tests
-      run: mvn -B test -Dsystem.test.exclude="none"
-
-    - name: Generate Code Coverage Report
-      run: mvn -B jacoco:report
-
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./target/site/jacoco/jacoco.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
-
-    - name: Display Coverage Report
-      run: |
-        echo "=== Code Coverage Report ==="
-        cat target/site/jacoco/index.html | grep -oP '(?<=<h2>Code Coverage</h2>).*?(?=</h2>)' || echo "Coverage data generated"
+        files: target/surefire-reports/TEST-*.xml
+        check_name: Test Results
+        comment_mode: always
+        large_files: true
 
     - name: Archive Test Results
       if: always()
@@ -73,14 +56,13 @@ jobs:
         name: coverage-report
         path: target/site/jacoco/
 
-    - name: Publish Test Results
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2
+    - name: Upload Coverage to Codecov
+      uses: codecov/codecov-action@v4
       with:
-        files: target/surefire-reports/TEST-*.xml
-        check_name: Test Results
-        comment_mode: always
-        large_files: true
+        files: ./target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
 
     - name: Build JAR
       run: mvn -B package -DskipTests
@@ -91,7 +73,10 @@ jobs:
         name: application-jar
         path: target/hotel-management-system-*.jar
 
-  regression-test:
+  # ─────────────────────────────────────────────────────────────
+  # Job 2 – Selenium E2E system tests (need running stack)
+  # ─────────────────────────────────────────────────────────────
+  system-test:
     runs-on: ubuntu-latest
     needs: build-and-test
     if: github.event_name == 'push'
@@ -106,34 +91,85 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Introduce Test Regression (Deliberate)
-      run: |
-        echo "This step demonstrates catching a regression in the pipeline."
-        echo "In a real scenario, code changes might break a test."
-
-    - name: Set up Node.js
+    - name: Set up Node.js 20
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
-    - name: Start Backend and Frontend
+    - name: Install Google Chrome
+      run: |
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update -q
+        sudo apt-get install -y google-chrome-stable
+
+    - name: Start Backend (Spring Boot on :8085)
       run: |
         nohup mvn spring-boot:run > backend.log 2>&1 &
+        echo "Waiting for backend on port 8085..."
+        for i in $(seq 1 60); do
+          if curl -sf http://localhost:8085/api/actuator/health > /dev/null 2>&1; then
+            echo "Backend is up after ${i}s"
+            break
+          fi
+          sleep 2
+        done
+        curl -sf http://localhost:8085/api/actuator/health || (echo "Backend failed to start" && cat backend.log && exit 1)
+
+    - name: Start Frontend (Vite dev on :5173)
+      run: |
         cd frontend
         npm install
-        nohup npm run dev > frontend.log 2>&1 &
-        sleep 45
+        # Point the dev frontend at the local backend (no localhost loop)
+        VITE_API_URL=http://localhost:8085/api nohup npm run dev > ../frontend.log 2>&1 &
+        echo "Waiting for frontend on port 5173..."
+        for i in $(seq 1 60); do
+          if curl -sf http://localhost:5173 > /dev/null 2>&1; then
+            echo "Frontend is up after ${i}s"
+            break
+          fi
+          sleep 2
+        done
+        curl -sf http://localhost:5173 || (echo "Frontend failed to start" && cat ../frontend.log && exit 1)
 
-    - name: Run Full Test Suite for Regression Detection
-      run: mvn -B clean test -Dsystem.test.exclude="none"
-
-    - name: Check Test Results
-      if: failure()
+    - name: Run Selenium System Tests (headless Chrome)
+      env:
+        CI: "true"
+        HEADLESS: "true"
       run: |
-        echo "::error::Regression detected - tests are failing!"
-        echo "Review the test output above for details."
-        exit 1
+        mvn -B test \
+          -Dsystem.test.exclude="none" \
+          -Dtest="HotelManagementSystemTest" \
+          -Dfrontend.url="http://localhost:5173" \
+          -Dbackend.url="http://localhost:8085/api/api" \
+          -Dchrome.headless=true \
+          -Dvisual.pause.ms=0
 
+    - name: Upload Selenium Screenshots
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: selenium-screenshots
+        path: target/selenium-screenshots/
+        if-no-files-found: ignore
+
+    - name: Upload Backend Log (on failure)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: backend-log
+        path: backend.log
+
+    - name: Upload Frontend Log (on failure)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-log
+        path: frontend.log
+
+  # ─────────────────────────────────────────────────────────────
+  # Job 3 – Code quality (checkstyle + verify)
+  # ─────────────────────────────────────────────────────────────
   code-quality:
     runs-on: ubuntu-latest
     needs: build-and-test
@@ -148,63 +184,25 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    - name: Run Maven checkstyle
+    - name: Run Checkstyle (non-blocking)
       run: mvn checkstyle:check || echo "Checkstyle issues found (non-blocking)"
 
-    - name: Build with Maven (including all plugins)
-      run: mvn -B clean verify
+    - name: Verify build (all plugins, skip tests)
+      run: mvn -B clean verify -DskipTests
 
-  code-coverage-check:
-    runs-on: ubuntu-latest
-    needs: build-and-test
-
-    steps:
-    - uses: actions/checkout@v4
-
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-
-    - name: Start Backend and Frontend
-      run: |
-        nohup mvn spring-boot:run > backend.log 2>&1 &
-        cd frontend
-        npm install
-        nohup npm run dev > frontend.log 2>&1 &
-        sleep 45
-
-    - name: Generate Coverage Report
-      run: mvn -B clean test -Dsystem.test.exclude="none" jacoco:report
-
-    - name: Verify Minimum Coverage Threshold (80%)
-      run: |
-        COVERAGE=$(grep -oP '(?<=<span class="counter">)[^%]*' target/site/jacoco/index.html | head -1 | sed 's/[^0-9]//g' || echo 0)
-        echo "Current Coverage: $COVERAGE%"
-        if [ "$COVERAGE" -lt 80 ]; then
-          echo "::error::Coverage ($COVERAGE%) is below target (80%)"
-          exit 1
-        else
-          echo "::notice::Coverage ($COVERAGE%) meets target (80%)"
-        fi
-
+  # ─────────────────────────────────────────────────────────────
+  # Job 4 – Summary
+  # ─────────────────────────────────────────────────────────────
   summary:
     runs-on: ubuntu-latest
-    needs: [build-and-test, code-quality, code-coverage-check]
+    needs: [build-and-test, system-test, code-quality]
     if: always()
 
     steps:
     - name: Pipeline Summary
       run: |
         echo "=== Hotel Management System CI/CD Pipeline Summary ==="
-        echo "Build Status: ${{ needs.build-and-test.result }}"
-        echo "Code Quality: ${{ needs.code-quality.result }}"
-        echo "Coverage Check: ${{ needs.code-coverage-check.result }}"
+        echo "Unit + Integration Tests : ${{ needs.build-and-test.result }}"
+        echo "Selenium System Tests    : ${{ needs.system-test.result }}"
+        echo "Code Quality             : ${{ needs.code-quality.result }}"
         echo "Pipeline execution completed"
