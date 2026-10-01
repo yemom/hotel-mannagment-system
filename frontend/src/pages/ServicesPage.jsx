@@ -87,7 +87,7 @@ const ServicesPage = () => {
           <h1>Everything You Need</h1>
           <p>
             From world-class wellness to curated dining, discover the full breadth of services
-            available during your stay at Aurelia Grand.
+            available during your stay at Yemom Grand.
           </p>
         </div>
       </header>

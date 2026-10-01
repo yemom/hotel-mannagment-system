@@ -35,7 +35,7 @@ const PublicNavbar = () => {
         <Link to="/" className="public-nav-brand">
           <div className="public-brand-mark">A</div>
           <div className="public-brand-text">
-            <span className="public-brand-title">Aurelia Grand</span>
+            <span className="public-brand-title">Yemom Grand</span>
             <span className="public-brand-subtitle">Luxury Sanctuary &amp; Spa</span>
           </div>
         </Link>

@@ -77,7 +77,7 @@ const Login = () => {
           <div className="auth-brand">
             <div className="auth-brand-mark">A</div>
             <div>
-              <h2 className="auth-brand-title">Aurelia Grand</h2>
+              <h2 className="auth-brand-title">Yemom Grand</h2>
               <span className="auth-brand-subtitle">Boutique Stays & Hospitality PMS</span>
             </div>
           </div>

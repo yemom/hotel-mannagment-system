@@ -418,7 +418,7 @@ const Rooms = () => {
                 <div>
                   <h2 style={{ margin: 0, fontSize: '20px', fontWeight: 800, color: 'var(--text)' }}>Add New Room to Inventory</h2>
                   <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-                    PROPERTY : ATELIER GRAND HOTEL &bull; CORE PMS REGISTRY
+                    PROPERTY : Yemom Grand HOTEL &bull; CORE PMS REGISTRY
                   </span>
                 </div>
               </div>

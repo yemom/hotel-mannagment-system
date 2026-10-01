@@ -78,7 +78,7 @@ const SignUp = () => {
           <div className="auth-brand">
             <div className="auth-brand-mark">A</div>
             <div>
-              <h2 className="auth-brand-title">Aurelia Grand</h2>
+              <h2 className="auth-brand-title">Yemom Grand</h2>
               <span className="auth-brand-subtitle">Guest Membership & Booking Portal</span>
             </div>
           </div>

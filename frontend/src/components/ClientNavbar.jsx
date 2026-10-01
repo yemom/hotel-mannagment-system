@@ -49,11 +49,11 @@ const ClientNavbar = ({ activeTab, onTabChange, reservationCount = 0 }) => {
           }}
           role="button"
           tabIndex={0}
-          title="Back to Aurelia Grand home"
+          title="Back to Yemom Grand home"
         >
           <div className="client-brand-mark public-brand-mark">A</div>
           <div className="public-brand-text">
-            <span className="client-brand-name public-brand-title">Aurelia Grand</span>
+            <span className="client-brand-name public-brand-title">Yemom Grand</span>
             <span className="client-brand-tagline public-brand-subtitle">
               Boutique Luxury Stays &amp; Dining
             </span>

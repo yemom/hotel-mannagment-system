@@ -80,3 +80,9 @@ This generated password is for development use only. Your security configuration
 2026-09-30 20:06:45.182  INFO 3772 --- [           main] com.hotelmanagement.config.DataSeeder    : Ensured 14 hotel rooms are registered in inventory (0 newly seeded)
 2026-09-30 20:06:45.187  INFO 3772 --- [           main] com.hotelmanagement.config.DataSeeder    : Spa services already seeded
 2026-09-30 20:06:45.187  INFO 3772 --- [           main] com.hotelmanagement.config.DataSeeder    : DataSeeder completed successfully on attempt 1
+2026-09-30 20:30:36.266  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m54s206ms719µs500ns).
+2026-10-01 08:43:10.187  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12h12m33s918ms961µs).
+2026-10-01 09:57:20.867  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=20m11s1ms57µs800ns).
+2026-10-01 10:16:30.226  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m9s358ms735µs400ns).
+2026-10-01 12:09:34.586  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m2s631ms462µs500ns).
+2026-10-01 14:14:26.712  WARN 3772 --- [l-1 housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2h1m52s72ms591µs100ns).

@@ -17,7 +17,7 @@ const Sidebar = () => {
         <div className="brand">
           <div className="brand-mark">A</div>
           <div>
-            <strong>Aurelia Grand</strong>
+            <strong>Yemom Grand</strong>
             <span>Boutique Hotel PMS</span>
           </div>
         </div>

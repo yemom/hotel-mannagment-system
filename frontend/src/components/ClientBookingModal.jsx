@@ -82,7 +82,7 @@ const ClientBookingModal = ({
         {/* Header */}
         <div className="modal-header">
           <div>
-            <span className="eyebrow" style={{ color: 'var(--accent)' }}>Aurelia Grand Accommodations</span>
+            <span className="eyebrow" style={{ color: 'var(--accent)' }}>Yemom Grand Accommodations</span>
             <h2>Confirm Your Room Stay</h2>
           </div>
           <button type="button" className="icon-button" onClick={onClose} aria-label="Close">
@@ -251,7 +251,7 @@ const ClientBookingModal = ({
                 </div>
                 <div className="prefill-item">
                   <span className="prefill-label">Hotel Member</span>
-                  <span className="prefill-val prefill-badge">Aurelia Grand VIP Guest</span>
+                  <span className="prefill-val prefill-badge">Yemom Grand VIP Guest</span>
                 </div>
               </div>
             </div>

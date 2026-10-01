@@ -11,7 +11,7 @@ const PublicFooter = () => {
             <div className="footer-brand">
               <span className="footer-brand-mark">A</span>
               <div>
-                <h3 className="footer-brand-name">Aurelia Grand</h3>
+                <h3 className="footer-brand-name">Yemom Grand</h3>
                 <span className="footer-brand-sub">Luxury Sanctuary &amp; Spa</span>
               </div>
             </div>
@@ -82,7 +82,7 @@ const PublicFooter = () => {
         </div>
 
         <div className="public-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Aurelia Grand Hotel Management System. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()}  Grand Hotel Management System. All rights reserved.</p>
           <div className="footer-bottom-links">
             <a href="#privacy" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
             <span>&bull;</span>

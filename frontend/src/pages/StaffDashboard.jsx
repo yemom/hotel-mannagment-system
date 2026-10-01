@@ -547,7 +547,7 @@ const StaffDashboard = () => {
           <div className="brand">
             <div className="brand-mark">A</div>
             <div>
-              <strong>Aurelia Grand</strong>
+              <strong>Yemom Grand</strong>
               <span>Front-Desk PMS (Staff)</span>
             </div>
           </div>

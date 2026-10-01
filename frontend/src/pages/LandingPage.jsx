@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import PublicFooter from '../components/PublicFooter';
-import { roomAPI, spaServiceAPI } from '../services/api';
+import { roomAPI, spaServiceAPI, restaurantTableAPI } from '../services/api';
 import { getRoomImage, getSpaImage } from '../utils/propertyImages';
 import { goToReserve } from '../utils/reserve';
 import { useAuth } from '../context/AuthContext';
@@ -34,16 +34,18 @@ const LandingPage = () => {
   // Live inventory — every value below is read from the backend, never invented.
   const [featuredRooms, setFeaturedRooms] = useState([]);
   const [featuredSpa, setFeaturedSpa] = useState([]);
+  const [diningTables, setDiningTables] = useState([]);
   const [previewLoading, setPreviewLoading] = useState(true);
   const [previewError, setPreviewError] = useState('');
-  const [inventory, setInventory] = useState({ roomCount: null, spaCount: null });
+  const [inventory, setInventory] = useState({ roomCount: null, spaCount: null, tableCount: null });
 
   const loadPreview = async () => {
     setPreviewLoading(true);
     setPreviewError('');
-    const [roomsResult, spaResult] = await Promise.allSettled([
+    const [roomsResult, spaResult, tablesResult] = await Promise.allSettled([
       roomAPI.getAll(),
       spaServiceAPI.getActive(),
+      restaurantTableAPI.getAll(),
     ]);
 
     if (roomsResult.status === 'fulfilled') {
@@ -65,6 +67,15 @@ const LandingPage = () => {
     } else {
       setFeaturedSpa([]);
       setInventory((prev) => ({ ...prev, spaCount: null }));
+    }
+
+    if (tablesResult.status === 'fulfilled') {
+      const list = Array.isArray(tablesResult.value.data) ? tablesResult.value.data : [];
+      setDiningTables(list);
+      setInventory((prev) => ({ ...prev, tableCount: list.length }));
+    } else {
+      setDiningTables([]);
+      setInventory((prev) => ({ ...prev, tableCount: null }));
     }
 
     setPreviewLoading(false);
@@ -112,11 +123,11 @@ const LandingPage = () => {
         <div className="landing-hero-content">
           <div className="hero-kicker">
             <span className="hero-kicker-dot" />
-            <span>AURELIA GRAND &bull; ADDIS ABABA &bull; EST. 2026</span>
+            <span>YEMOM HOTEL &bull; ADDIS ABABA &bull; EST. 2026</span>
           </div>
 
           <h1 className="hero-headline">
-            Aurelia Grand — A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
+            Yemom Hotel — A Sanctuary of Timeless Luxury &amp; Bespoke Hospitality
           </h1>
 
           <p className="hero-subheadline">
@@ -238,7 +249,7 @@ const LandingPage = () => {
             <div className="welcome-media">
               <img
                 src={HERO_BG}
-                alt="The architecture and atrium of Aurelia Grand"
+                alt="The architecture and atrium of Yemom Grand"
                 loading="lazy"
               />
             </div>
@@ -246,7 +257,7 @@ const LandingPage = () => {
               <span className="section-eyebrow">WELCOME</span>
               <h2>Arrive as a guest. Leave as part of the house.</h2>
               <p>
-                Aurelia Grand is an intimate luxury retreat in Bole, Addis Ababa — built around
+                Yemom Hotel is an intimate luxury retreat in Bole, Addis Ababa — built around
                 quiet architecture, warm materials, and hospitality that anticipates rather than
                 reacts. Every suite, treatment, and table is designed to slow the pace of your day.
               </p>
@@ -460,45 +471,23 @@ const LandingPage = () => {
       {/* Section 3: Fine Dining & Culinary Experience */}
       <section className="landing-section">
         <div className="section-container">
+          {/* Intro split */}
           <div className="dining-split-card">
             <div className="dining-image-column">
               <img
                 src={RESTAURANT_BG}
-                alt="Fine Dining at Aurelia Grand"
+                alt="Fine Dining at Yemom Hotel"
                 loading="lazy"
               />
             </div>
             <div className="dining-text-column">
               <span className="section-eyebrow">EPICUREAN EXCELLENCE</span>
-              <h2>Atelier Fine Dining &amp; Terrace</h2>
+              <h2>Yemom Fine Dining &amp; Terrace</h2>
               <p>
                 A sensory journey led by executive culinary artisans. From open-air sunset dinners
                 on our panoramic Balcony Terrace to intimate pairings in our subterranean wine cellar,
                 every dish celebrates seasonal organic gastronomy.
               </p>
-              <ul className="dining-highlights">
-                <li>
-                  <span className="material-symbols-outlined">restaurant</span>
-                  <div>
-                    <strong>Chef-Curated Tasting Menus</strong>
-                    <span>Crafted daily with hand-picked regional harvest</span>
-                  </div>
-                </li>
-                <li>
-                  <span className="material-symbols-outlined">deck</span>
-                  <div>
-                    <strong>Open-Air Balcony &amp; Pergola</strong>
-                    <span>Sunset vistas overlooking the fountain gardens</span>
-                  </div>
-                </li>
-                <li>
-                  <span className="material-symbols-outlined">wine_bar</span>
-                  <div>
-                    <strong>Sommelier Reserve Pairings</strong>
-                    <span>Curated cellar of vintage Ethiopian and European reserves</span>
-                  </div>
-                </li>
-              </ul>
               <div className="dining-cta-group">
                 <button
                   type="button"
@@ -512,6 +501,91 @@ const LandingPage = () => {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Live table listing from backend */}
+          <div style={{ marginTop: '48px' }}>
+            <div className="landing-section-header" style={{ marginBottom: '24px' }}>
+              <span className="section-eyebrow">AVAILABLE TABLES</span>
+              <h2 style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
+                Our Dining Tables
+                {inventory.tableCount !== null && (
+                  <span style={{
+                    marginLeft: '12px',
+                    fontSize: '14px',
+                    fontFamily: 'var(--font-sans)',
+                    fontWeight: 500,
+                    color: 'var(--muted)',
+                    letterSpacing: '0.05em',
+                  }}>
+                    {inventory.tableCount} tables
+                  </span>
+                )}
+              </h2>
+            </div>
+
+            {previewLoading && (
+              <div className="catalog-loading-state">
+                <span className="spinner-large" />
+                <p>Loading dining tables&hellip;</p>
+              </div>
+            )}
+
+            {!previewLoading && diningTables.length === 0 && (
+              <div className="empty-card">
+                <span className="material-symbols-outlined">restaurant</span>
+                <h3>No tables currently listed</h3>
+                <p>Our dining area is being set up. Please check back shortly or contact us directly.</p>
+              </div>
+            )}
+
+            {!previewLoading && diningTables.length > 0 && (
+              <div className="dining-tables-grid">
+                {diningTables.slice(0, 6).map((table) => (
+                  <div key={table.id} className="dining-table-card">
+                    <div className="dining-table-header">
+                      <span className="dining-table-number">Table {table.tableNumber}</span>
+                      <span className={`dining-table-status ${(table.status || 'AVAILABLE').toLowerCase()}`}>
+                        {table.status || 'AVAILABLE'}
+                      </span>
+                    </div>
+                    <div className="dining-table-body">
+                      <div className="dining-table-info">
+                        <span className="material-symbols-outlined">group</span>
+                        <span>{table.capacity} Guests</span>
+                      </div>
+                      {table.location && (
+                        <div className="dining-table-info">
+                          <span className="material-symbols-outlined">location_on</span>
+                          <span>{table.location}</span>
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      className="dining-table-cta"
+                      onClick={handleReserveTable}
+                    >
+                      {currentUser ? 'Reserve This Table' : 'Sign In to Reserve'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!previewLoading && diningTables.length > 6 && (
+              <div className="section-footer-cta" style={{ marginTop: '32px' }}>
+                <button
+                  type="button"
+                  className="public-outline-btn"
+                  onClick={handleReserveTable}
+                  style={{ color: 'var(--primary)', borderColor: 'var(--primary)' }}
+                >
+                  <span>View All {inventory.tableCount} Tables</span>
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -595,7 +669,7 @@ const LandingPage = () => {
             </span>
             <h2 style={{ color: '#ffffff' }}>Begins Here</h2>
             <p style={{ color: 'rgba(255,255,255,0.78)' }}>
-              Reserve directly with Aurelia Grand for preferred suite allocation, complimentary
+              Reserve directly with Yemom Grand for preferred suite allocation, complimentary
               artisan breakfast, and flexible arrival scheduling.
             </p>
             <div className="final-cta-actions">

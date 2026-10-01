@@ -158,7 +158,7 @@ const Guests = () => {
       {/* Header matching Image 3 */}
       <div className="section-heading" style={{ marginBottom: '20px' }}>
         <div>
-          <span className="eyebrow" style={{ color: 'var(--jade)' }}>HOSPITALITY OPERATIONS &bull; ATELIER GRAND HOTEL</span>
+          <span className="eyebrow" style={{ color: 'var(--jade)' }}>HOSPITALITY OPERATIONS &bull; Yemom Grand HOTEL</span>
           <h1 style={{ fontSize: '26px', margin: '4px 0 0', color: 'var(--text)' }}>Guest Relations &amp; Profile Directory</h1>
           <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
             Centralized guest portfolio with VIP status verification, preference logs, and stay ledger.

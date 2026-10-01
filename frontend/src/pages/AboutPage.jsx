@@ -48,7 +48,7 @@ const AboutPage = () => {
       <header className="rooms-header-banner">
         <div className="section-container banner-content">
           <span className="banner-kicker">OUR STORY</span>
-          <h1>About Aurelia Grand</h1>
+          <h1>About Yemom Grand</h1>
           <p>
             A boutique sanctuary where timeless Ethiopian hospitality meets world-class luxury.
             Founded with a single vision: to make every guest feel completely at home.
@@ -64,7 +64,7 @@ const AboutPage = () => {
               <span className="section-eyebrow">OUR PHILOSOPHY</span>
               <h2>Luxury with Soul</h2>
               <p>
-                At Aurelia Grand, we believe luxury is not defined by marble floors or thread counts alone —
+                At Yemom Grand, we believe luxury is not defined by marble floors or thread counts alone —
                 it is the invisible art of making a person feel seen, valued, and entirely cared for from
                 the moment they arrive until long after they depart.
               </p>
@@ -167,7 +167,7 @@ const AboutPage = () => {
           <h2>Experience It for Yourself</h2>
           <p>
             Words can only convey so much. We invite you to visit, stay, and discover what
-            makes Aurelia Grand unlike anywhere else.
+            makes Yemom Grand unlike anywhere else.
           </p>
           <div className="invitation-actions">
             <Link to="/rooms" className="public-cta-btn">

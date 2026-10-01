@@ -6409,7 +6409,7 @@ p {
 
 
 /* ============================================================
-   AURELIA GRAND — EDITORIAL WELCOME & FINAL CTA SECTIONS
+   Yemom Grand — EDITORIAL WELCOME & FINAL CTA SECTIONS
    ============================================================ */
 
 /* Welcome / Introduction editorial split */
@@ -6555,7 +6555,7 @@ p {
 }
 
 /* ============================================================
-   AURELIA GRAND — CLIENT PORTAL NAVBAR (matches landing navbar)
+   Yemom Grand — CLIENT PORTAL NAVBAR (matches landing navbar)
    ============================================================ */
 
 /* Client navbar adopts the landing-page dark charcoal identity */
@@ -8125,4 +8125,121 @@ p {
   max-width: 420px;
 }
 
+/* ─────────────────────────────────────────
+   Landing Page — Dining Tables Grid
+   ───────────────────────────────────────── */
 
+.dining-tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.dining-table-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-line);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.dining-table-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+.dining-table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--surface-line);
+}
+
+.dining-table-number {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.dining-table-status {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.dining-table-status.available {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.dining-table-status.occupied {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.dining-table-status.reserved {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.dining-table-status.maintenance {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.dining-table-body {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dining-table-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.dining-table-info .material-symbols-outlined {
+  font-size: 18px;
+  color: var(--accent);
+}
+
+.dining-table-cta {
+  width: 100%;
+  padding: 12px 18px;
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dining-table-cta:hover {
+  background: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .dining-tables-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dining-tables-grid {
+    grid-template-columns: 1fr;
+  }
+}
