@@ -1,24 +1,14 @@
 import axios from "axios";
 
-let rawBase =
+// VITE_API_URL should be the full base path to the API (no trailing slash).
+// For local dev:        http://localhost:8085/api   (or use the Vite proxy: /api)
+// For production:       https://your-backend.com/api
+const API_BASE_URL = (
   (typeof import.meta !== "undefined" &&
     import.meta.env &&
     import.meta.env.VITE_API_URL) ||
-  (typeof process !== "undefined" &&
-    process.env &&
-    (process.env.REACT_APP_API_URL || process.env.VITE_API_URL)) ||
-  "http://localhost:8085/api/api";
-
-const cleanUrl = rawBase.replace(/\/+$/, "");
-if (cleanUrl.endsWith("/api/api")) {
-  rawBase = cleanUrl;
-} else if (cleanUrl.endsWith("/api")) {
-  rawBase = `${cleanUrl}/api`;
-} else {
-  rawBase = `${cleanUrl}/api/api`;
-}
-
-const API_BASE_URL = rawBase;
+  "/api"
+).replace(/\/+$/, "");
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
