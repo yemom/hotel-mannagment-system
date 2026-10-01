@@ -2,9 +2,9 @@ name: Hotel Management System CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   # ─────────────────────────────────────────────────────────────
@@ -18,60 +18,60 @@ jobs:
       pull-requests: write
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Build with Maven
-      run: mvn -B clean compile
+      - name: Build with Maven
+        run: mvn -B clean compile
 
-    - name: Run Unit and Integration Tests (exclude Selenium system tests)
-      run: mvn -B test jacoco:report
+      - name: Run Unit and Integration Tests (exclude Selenium system tests)
+        run: mvn -B test jacoco:report
 
-    - name: Publish Test Results
-      if: always()
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      with:
-        files: target/surefire-reports/TEST-*.xml
-        check_name: Test Results
-        comment_mode: always
-        large_files: true
+      - name: Publish Test Results
+        if: always()
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          files: target/surefire-reports/TEST-*.xml
+          check_name: Test Results
+          comment_mode: always
+          large_files: true
 
-    - name: Archive Test Results
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: test-results
-        path: target/surefire-reports/
+      - name: Archive Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: target/surefire-reports/
 
-    - name: Archive Coverage Report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-report
-        path: target/site/jacoco/
+      - name: Archive Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: target/site/jacoco/
 
-    - name: Upload Coverage to Codecov
-      uses: codecov/codecov-action@v4
-      with:
-        files: ./target/site/jacoco/jacoco.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: false
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./target/site/jacoco/jacoco.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
 
-    - name: Build JAR
-      run: mvn -B package -DskipTests
+      - name: Build JAR
+        run: mvn -B package -DskipTests
 
-    - name: Archive Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: application-jar
-        path: target/hotel-management-system-*.jar
+      - name: Archive Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: application-jar
+          path: target/hotel-management-system-*.jar
 
   # ─────────────────────────────────────────────────────────────
   # Job 2 – Selenium E2E system tests (need running stack)
@@ -82,90 +82,91 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Set up Node.js 20
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-    - name: Install Google Chrome
-      run: |
-        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-        sudo apt-get update -q
-        sudo apt-get install -y google-chrome-stable
+      - name: Install Google Chrome
+        run: |
+          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update -q
+          sudo apt-get install -y google-chrome-stable
 
-    - name: Start Backend (Spring Boot on :8085)
-      run: |
-        nohup mvn spring-boot:run > backend.log 2>&1 &
-        echo "Waiting for backend on port 8085..."
-        for i in $(seq 1 60); do
-          if curl -sf http://localhost:8085/api/actuator/health > /dev/null 2>&1; then
-            echo "Backend is up after ${i}s"
-            break
-          fi
-          sleep 2
-        done
-        curl -sf http://localhost:8085/api/actuator/health || (echo "Backend failed to start" && cat backend.log && exit 1)
+      - name: Start Backend (Spring Boot on :8085)
+        run: |
+          nohup mvn spring-boot:run > backend.log 2>&1 &
+          echo "Waiting for backend on port 8085..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8085/api/actuator/health > /dev/null 2>&1; then
+              echo "Backend is up after ${i}s"
+              break
+            fi
+            sleep 2
+          done
+          curl -sf http://localhost:8085/api/actuator/health || (echo "Backend failed to start" && cat backend.log && exit 1)
 
-    - name: Start Frontend (Vite dev on :5173)
-      run: |
-        cd frontend
-        npm install
-        # Point the dev frontend at the local backend (no localhost loop)
-        VITE_API_URL=http://localhost:8085/api nohup npm run dev > ../frontend.log 2>&1 &
-        echo "Waiting for frontend on port 5173..."
-        for i in $(seq 1 60); do
-          if curl -sf http://localhost:5173 > /dev/null 2>&1; then
-            echo "Frontend is up after ${i}s"
-            break
-          fi
-          sleep 2
-        done
-        curl -sf http://localhost:5173 || (echo "Frontend failed to start" && cat ../frontend.log && exit 1)
+      - name: Start Frontend (Vite dev on :5173)
+        run: |
+          cd frontend
+          npm install
+          chmod +x node_modules/.bin/vite || true
+          # Point the dev frontend at the local backend (no localhost loop)
+          VITE_API_URL=http://localhost:8085/api nohup npm run dev > ../frontend.log 2>&1 &
+          echo "Waiting for frontend on port 5173..."
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:5173 > /dev/null 2>&1; then
+              echo "Frontend is up after ${i}s"
+              break
+            fi
+            sleep 2
+          done
+          curl -sf http://localhost:5173 || (echo "Frontend failed to start" && cat ../frontend.log && exit 1)
 
-    - name: Run Selenium System Tests (headless Chrome)
-      env:
-        CI: "true"
-        HEADLESS: "true"
-      run: |
-        mvn -B test \
-          -Dsystem.test.exclude="none" \
-          -Dtest="HotelManagementSystemTest" \
-          -Dfrontend.url="http://localhost:5173" \
-          -Dbackend.url="http://localhost:8085/api/api" \
-          -Dchrome.headless=true \
-          -Dvisual.pause.ms=0
+      - name: Run Selenium System Tests (headless Chrome)
+        env:
+          CI: "true"
+          HEADLESS: "true"
+        run: |
+          mvn -B test \
+            -Dsystem.test.exclude="none" \
+            -Dtest="HotelManagementSystemTest" \
+            -Dfrontend.url="http://localhost:5173" \
+            -Dbackend.url="http://localhost:8085/api/api" \
+            -Dchrome.headless=true \
+            -Dvisual.pause.ms=0
 
-    - name: Upload Selenium Screenshots
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: selenium-screenshots
-        path: target/selenium-screenshots/
-        if-no-files-found: ignore
+      - name: Upload Selenium Screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-screenshots
+          path: target/selenium-screenshots/
+          if-no-files-found: ignore
 
-    - name: Upload Backend Log (on failure)
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: backend-log
-        path: backend.log
+      - name: Upload Backend Log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-log
+          path: backend.log
 
-    - name: Upload Frontend Log (on failure)
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-log
-        path: frontend.log
+      - name: Upload Frontend Log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-log
+          path: frontend.log
 
   # ─────────────────────────────────────────────────────────────
   # Job 3 – Code quality (checkstyle + verify)
@@ -175,20 +176,20 @@ jobs:
     needs: build-and-test
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up JDK 21
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: maven
 
-    - name: Run Checkstyle (non-blocking)
-      run: mvn checkstyle:check || echo "Checkstyle issues found (non-blocking)"
+      - name: Run Checkstyle (non-blocking)
+        run: mvn checkstyle:check || echo "Checkstyle issues found (non-blocking)"
 
-    - name: Verify build (all plugins, skip tests)
-      run: mvn -B clean verify -DskipTests
+      - name: Verify build (all plugins, skip tests)
+        run: mvn -B clean verify -DskipTests
 
   # ─────────────────────────────────────────────────────────────
   # Job 4 – Summary
@@ -199,10 +200,10 @@ jobs:
     if: always()
 
     steps:
-    - name: Pipeline Summary
-      run: |
-        echo "=== Hotel Management System CI/CD Pipeline Summary ==="
-        echo "Unit + Integration Tests : ${{ needs.build-and-test.result }}"
-        echo "Selenium System Tests    : ${{ needs.system-test.result }}"
-        echo "Code Quality             : ${{ needs.code-quality.result }}"
-        echo "Pipeline execution completed"
+      - name: Pipeline Summary
+        run: |
+          echo "=== Hotel Management System CI/CD Pipeline Summary ==="
+          echo "Unit + Integration Tests : ${{ needs.build-and-test.result }}"
+          echo "Selenium System Tests    : ${{ needs.system-test.result }}"
+          echo "Code Quality             : ${{ needs.code-quality.result }}"
+          echo "Pipeline execution completed"
